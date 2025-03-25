@@ -1,0 +1,130 @@
+const fs = require('fs');
+const mysql = require('mysql2'); // Change to 'pg' for PostgreSQL
+
+// Load JSON
+const jsonData = JSON.parse(fs.readFileSync('pothen_esxes.json', 'utf8'));
+
+// Database connection
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'your_user',
+    password: 'your_password',
+    database: 'your_database'
+});
+
+connection.connect();
+
+async function insertData() {
+    for (const declaration of jsonData.declarations.declaration) {
+        const metadata = declaration.metadata;
+        const personalData = declaration.part[0].perosnalData;
+
+        // Insert into `people`
+        const [peopleResult] = await connection.promise().execute(
+            `INSERT INTO people (name, title, office, address, dob, id_number, marital_status, num_of_dependents, date_of_submission, 
+                political_affiliation, biography_link, image_link, wikidata_entity_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+            [
+                personalData.name.value,
+                metadata.title,
+                personalData.office.value,
+                personalData.address.value || null,
+                personalData.dob.metaValue || null,
+                personalData.id.value || null,
+                personalData.maritalStatus.value || null,
+                personalData.noOfDependants.metaValue || 0,
+                personalData.dateOfSubmission.metaValue || null,
+                metadata.politicalAffiliation,
+                metadata.biographyLink,
+                metadata.image,
+                metadata.wikidata_entity_id
+            ]
+        );
+
+        const personId = peopleResult.insertId;
+
+        // Insert properties
+        for (const part of declaration.part) {
+            if (part.subpart) {
+                for (const subpart of part.subpart) {
+                    if (subpart.properties && subpart.properties.property) {
+                        for (const prop of subpart.properties.property) {
+                            await connection.promise().execute(
+                                `INSERT INTO properties (person_id, location, type, topographic_data, acquisition_method, acquisition_year)
+                                VALUES (?, ?, ?, ?, ?, ?)`,
+                                [
+                                    personId,
+                                    prop.location.value || null,
+                                    prop.type.value || null,
+                                    prop.topographicData.value || null,
+                                    prop.acquisition.value || null,
+                                    prop.yearOfAcquisition.value || null
+                                ]
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        // Insert vehicles
+        for (const part of declaration.part) {
+            if (part.vehicles && part.vehicles.vehicle) {
+                for (const vehicle of part.vehicles.vehicle) {
+                    await connection.promise().execute(
+                        `INSERT INTO vehicles (person_id, description, value)
+                        VALUES (?, ?, ?)`,
+                        [
+                            personId,
+                            vehicle.vehicleDescription.value || null,
+                            parseFloat(vehicle.vehicleValue.metaValue) || null
+                        ]
+                    );
+                }
+            }
+        }
+
+        // Insert liquid assets
+        for (const part of declaration.part) {
+            if (part.subsubpart) {
+                for (const subsubpart of part.subsubpart) {
+                    if (subsubpart.liquidAssets && subsubpart.liquidAssets.liquidAsset) {
+                        for (const asset of subsubpart.liquidAssets.liquidAsset) {
+                            await connection.promise().execute(
+                                `INSERT INTO liquid_assets (person_id, asset_type, description, amount)
+                                VALUES (?, ?, ?, ?)`,
+                                [
+                                    personId,
+                                    asset.liquidAssetType.value || null,
+                                    asset.liquidAssetDescription.value || null,
+                                    asset.liquidAssetNumber.value || null
+                                ]
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        // Insert companies (if available)
+        for (const part of declaration.part) {
+            if (part.companies && part.companies.company) {
+                for (const company of part.companies.company) {
+                    await connection.promise().execute(
+                        `INSERT INTO companies (person_id, company_name)
+                        VALUES (?, ?)`,
+                        [personId, company.name.value || null]
+                    );
+                }
+            }
+        }
+
+        console.log(`Inserted: ${personalData.name.value}`);
+    }
+
+    console.log("Data inserted successfully!");
+    connection.end();
+}
+
+// Run the function
+insertData().catch(console.error);
