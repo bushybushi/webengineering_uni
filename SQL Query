@@ -1,0 +1,51 @@
+CREATE TABLE people (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    title VARCHAR(255),
+    office VARCHAR(255),
+    address TEXT,
+    dob DATE,
+    id_number VARCHAR(50),
+    marital_status VARCHAR(50),
+    num_of_dependents INT,
+    date_of_submission DATE,
+    political_affiliation VARCHAR(255),
+    biography_link TEXT,
+    image_link TEXT,
+    wikidata_entity_id VARCHAR(50)
+);
+
+CREATE TABLE properties (
+    id SERIAL PRIMARY KEY,
+    person_id INT,
+    location TEXT,
+    type VARCHAR(255),
+    topographic_data TEXT,
+    acquisition_method TEXT,
+    acquisition_year VARCHAR(20),
+    FOREIGN KEY (person_id) REFERENCES people(id)
+);
+
+CREATE TABLE vehicles (
+    id SERIAL PRIMARY KEY,
+    person_id INT,
+    description TEXT,
+    value DECIMAL(15,2),
+    FOREIGN KEY (person_id) REFERENCES people(id)
+);
+
+CREATE TABLE companies (
+    id SERIAL PRIMARY KEY,
+    person_id INT,
+    company_name TEXT,
+    FOREIGN KEY (person_id) REFERENCES people(id)
+);
+
+CREATE TABLE liquid_assets (
+    id SERIAL PRIMARY KEY,
+    person_id INT,
+    asset_type TEXT,
+    description TEXT,
+    amount VARCHAR(255),
+    FOREIGN KEY (person_id) REFERENCES people(id)
+);
