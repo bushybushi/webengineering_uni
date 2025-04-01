@@ -1,9 +1,32 @@
+.fi {
+    border-radius: 0.3rem;
+}
+.navbar {
+    height: 76px;
+    padding: 0.5rem 0;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: #333;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #ED9635;
+}
 
 .hero-section {
-    background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+    background: linear-gradient(135deg, #ED9635 0%, #f0a85a 100%);
     color: white;
     padding: 6rem 0;
     margin-bottom: 4rem;
+    margin-top: 70px;
 }
 .hero-title {
     font-size: 3.5rem;
@@ -26,7 +49,7 @@
 }
 .feature-icon {
     font-size: 2.5rem;
-    color: #0d6efd;
+    color: #ED9635;
     margin-bottom: 1rem;
 }
 .latest-declarations {
@@ -50,7 +73,7 @@
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    color: #0d6efd;
+    color: #000000;
 }
 .stats-card {
     background: white;
@@ -61,7 +84,7 @@
 .stat-number {
     font-size: 2rem;
     font-weight: 700;
-    color: #0d6efd;
+    color: #ED9635;
 }
 .stat-label {
     color: #6c757d;
@@ -74,12 +97,13 @@
     border-radius: 50%;
     border: none;
     background: #e9ecef;
-    color: #0d6efd;
+    color: #000000;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
     transition: all 0.3s ease;
+    margin: 0 0.5rem;
 }
 .profile-btn:hover {
     background: #dee2e6;
@@ -98,70 +122,34 @@
 }
 .dropdown-item:hover {
     background-color: #f8f9fa;
-    color: #0d6efd;
+    color: #ED9635;
 }
 .dropdown-item i {
     margin-right: 0.5rem;
     width: 1.2rem;
     text-align: center;
 }
-
-
-
-.profile-btn {
+.lang-btn {
     width: 40px;
     height: 40px;
     padding: 0;
     border-radius: 50%;
     border: none;
     background: #e9ecef;
-    color: #0d6efd;
+    color: #000000;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
     transition: all 0.3s ease;
+    margin: 0 0.5rem;
 }
-.lang-btn {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    border-radius: 50%;
-    border: none;
-    background: #e9ecef;
-    color: #0d6efd;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-.profile-btn:hover, .lang-btn:hover {
+.lang-btn:hover {
     background: #dee2e6;
     transform: scale(1.05);
 }
-.dropdown-menu {
-    border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    padding: 0.5rem;
-}
-.dropdown-item {
-    border-radius: 5px;
-    padding: 0.5rem 1rem;
-    color: #212529;
-}
-.dropdown-item:hover {
-    background-color: #f8f9fa;
-    color: #0d6efd;
-}
-.dropdown-item i {
-    margin-right: 0.5rem;
-    width: 1.2rem;
-    text-align: center;
-}
 .lang-btn.active {
-    background: #0d6efd;
+    background: #000000;
     color: white;
 }
 .feature-card {
@@ -191,9 +179,248 @@
 .stat-value {
     font-size: 2rem;
     font-weight: bold;
-    color: #0d6efd;
+    color: #ED9635;
 }
 .stat-label {
     color: #6c757d;
     font-size: 0.9rem;
+}
+.btn-outline-primary:hover {
+    background-color: #ED9635;
+    border-color: #ED9635;
+    color: white !important;
+}
+.btn-primary:hover {
+    background-color: #d67b1f;
+    border-color: #d67b1f;
+    color: white !important;
+}
+.btn-light:hover {
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+    color: #ED9635 !important;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 4rem 0;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .feature-card {
+        margin-bottom: 1rem;
+    }
+
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+
+    .declaration-item {
+        padding: 0.75rem 0;
+    }
+
+    .avatar-circle {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+    }
+
+    .feature-icon {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .navbar {
+        height: 66px;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .feature-icon {
+        font-size: 1.75rem;
+    }
+}
+
+/* Mobile Navigation Styles */
+@media (max-width: 991px) {
+    .navbar-toggler {
+        padding: 0.5rem;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-toggler:focus {
+        box-shadow: none;
+        background-color: #f8f9fa;
+    }
+
+    .navbar-toggler-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    /* Offcanvas Styles */
+    .offcanvas {
+        width: 300px;
+        border-left: 1px solid #dee2e6;
+    }
+
+    .offcanvas-header {
+        padding: 1rem 1.5rem;
+    }
+
+    .offcanvas-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .offcanvas-body {
+        padding: 1.5rem;
+    }
+
+    .offcanvas .nav-link {
+        color: #333;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .offcanvas .nav-link:hover {
+        color: #ED9635;
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    .offcanvas .nav-link i {
+        font-size: 1.1rem;
+        color: #6c757d;
+        transition: color 0.2s ease;
+    }
+
+    .offcanvas .nav-link:hover i {
+        color: #ED9635;
+    }
+
+    .offcanvas .border-top {
+        border-color: #eee !important;
+    }
+
+    .offcanvas .fw-medium {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+@media (max-width: 576px) {
+    .offcanvas {
+        width: 100%;
+    }
+}
+
+/* Desktop Navigation Styles */
+.lang-btn, .profile-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+    background: #e9ecef;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    margin: 0 0.5rem;
+}
+
+.lang-btn:hover, .profile-btn:hover {
+    background: #dee2e6;
+    transform: scale(1.05);
+}
+
+.lang-btn.active, .profile-btn.active {
+    background: #000000;
+    color: white;
+}
+
+@media (min-width: 992px) {
+    .navbar-nav .nav-item:last-child {
+        margin-left: 0.5rem;
+    }
+}
+
+.offcanvas {
+    max-width: 70%;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+footer a {
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: #ED9635;
+}
+
+footer .text-decoration-none {
+    position: relative;
+}
+
+footer .text-decoration-none::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #ED9635;
+    transition: width 0.3s ease;
+}
+
+footer .text-decoration-none:hover::after {
+    width: 100%;
 }
