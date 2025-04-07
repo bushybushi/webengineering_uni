@@ -1,9 +1,8 @@
 <?php
 require_once '../../config/db_connection.php';
 
-// Initialize database connection
-$database = new Database();
-$conn = $database->getConnection();
+// Get database connection
+$conn = require '../../config/db_connection.php';
 
 // Calculate statistics
 try {
