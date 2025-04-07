@@ -119,7 +119,7 @@ try {
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="../../index.html">
+            <a class="navbar-brand d-flex align-items-center" href="../../index.php">
                 <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
                 <span class="fw-bold">ΠΟΘΕΝ ΕΣΧΕΣ</span>
             </a>
@@ -133,7 +133,7 @@ try {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="../../index.html">Home</a>
+                        <a class="nav-link" href="../../index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="./search.php">Search</a>
@@ -161,8 +161,8 @@ try {
                                 <i class="bi bi-person-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="../login_module/login.html"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
-                                <li><a class="dropdown-item" href="../login_module/register.html"><i class="bi bi-person-plus"></i> Register</a></li>
+                                <li><a class="dropdown-item" href="../login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+                                <li><a class="dropdown-item" href="../login_module/register.php"><i class="bi bi-person-plus"></i> Register</a></li>
                             </ul>
                         </div>
                     </li>
@@ -276,47 +276,6 @@ try {
                             <h5 class="card-title mb-4">Declarations by Political Party</h5>
                             <div class="chart-container">
                                 <canvas id="partyChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Asset Distribution -->
-                <div class="col-lg-6">
-                    <div class="card feature-card">
-                        <div class="card-body">
-                            <h5 class="card-title mb-4">Declaration Distribution by Office</h5>
-                            <div class="chart-container">
-                                <canvas id="officeChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row mt-4">
-                <!-- Yearly Trends -->
-                <div class="col-lg-8">
-                    <div class="card feature-card">
-                        <div class="card-body">
-                            <h5 class="card-title mb-4">Yearly Declaration Trends</h5>
-                            <div class="chart-container">
-                                <canvas id="trendChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Top Positions -->
-                <div class="col-lg-4">
-                    <div class="card feature-card">
-                        <div class="card-body">
-                            <h5 class="card-title mb-4">Top Positions</h5>
-                            <div class="list-group list-group-flush">
-                                <?php foreach ($topPositions as $position): ?>
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <?php echo htmlspecialchars($position['office']); ?>
-                                    <span class="badge bg-warning text-dark rounded-pill"><?php echo $position['count']; ?></span>
-                                </div>
-                                <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
