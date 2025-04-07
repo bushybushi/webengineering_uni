@@ -1,6 +1,6 @@
 <?php
 // Include config file
-$pdo = require_once "db_connection.php";
+$pdo = require_once "../../config/db_connection.php";
 
 // Define variables and initialize with empty values
 $first_name = $last_name = $email = $password = $confirm_password = $role = "";
@@ -136,7 +136,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $pdo->commit();
             
             // Redirect to login page
-            header("location: login.php");
+            header("location: ../../login.php");
             exit();
             
         } catch(PDOException $e) {
@@ -158,7 +158,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="../../assets/css/style.css" rel="stylesheet">
 </head>
 <body class="bg-light">
     <!-- Main Content -->
@@ -168,7 +168,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="card feature-card shadow-sm">
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
-                            <img src="assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
+                            <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
                             <h2 class="fw-bold">Create Account</h2>
                             <p class="text-muted">Join ΠΟΘΕΝ ΕΣΧΕΣ to submit your asset declarations</p>
                         </div>
@@ -221,77 +221,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                     </div>
                                 </div>
 
-                                <!-- Additional Information -->
-                                <div class="col-12">
-                                    <label class="form-label">Title</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                                        <input type="text" name="title" class="form-control" value="<?php echo $title; ?>">
-                                    </div>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label">Office</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-building"></i></span>
-                                        <input type="text" name="office" class="form-control" value="<?php echo $office; ?>">
-                                    </div>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label">Address</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                        <textarea name="address" class="form-control"><?php echo $address; ?></textarea>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Date of Birth</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-                                        <input type="date" name="dob" class="form-control" value="<?php echo $dob; ?>">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">ID Number</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-card-text"></i></span>
-                                        <input type="text" name="id_number" class="form-control" value="<?php echo $id_number; ?>">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Marital Status</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-people"></i></span>
-                                        <select name="marital_status" class="form-select">
-                                            <option value="">Select status</option>
-                                            <option value="Single" <?php echo ($marital_status == "Single") ? 'selected' : ''; ?>>Single</option>
-                                            <option value="Married" <?php echo ($marital_status == "Married") ? 'selected' : ''; ?>>Married</option>
-                                            <option value="Divorced" <?php echo ($marital_status == "Divorced") ? 'selected' : ''; ?>>Divorced</option>
-                                            <option value="Widowed" <?php echo ($marital_status == "Widowed") ? 'selected' : ''; ?>>Widowed</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Number of Dependents</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-people-fill"></i></span>
-                                        <input type="number" name="num_of_dependents" class="form-control" value="<?php echo $num_of_dependents; ?>" min="0">
-                                    </div>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label">Political Affiliation</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-flag"></i></span>
-                                        <input type="text" name="political_affiliation" class="form-control" value="<?php echo $political_affiliation; ?>">
-                                    </div>
-                                </div>
-
                                 <div class="col-12">
                                     <label class="form-label">Position/Role</label>
                                     <div class="input-group">
@@ -323,7 +252,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 <p class="mb-0">Already have an account? <a href="login.php" class="text-decoration-none">Sign in</a></p>
                             </div>
                             <div class="text-center">
-                                <p class="mb-0"><a href="index.php" class="text-decoration-none">Back to Home</a></p>
+                                <p class="mb-0"><a href="../../index.php" class="text-decoration-none">Back to Home</a></p>
                             </div>
                         </form>
                     </div>
