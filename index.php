@@ -63,7 +63,7 @@
                         <a class="nav-link" href="search.html">Search</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="statistics.html">Statistics</a>
+                        <a class="nav-link" href="modules/search_module/statistics.php">Statistics</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="declaration-form.html">Submit</a>
