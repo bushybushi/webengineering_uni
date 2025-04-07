@@ -1,5 +1,5 @@
 <?php
-$host = 'websrv1.cut.ac.cy'; 
+$host = 'localhost'; 
 $dbname = 'cei326omada4';
 $username = 'cei326omada4user'; 
 $password = 'ykZ8sx]U7RLuftlO';
