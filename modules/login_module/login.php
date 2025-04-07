@@ -4,12 +4,12 @@ session_start();
 
 // Check if the user is already logged in, if yes then redirect him to welcome page
 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-    header("location: dashboard.php");
+    header("location: ../../index.php");
     exit;
 }
 
 // Include config file
-$pdo = require_once "db_connection.php";
+$pdo = require_once "../../config/db_connection.php";
 
 // Define variables and initialize with empty values
 $email = $password = "";
@@ -68,7 +68,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             $_SESSION["person_id"] = $person_id;
                             
                             // Redirect user to welcome page
-                            header("location: dashboard.php");
+                            header("location: ../../index.php");
                         } else{
                             // Password is not valid, display a generic error message
                             $login_err = "Invalid email or password.";
@@ -96,7 +96,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="../../assets/css/style.css" rel="stylesheet">
 </head>
 <body class="bg-light">
     <!-- Main Content -->
@@ -106,7 +106,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="card feature-card shadow-sm">
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
-                            <img src="assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
+                            <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
                             <h2 class="fw-bold">Sign In</h2>
                             <p class="text-muted">Welcome back to ΠΟΘΕΝ ΕΣΧΕΣ</p>
                         </div>
@@ -152,7 +152,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 <p class="mb-0"><a href="forgot-password.php" class="text-decoration-none">Forgot your password?</a></p>
                             </div>
                             <div class="text-center">
-                                <p class="mb-0"><a href="index.php" class="text-decoration-none">Back to Home</a></p>
+                                <p class="mb-0"><a href="../../index.php" class="text-decoration-none">Back to Home</a></p>
                             </div>
                         </form>
                     </div>
