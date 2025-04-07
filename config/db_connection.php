@@ -1,9 +1,8 @@
 <?php
-// Database configuration
-$host = 'localhost'; 
-$dbname = 'pothen_esxes';
-$username = 'root'; 
-$password = '';
+$host = 'websrv1.cut.ac.cy'; 
+$dbname = 'cei326omada4';
+$username = 'cei326omada4user'; 
+$password = 'ykZ8sx]U7RLuftlO';
 
 try {
     // Create a new PDO instance
