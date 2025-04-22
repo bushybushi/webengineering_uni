@@ -22,10 +22,6 @@ try {
     $partyLabels = array_map(function($item) { return $item['political_affiliation']; }, $partyData);
     $partyCounts = array_map(function($item) { return $item['count']; }, $partyData);
 
-    // Top positions
-    $stmt = $conn->query("SELECT office, COUNT(*) as count FROM people WHERE office IS NOT NULL GROUP BY office ORDER BY count DESC LIMIT 4");
-    $topPositions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
     // Calculate submission rate (assuming all records are submissions)
     $submissionRate = 100; // Since we're counting from submitted records
 
@@ -60,7 +56,6 @@ try {
     $totalParties = 0;
     $partyLabels = [];
     $partyCounts = [];
-    $topPositions = [];
     $submissionRate = 0;
     $valueLabels = [];
     $valueCounts = [];
@@ -307,20 +302,6 @@ try {
                     </div>
                 </div>
             </div>
-
-            <!-- Office Distribution Section -->
-            <div class="row mt-4">
-                <div class="col-lg-6">
-                    <div class="card feature-card">
-                        <div class="card-body">
-                            <h5 class="card-title mb-4">Office Distribution</h5>
-                            <div class="chart-container">
-                                <canvas id="officeChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 
@@ -364,28 +345,6 @@ try {
                         '#6c757d',
                         '#495057',
                         '#343a40'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-
-        // Office Distribution Chart
-        const officeCtx = document.getElementById('officeChart').getContext('2d');
-        new Chart(officeCtx, {
-            type: 'doughnut',
-            data: {
-                labels: <?php echo json_encode(array_column($topPositions, 'office')); ?>,
-                datasets: [{
-                    data: <?php echo json_encode(array_column($topPositions, 'count')); ?>,
-                    backgroundColor: [
-                        '#ED9635',
-                        '#d67b1f',
-                        '#f0a85a',
-                        '#6c757d'
                     ]
                 }]
             },
