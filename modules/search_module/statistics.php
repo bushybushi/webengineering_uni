@@ -22,14 +22,6 @@ try {
     $partyLabels = array_map(function($item) { return $item['political_affiliation']; }, $partyData);
     $partyCounts = array_map(function($item) { return $item['count']; }, $partyData);
 
-    // Yearly trends
-    $stmt = $conn->query("SELECT YEAR(date_of_submission) as year, COUNT(*) as count FROM people WHERE date_of_submission IS NOT NULL GROUP BY YEAR(date_of_submission) ORDER BY year");
-    $yearlyData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Format yearly data for chart
-    $yearLabels = array_map(function($item) { return $item['year']; }, $yearlyData);
-    $yearCounts = array_map(function($item) { return $item['count']; }, $yearlyData);
-
     // Top positions
     $stmt = $conn->query("SELECT office, COUNT(*) as count FROM people WHERE office IS NOT NULL GROUP BY office ORDER BY count DESC LIMIT 4");
     $topPositions = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -37,7 +29,7 @@ try {
     // Calculate submission rate (assuming all records are submissions)
     $submissionRate = 100; // Since we're counting from submitted records
 
-        // Asset Value Distribution
+    // Asset Value Distribution
     $stmt = $conn->query("SELECT 
         CASE 
             WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 10000 THEN 'Under €10,000'
@@ -60,7 +52,6 @@ try {
     $valueLabels = array_map(function($item) { return $item['value_range']; }, $valueDistribution);
     $valueCounts = array_map(function($item) { return $item['count']; }, $valueDistribution);
 
-
 } catch(PDOException $e) {
     // Handle any database errors
     error_log("Database Error: " . $e->getMessage());
@@ -69,8 +60,6 @@ try {
     $totalParties = 0;
     $partyLabels = [];
     $partyCounts = [];
-    $yearLabels = [];
-    $yearCounts = [];
     $topPositions = [];
     $submissionRate = 0;
     $valueLabels = [];
@@ -327,17 +316,6 @@ try {
                             <h5 class="card-title mb-4">Office Distribution</h5>
                             <div class="chart-container">
                                 <canvas id="officeChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Yearly Trends -->
-                <div class="col-lg-6">
-                    <div class="card feature-card">
-                        <div class="card-body">
-                            <h5 class="card-title mb-4">Yearly Declaration Trends</h5>
-                            <div class="chart-container">
-                                <canvas id="trendChart"></canvas>
                             </div>
                         </div>
                     </div>
