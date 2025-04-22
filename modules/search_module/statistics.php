@@ -306,7 +306,6 @@ try {
                         </div>
                     </div>
                 </div>
-            </div>
                 <!-- Asset Value Distribution -->
                 <div class="col-lg-6">
                     <div class="card feature-card">
@@ -314,6 +313,31 @@ try {
                             <h5 class="card-title mb-4">Asset Value Distribution</h5>
                             <div class="chart-container">
                                 <canvas id="valueDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Office Distribution Section -->
+            <div class="row mt-4">
+                <div class="col-lg-6">
+                    <div class="card feature-card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Office Distribution</h5>
+                            <div class="chart-container">
+                                <canvas id="officeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Yearly Trends -->
+                <div class="col-lg-6">
+                    <div class="card feature-card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Yearly Declaration Trends</h5>
+                            <div class="chart-container">
+                                <canvas id="trendChart"></canvas>
                             </div>
                         </div>
                     </div>
