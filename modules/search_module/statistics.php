@@ -37,6 +37,30 @@ try {
     // Calculate submission rate (assuming all records are submissions)
     $submissionRate = 100; // Since we're counting from submitted records
 
+        // Asset Value Distribution
+    $stmt = $conn->query("SELECT 
+        CASE 
+            WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 10000 THEN 'Under €10,000'
+            WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 50000 THEN '€10,000 - €50,000'
+            WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 100000 THEN '€50,000 - €100,000'
+            ELSE 'Over €100,000'
+        END as value_range,
+        COUNT(*) as count
+        FROM liquid_assets 
+        WHERE amount IS NOT NULL 
+        GROUP BY value_range
+        ORDER BY 
+            CASE value_range
+                WHEN 'Under €10,000' THEN 1
+                WHEN '€10,000 - €50,000' THEN 2
+                WHEN '€50,000 - €100,000' THEN 3
+                ELSE 4
+            END");
+    $valueDistribution = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $valueLabels = array_map(function($item) { return $item['value_range']; }, $valueDistribution);
+    $valueCounts = array_map(function($item) { return $item['count']; }, $valueDistribution);
+
+
 } catch(PDOException $e) {
     // Handle any database errors
     error_log("Database Error: " . $e->getMessage());
@@ -49,6 +73,8 @@ try {
     $yearCounts = [];
     $topPositions = [];
     $submissionRate = 0;
+    $valueLabels = [];
+    $valueCounts = [];
 }
 ?>
 <!DOCTYPE html>
@@ -281,6 +307,18 @@ try {
                     </div>
                 </div>
             </div>
+                <!-- Asset Value Distribution -->
+                <div class="col-lg-6">
+                    <div class="card feature-card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Asset Value Distribution</h5>
+                            <div class="chart-container">
+                                <canvas id="valueDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -355,22 +393,26 @@ try {
             }
         });
 
-        // Trend Chart
-        const trendCtx = document.getElementById('trendChart').getContext('2d');
-        new Chart(trendCtx, {
-            type: 'line',
+        // Value Distribution Chart
+        const valueCtx = document.getElementById('valueDistributionChart').getContext('2d');
+        new Chart(valueCtx, {
+            type: 'bar',
             data: {
-                labels: <?php echo json_encode($yearLabels); ?>,
+                labels: <?php echo json_encode($valueLabels); ?>,
                 datasets: [{
-                    label: 'Number of Declarations',
-                    data: <?php echo json_encode($yearCounts); ?>,
-                    borderColor: '#ED9635',
-                    tension: 0.1
+                    label: 'Number of Assets',
+                    data: <?php echo json_encode($valueCounts); ?>,
+                    backgroundColor: '#ED9635'
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
             }
         });
     </script>
