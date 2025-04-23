@@ -57,7 +57,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
+                        <a class="nav-link" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href=modules/search_module/search.php">Search</a>
@@ -66,7 +66,7 @@
                         <a class="nav-link" href="modules/search_module/statistics.php">Statistics</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="declaration-form.html">Submit</a>
+                        <a class="nav-link" href="modules/submit_module/declaration-form.php">Submit</a>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -102,22 +102,22 @@
                 <div class="offcanvas-body">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="index.html">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="index.php">
                                 <i class="bi bi-house"></i> Home
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="search.html">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="modules/search_module/search.php">
                                 <i class="bi bi-search"></i> Search
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="statistics.html">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="modules/search_module/statistics.php">
                                 <i class="bi bi-graph-up"></i> Statistics
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-3" href="declaration-form.html">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-3" href="modules/submit_module/declaration-form.php">
                                 <i class="bi bi-file-earmark-text"></i> Submit
                             </a>
                         </li>
@@ -163,8 +163,8 @@
                     <h1 class="hero-title">Monitor Asset Declarations</h1>
                     <p class="hero-subtitle">Subtitle</p>
                     <div class="d-flex flex-column flex-sm-row gap-3">
-                        <a href="search.html" class="btn btn-light btn-lg px-4">Search Declarations</a>
-                        <a href="register.html" class="btn btn-outline-light btn-lg px-4">Get Started</a>
+                        <a href="modules/search_module/search.php" class="btn btn-light btn-lg px-4">Search Declarations</a>
+                        <a href="modules/login_module/register.php" class="btn btn-outline-light btn-lg px-4">Get Started</a>
                     </div>
                 </div>
             </div>
@@ -203,7 +203,7 @@
                         <i class="bi bi-search feature-icon"></i>
                         <h5 class="card-title">Public Search</h5>
                         <p class="card-text">Text</p>
-                        <a href="search.html" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Search Now</a>
+                        <a href="modules/search_module/search.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Search Now</a>
                     </div>
                 </div>
             </div>
@@ -213,7 +213,7 @@
                         <i class="bi bi-file-earmark-text feature-icon"></i>
                         <h5 class="card-title">Declaration Submission</h5>
                         <p class="card-text">Text</p>
-                        <a href="declaration-form.html" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Submit Declaration</a>
+                        <a href="modules/submit_module/declaration-form.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Submit Declaration</a>
                     </div>
                 </div>
             </div>
@@ -223,7 +223,7 @@
                         <i class="bi bi-graph-up feature-icon"></i>
                         <h5 class="card-title">Statistics & Analysis</h5>
                         <p class="card-text">Text</p>
-                        <a href="statistics.html" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">View Statistics</a>
+                        <a href="modules/search_module/statistics.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">View Statistics</a>
                     </div>
                 </div>
             </div>
