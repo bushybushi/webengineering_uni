@@ -60,7 +60,7 @@
                         <a class="nav-link" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href=modules/search_module/search.php">Search</a>
+                        <a class="nav-link" href="modules/search_module/search.php">Search</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="modules/search_module/statistics.php">Statistics</a>
