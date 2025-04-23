@@ -152,7 +152,7 @@ try {
                         <a class="nav-link active" href="./statistics.php">Statistics</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../submit_module/declaration-form.html">Submit</a>
+                        <a class="nav-link" href="../submit_module/declaration-form.php">Submit</a>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -188,7 +188,7 @@ try {
                 <div class="offcanvas-body">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../../index.html">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../../index.php">
                                 <i class="bi bi-house"></i> Home
                             </a>
                         </li>
@@ -203,7 +203,7 @@ try {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../submit_module/declaration-form.html">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../submit_module/declaration-form.php">
                                 <i class="bi bi-file-earmark-text"></i> Submit
                             </a>
                         </li>
@@ -230,7 +230,7 @@ try {
                                 <a href="../login_module/login.html" class="nav-link py-2">
                                     <i class="bi bi-box-arrow-in-right me-2"></i> Login
                                 </a>
-                                <a href="../login_module/register.html" class="nav-link py-2">
+                                <a href="../login_module/register.php" class="nav-link py-2">
                                     <i class="bi bi-person-plus me-2"></i> Register
                                 </a>
                             </div>
@@ -314,9 +314,9 @@ try {
                 </div>
                 <div class="col-12 col-md-6 text-center text-md-end">
                     <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.html" class="text-decoration-none">About</a>
-                        <a href="contact.html" class="text-decoration-none">Contact</a>
-                        <a href="privacy.html" class="text-decoration-none">Privacy Policy</a>
+                        <a href="about.php" class="text-decoration-none">About</a>
+                        <a href="contact.php" class="text-decoration-none">Contact</a>
+                        <a href="privacy.php" class="text-decoration-none">Privacy Policy</a>
                     </div>
                 </div>
             </div>
