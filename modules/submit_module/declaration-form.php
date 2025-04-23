@@ -1,5 +1,5 @@
 <?php
-// Database connection - using local connection for development
+// Database connection
 require_once '../../config/db_connection.php';
 
 // Initialize variables
@@ -9,13 +9,13 @@ $error_message = '';
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        $conn->beginTransaction();
+        $pdo->beginTransaction();
 
         // Debug: Log POST data
         error_log("POST Data: " . print_r($_POST, true));
 
         // Insert person's information
-        $stmt = $conn->prepare("INSERT INTO people (name, title, office, id_number, dob, marital_status) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO people (name, title, office, id_number, dob, marital_status) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $_POST['name'],
             $_POST['title'],
@@ -24,14 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['dob'],
             $_POST['marital_status']
         ]);
-        $person_id = $conn->lastInsertId();
+        $person_id = $pdo->lastInsertId();
         
         // Debug: Log person_id
         error_log("Inserted person_id: " . $person_id);
 
         // Insert properties
         if (isset($_POST['properties'])) {
-            $stmt = $conn->prepare("INSERT INTO properties (person_id, type, location, topographic_data, acquisition_method, acquisition_year) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO properties (person_id, type, location, topographic_data, acquisition_method, acquisition_year) VALUES (?, ?, ?, ?, ?, ?)");
             foreach ($_POST['properties'] as $property) {
                 $stmt->execute([
                     $person_id,
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insert liquid assets with debugging
         if (isset($_POST['asset_type'])) {
-            $stmt = $conn->prepare("INSERT INTO liquid_assets (person_id, asset_type, description, amount) VALUES (?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO liquid_assets (person_id, asset_type, description, amount) VALUES (?, ?, ?, ?)");
             for ($i = 0; $i < count($_POST['asset_type']); $i++) {
                 // Debug: Log each liquid asset before insert
                 error_log("Inserting liquid asset: " . print_r([
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insert vehicles
         if (isset($_POST['vehicles'])) {
-            $stmt = $conn->prepare("INSERT INTO vehicles (person_id, description, value) VALUES (?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO vehicles (person_id, description, value) VALUES (?, ?, ?)");
             foreach ($_POST['vehicles'] as $vehicle) {
                 $stmt->execute([
                     $person_id,
@@ -84,14 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        $conn->commit();
+        $pdo->commit();
         $success_message = "Declaration submitted successfully!";
         
         // Debug: Log successful submission
         error_log("Declaration submitted successfully for person_id: " . $person_id);
         
     } catch (PDOException $e) {
-        $conn->rollBack();
+        $pdo->rollBack();
         $error_message = "Error: " . $e->getMessage();
         
         // Debug: Log error
