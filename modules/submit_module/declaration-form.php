@@ -4,7 +4,7 @@
  */
 
 // Connect to database
-require_once '../../config/db_connection_local.php';
+require_once '../../config/db_connection.php';
 
 // Make variables for messages
 $success_message = '';
