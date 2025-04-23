@@ -1,5 +1,5 @@
 <?php
-// Database connection
+// Database connection - using server connection
 require_once '../../config/db_connection.php';
 
 // Initialize variables
@@ -11,44 +11,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // Debug: Log POST data
-        error_log("POST Data: " . print_r($_POST, true));
-
         // Insert person's information
-        $stmt = $pdo->prepare("INSERT INTO people (name, title, office, id_number, dob, marital_status) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO people (name, title, office, address, dob, id_number, marital_status, num_of_dependents, date_of_submission, political_affiliation) 
+                              VALUES (:name, :title, :office, :address, :dob, :id_number, :marital_status, :num_of_dependents, :date_of_submission, :political_affiliation)");
+        
         $stmt->execute([
-            $_POST['name'],
-            $_POST['title'],
-            $_POST['office'],
-            $_POST['id_number'],
-            $_POST['dob'],
-            $_POST['marital_status']
+            ':name' => $_POST['name'],
+            ':title' => $_POST['title'],
+            ':office' => $_POST['office'],
+            ':address' => $_POST['address'],
+            ':dob' => $_POST['dob'],
+            ':id_number' => $_POST['id_number'],
+            ':marital_status' => $_POST['marital_status'],
+            ':num_of_dependents' => $_POST['num_of_dependents'],
+            ':date_of_submission' => date('Y-m-d H:i:s'),
+            ':political_affiliation' => $_POST['political_affiliation']
         ]);
+        
         $person_id = $pdo->lastInsertId();
         
-        // Debug: Log person_id
-        error_log("Inserted person_id: " . $person_id);
-
         // Insert properties
         if (isset($_POST['properties'])) {
-            $stmt = $pdo->prepare("INSERT INTO properties (person_id, type, location, topographic_data, acquisition_method, acquisition_year) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO properties (person_id, type, location, topographic_data, acquisition_method, acquisition_year) 
+                                  VALUES (:person_id, :type, :location, :topographic_data, :acquisition_method, :acquisition_year)");
             foreach ($_POST['properties'] as $property) {
                 $stmt->execute([
-                    $person_id,
-                    $property['type'],
-                    $property['location'],
-                    $property['topographic_data'],
-                    $property['acquisition_method'],
-                    $property['acquisition_year']
+                    ':person_id' => $person_id,
+                    ':type' => $property['type'],
+                    ':location' => $property['location'],
+                    ':topographic_data' => $property['topographic_data'],
+                    ':acquisition_method' => $property['acquisition_method'],
+                    ':acquisition_year' => $property['acquisition_year']
                 ]);
-                // Debug: Log property insert
-                error_log("Inserted property for person_id: " . $person_id);
             }
         }
 
-        // Insert liquid assets with debugging
+        // Insert liquid assets
         if (isset($_POST['asset_type'])) {
-            $stmt = $pdo->prepare("INSERT INTO liquid_assets (person_id, asset_type, description, amount) VALUES (?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO liquid_assets (person_id, asset_type, description, amount) 
+                                  VALUES (:person_id, :asset_type, :description, :amount)");
             for ($i = 0; $i < count($_POST['asset_type']); $i++) {
                 // Debug: Log each liquid asset before insert
                 error_log("Inserting liquid asset: " . print_r([
@@ -59,13 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ], true));
 
                 $stmt->execute([
-                    $person_id,
-                    $_POST['asset_type'][$i],
-                    $_POST['asset_description'][$i],
-                    $_POST['asset_amount'][$i]
+                    ':person_id' => $person_id,
+                    ':asset_type' => $_POST['asset_type'][$i],
+                    ':description' => $_POST['asset_description'][$i],
+                    ':amount' => $_POST['asset_amount'][$i]
                 ]);
-                // Debug: Log successful insert
-                error_log("Successfully inserted liquid asset for person_id: " . $person_id);
             }
         } else {
             // Debug: Log if no liquid assets were submitted
@@ -74,12 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insert vehicles
         if (isset($_POST['vehicles'])) {
-            $stmt = $pdo->prepare("INSERT INTO vehicles (person_id, description, value) VALUES (?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO vehicles (person_id, description, value) 
+                                  VALUES (:person_id, :description, :value)");
             foreach ($_POST['vehicles'] as $vehicle) {
                 $stmt->execute([
-                    $person_id,
-                    $vehicle['description'],
-                    $vehicle['value']
+                    ':person_id' => $person_id,
+                    ':description' => $vehicle['description'],
+                    ':value' => $vehicle['value']
                 ]);
             }
         }
