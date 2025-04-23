@@ -1,91 +1,101 @@
 <?php
-/*
- * This file has been beautified and commented using AI assistance.
- */
-
-// Connect to database
+// Database connection - using local connection for development
 require_once '../../config/db_connection.php';
 
-// Make variables for messages
+// Initialize variables
 $success_message = '';
 $error_message = '';
 
-// Check if form is submitted
-if (isset($_POST['name'])) {
-    // Get all form data
-    $name = $_POST['name'];
-    $office = $_POST['office'];
-    $id_number = $_POST['id_number'];
-    $dob = $_POST['dob'];
-    $marital_status = $_POST['marital_status'];
-    $address = $_POST['address'];
-    $num_of_dependents = $_POST['num_of_dependents'];
-    $political_affiliation = $_POST['political_affiliation'];
-
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // Start transaction
         $conn->beginTransaction();
 
-        // Insert person data
-        $sql = "INSERT INTO people (name, title, office, id_number, dob, marital_status, address, num_of_dependents, date_of_submission, political_affiliation, biography_link, image_link, wikidata_entity_id) 
-                VALUES ('$name', NULL, '$office', '$id_number', '$dob', '$marital_status', '$address', $num_of_dependents, NOW(), '$political_affiliation', NULL, NULL, NULL)";
+        // Debug: Log POST data
+        error_log("POST Data: " . print_r($_POST, true));
 
-         // Log the SQL query for debugging
-        error_log("Executing SQL: " . $sql);
-        
-        $conn->exec($sql);
+        // Insert person's information
+        $stmt = $conn->prepare("INSERT INTO people (name, title, office, id_number, dob, marital_status) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $_POST['name'],
+            $_POST['title'],
+            $_POST['office'],
+            $_POST['id_number'],
+            $_POST['dob'],
+            $_POST['marital_status']
+        ]);
         $person_id = $conn->lastInsertId();
+        
+        // Debug: Log person_id
+        error_log("Inserted person_id: " . $person_id);
 
-        // Insert properties if they exist
+        // Insert properties
         if (isset($_POST['properties'])) {
+            $stmt = $conn->prepare("INSERT INTO properties (person_id, type, location, topographic_data, acquisition_method, acquisition_year) VALUES (?, ?, ?, ?, ?, ?)");
             foreach ($_POST['properties'] as $property) {
-                $type = $property['type'];
-                $location = $property['location'];
-                $topographic_data = $property['topographic_data'];
-                $acquisition_method = $property['acquisition_method'];
-                $acquisition_year = $property['acquisition_year'];
-
-                $sql = "INSERT INTO properties (person_id, type, location, topographic_data, acquisition_method, acquisition_year) 
-                        VALUES ($person_id, '$type', '$location', '$topographic_data', '$acquisition_method', '$acquisition_year')";
-                $conn->exec($sql);
+                $stmt->execute([
+                    $person_id,
+                    $property['type'],
+                    $property['location'],
+                    $property['topographic_data'],
+                    $property['acquisition_method'],
+                    $property['acquisition_year']
+                ]);
+                // Debug: Log property insert
+                error_log("Inserted property for person_id: " . $person_id);
             }
         }
 
-        // Insert liquid assets if they exist
+        // Insert liquid assets with debugging
         if (isset($_POST['asset_type'])) {
+            $stmt = $conn->prepare("INSERT INTO liquid_assets (person_id, asset_type, description, amount) VALUES (?, ?, ?, ?)");
             for ($i = 0; $i < count($_POST['asset_type']); $i++) {
-                $asset_type = $_POST['asset_type'][$i];
-                $description = $_POST['asset_description'][$i];
-                $amount = $_POST['asset_amount'][$i];
+                // Debug: Log each liquid asset before insert
+                error_log("Inserting liquid asset: " . print_r([
+                    'person_id' => $person_id,
+                    'asset_type' => $_POST['asset_type'][$i],
+                    'description' => $_POST['asset_description'][$i],
+                    'amount' => $_POST['asset_amount'][$i]
+                ], true));
 
-                $sql = "INSERT INTO liquid_assets (person_id, asset_type, description, amount) 
-                        VALUES ($person_id, '$asset_type', '$description', $amount)";
-                $conn->exec($sql);
+                $stmt->execute([
+                    $person_id,
+                    $_POST['asset_type'][$i],
+                    $_POST['asset_description'][$i],
+                    $_POST['asset_amount'][$i]
+                ]);
+                // Debug: Log successful insert
+                error_log("Successfully inserted liquid asset for person_id: " . $person_id);
             }
+        } else {
+            // Debug: Log if no liquid assets were submitted
+            error_log("No liquid assets submitted in the form");
         }
 
-        // Insert vehicles if they exist
+        // Insert vehicles
         if (isset($_POST['vehicles'])) {
+            $stmt = $conn->prepare("INSERT INTO vehicles (person_id, description, value) VALUES (?, ?, ?)");
             foreach ($_POST['vehicles'] as $vehicle) {
-                $description = $vehicle['description'];
-                $value = $vehicle['value'];
-
-                $sql = "INSERT INTO vehicles (person_id, description, value) 
-                        VALUES ($person_id, '$description', $value)";
-                $conn->exec($sql);
+                $stmt->execute([
+                    $person_id,
+                    $vehicle['description'],
+                    $vehicle['value']
+                ]);
             }
         }
 
-        // If everything is good, save changes
         $conn->commit();
         $success_message = "Declaration submitted successfully!";
         
-    } catch (Exception $e) {
-        // If something went wrong, undo changes
+        // Debug: Log successful submission
+        error_log("Declaration submitted successfully for person_id: " . $person_id);
+        
+    } catch (PDOException $e) {
         $conn->rollBack();
-         error_log("Form submission error: " . $e->getMessage());
-        // Show a user-friendly error message
-        $error_message = "An error occurred while submitting your declaration. Please try again or contact the administrator.";
+        $error_message = "Error: " . $e->getMessage();
+        
+        // Debug: Log error
+        error_log("Error submitting declaration: " . $e->getMessage());
     }
 }
 ?>
@@ -94,16 +104,15 @@ if (isset($_POST['name'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asset Declaration Form</title>
-    
-    <!-- Load all CSS files -->
+    <title>Asset Declaration Form - ΠΟΘΕΝ ΕΣΧΕΣ</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+    <!-- Custom CSS -->
     <link href="../../assets/css/style.css" rel="stylesheet">
-    
     <style>
-        /* Basic styling for language button */
         .lang-btn {
             width: 32px;
             height: 32px;
@@ -129,18 +138,20 @@ if (isset($_POST['name'])) {
     </style>
 </head>
 <body>
-    <!-- Navigation bar -->
+    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="../../index.php">
-                <img src="../../assets/images/logo.jpg" alt="Logo" height="40" class="me-3">
+                <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
                 <span class="fw-bold">ΠΟΘΕΝ ΕΣΧΕΣ</span>
             </a>
             
+            <!-- Mobile Toggle Button -->
             <button class="navbar-toggler border-0 d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
+            <!-- Desktop Menu -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
@@ -182,8 +193,9 @@ if (isset($_POST['name'])) {
         </div>
     </nav>
 
-    <!-- Main content -->
+    <!-- Add padding-top to account for fixed navbar -->
     <div class="pt-5">
+        <!-- Main Content -->
         <main class="container my-5">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1>Declaration Form</h1>
@@ -220,6 +232,10 @@ if (isset($_POST['name'])) {
                                                 <input type="text" name="name" class="form-control" required>
                                             </div>
                                             <div class="col-md-6">
+                                                <label class="form-label">Title</label>
+                                                <input type="text" name="title" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6">
                                                 <label class="form-label">Role</label>
                                                 <input type="text" name="office" class="form-control" required>
                                             </div>
@@ -227,13 +243,13 @@ if (isset($_POST['name'])) {
                                                 <label class="form-label">ID Number</label>
                                                 <input type="text" name="id_number" class="form-control" required>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-12">
                                                 <label class="form-label">Address</label>
                                                 <textarea name="address" class="form-control" rows="3" required></textarea>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Date of Birth</label>
-                                                <input type="datetime-local" name="dob" class="form-control" required>
+                                                <input type="date" name="dob" class="form-control" required>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Marital Status</label>
@@ -359,6 +375,8 @@ if (isset($_POST['name'])) {
                                         </button>
                                     </div>
 
+                                
+
                                     <!-- Declaration -->
                                     <div class="mb-5">
                                         <h4 class="mb-4">6. Declaration</h4>
@@ -407,8 +425,9 @@ if (isset($_POST['name'])) {
         </div>
     </footer>
 
-    <!-- Load all JavaScript files -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
     <script>
         // Function to add new property entry
         function addPropertyEntry() {
@@ -517,7 +536,7 @@ if (isset($_POST['name'])) {
                 setTimeout(function() {
                     const alert = new bootstrap.Alert(successAlert);
                     alert.close();
-                }, 5000);
+                }, 5000); // 5000 milliseconds = 5 seconds
             }
         });
     </script>
