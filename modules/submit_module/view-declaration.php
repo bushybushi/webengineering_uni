@@ -1,27 +1,27 @@
 <?php
 // Database connection
-require_once '../../config/db_connection.php';
+$pdo = require_once '../../config/db_connection.php';
 
 // Get declaration ID from URL
 $declaration_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // Fetch person's information
-$stmt = $conn->prepare("SELECT * FROM people WHERE id = ?");
+$stmt = $pdo->prepare("SELECT * FROM people WHERE id = ?");
 $stmt->execute([$declaration_id]);
 $person = $stmt->fetch();
 
 // Fetch properties
-$stmt = $conn->prepare("SELECT * FROM properties WHERE person_id = ?");
+$stmt = $pdo->prepare("SELECT * FROM properties WHERE person_id = ?");
 $stmt->execute([$declaration_id]);
 $properties = $stmt->fetchAll();
 
 // Fetch liquid assets
-$stmt = $conn->prepare("SELECT * FROM liquid_assets WHERE person_id = ?");
+$stmt = $pdo->prepare("SELECT * FROM liquid_assets WHERE person_id = ?");
 $stmt->execute([$declaration_id]);
 $liquid_assets = $stmt->fetchAll();
 
 // Fetch vehicles
-$stmt = $conn->prepare("SELECT * FROM vehicles WHERE person_id = ?");
+$stmt = $pdo->prepare("SELECT * FROM vehicles WHERE person_id = ?");
 $stmt->execute([$declaration_id]);
 $vehicles = $stmt->fetchAll();
 
