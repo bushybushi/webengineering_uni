@@ -29,6 +29,10 @@ if (isset($_POST['name'])) {
         // Insert person data
         $sql = "INSERT INTO people (name, title, office, id_number, dob, marital_status, address, num_of_dependents, date_of_submission, political_affiliation, biography_link, image_link, wikidata_entity_id) 
                 VALUES ('$name', NULL, '$office', '$id_number', '$dob', '$marital_status', '$address', $num_of_dependents, NOW(), '$political_affiliation', NULL, NULL, NULL)";
+
+         // Log the SQL query for debugging
+        error_log("Executing SQL: " . $sql);
+        
         $conn->exec($sql);
         $person_id = $conn->lastInsertId();
 
@@ -79,7 +83,9 @@ if (isset($_POST['name'])) {
     } catch (Exception $e) {
         // If something went wrong, undo changes
         $conn->rollBack();
-        $error_message = "Error: " . $e->getMessage();
+         error_log("Form submission error: " . $e->getMessage());
+        // Show a user-friendly error message
+        $error_message = "An error occurred while submitting your declaration. Please try again or contact the administrator.";
     }
 }
 ?>
