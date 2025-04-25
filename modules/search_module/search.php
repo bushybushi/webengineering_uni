@@ -87,8 +87,16 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
         background: #000000;
         color: white;
     }
+
     
-    .pagination {
+element.style {
+}
+div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+    margin: 2px 0;
+    white-space: nowrap;
+    justify-content: flex-end;
+}
+.pagination {
     --bs-pagination-padding-x: 0.75rem;
     --bs-pagination-padding-y: 0.375rem;
     --bs-pagination-font-size: 1rem;
@@ -114,6 +122,7 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
     padding-left: 0;
     list-style: none;
 }
+
 </style>
 <body>
     <!-- Navigation -->
@@ -269,7 +278,7 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['political_affiliation']); ?></span>
+                                            <span class="badge bg-warning text-dark political-affiliation" style="cursor: pointer;"><?php echo htmlspecialchars($declaration['political_affiliation']); ?></span>
                                         </td>
                                         <td>
                                             <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="View Declaration Details">
@@ -354,6 +363,12 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                         orderable: false
                     }
                 ]
+            });
+
+            // Add click event for political affiliations
+            $(document).on('click', '.political-affiliation', function() {
+                const party = $(this).text();
+                $('select[name="position"]').val(party).trigger('change');
             });
         });
     </script>
