@@ -316,14 +316,21 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                         previous: "Previous"
                     }
                 },
+                columns: [
+                    { name: 'person_details' },    // Person Details
+                    { name: 'title' },            // Title
+                    { name: 'submission_date' },  // Submission Date
+                    { name: 'political' },        // Political Affiliation
+                    { name: 'actions' }           // Actions
+                ],
                 columnDefs: [
                     {
-                        targets: [0, 2], // Person Details (0) and Submission Date (2)
+                        targets: ['person_details:name', 'submission_date:name'],
                         orderable: true,
-                        orderSequence: ['asc', 'desc', null] // Use null instead of empty string
+                        orderSequence: ['asc', 'desc', null]
                     },
                     {
-                        targets: [1, 3, 4], // Title, Political Affiliation, and Actions
+                        targets: ['title:name', 'political:name', 'actions:name'],
                         orderable: false
                     }
                 ]
