@@ -87,6 +87,40 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
         background: #000000;
         color: white;
     }
+
+        /* DataTables Pagination Styling */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.5rem 1rem;
+        margin: 0 0.25rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        background: #fff;
+        color: #000 !important;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #e9ecef;
+        border-color: #dee2e6;
+        color: #000 !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+        background: #ffc107 !important;
+        border-color: #ffc107;
+        color: #000 !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+        background: #e9ecef;
+        border-color: #dee2e6;
+        color: #6c757d !important;
+        cursor: not-allowed;
+    }
+    
 </style>
 <body>
     <!-- Navigation -->
