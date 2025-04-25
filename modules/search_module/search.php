@@ -299,6 +299,12 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
     <script src="../../assets/js/main.js"></script>
     <script>
         $(document).ready(function() {
+                        // Debug: Log the number of columns in header and first row
+            var headerCols = $('#declarationsTable thead th').length;
+            var firstRowCols = $('#declarationsTable tbody tr:first-child td').length;
+            console.log('Header columns:', headerCols);
+            console.log('First row columns:', firstRowCols);
+
            $('#declarationsTable').DataTable({
                 order: [], // No default sorting
                 pageLength: 10,
