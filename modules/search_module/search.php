@@ -316,10 +316,16 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                         previous: "Previous"
                     }
                 },
-                columnDefs: [{
+                columnDefs: [
+                    {
                         targets: [0, 2], // Person Details (0) and Submission Date (2)
                         orderSequence: ['asc', 'desc', ''] // Add empty string for no sort
-                }]
+                    },
+                    {
+                        targets: '_all', // All other columns
+                        orderable: false // Disable sorting
+                    }
+                ]
             });
         });
     </script>
