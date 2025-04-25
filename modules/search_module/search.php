@@ -299,7 +299,7 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
     <script>
         $(document).ready(function() {
             $('.table').DataTable({
-                order: [[2, 'desc']], // Sort by Submission Date column (index 2) by default
+                order: [], // No default sorting
                 pageLength: 10,
                 dom: '<"row"<"col-12"l>>rtip', // Remove search field (f) from dom
                 language: {
