@@ -320,7 +320,10 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                     {
                         targets: [0, 2], // Person Details (0) and Submission Date (2)
                         orderable: true,
-                        orderSequence: ['asc', 'desc', '']
+                        orderSequence: ['asc', 'desc', ' '],
+                        orderData: function(idx) {
+                            return idx === ' ' ? [] : [[idx, 'asc']];
+                        }
                     },
                     {
                         targets: [1, 3, 4], // Title, Political Affiliation, and Actions
