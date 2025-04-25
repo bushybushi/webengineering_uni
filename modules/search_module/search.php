@@ -369,10 +369,10 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
             // Add click handler for political badges
             $(document).on('click', '.political-badge', function() {
                 const partyName = $(this).data('party');
-                // Update the search input
-                $('input[name="search"]').val(partyName);
-                // Filter the table
-                table.search(partyName).draw();
+                // Update the position dropdown
+                $('select[name="position"]').val(partyName);
+                // Submit the form
+                $('form').submit();
             });
         });
     </script>
