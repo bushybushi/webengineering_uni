@@ -278,7 +278,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge bg-warning text-dark political-affiliation" style="cursor: pointer;"><?php echo htmlspecialchars($declaration['political_affiliation']); ?></span>
+                                            <span class="badge bg-warning text-dark political-badge" data-party="<?php echo htmlspecialchars($declaration['political_affiliation']); ?>"><?php echo htmlspecialchars($declaration['political_affiliation']); ?></span>
                                         </td>
                                         <td>
                                             <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="View Declaration Details">
@@ -334,7 +334,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     <script src="../../assets/js/main.js"></script>
     <script>
         $(document).ready(function() {
-            $('.table').DataTable({
+            // Initialize DataTable
+            var table = $('.table').DataTable({
                 order: [], // No default sorting
                 pageLength: 10,
                 dom: '<"row"<"col-12"l>>rtip', // Remove search field (f) from dom
@@ -365,10 +366,13 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                 ]
             });
 
-            // Add click event for political affiliations
-            $(document).on('click', '.political-affiliation', function() {
-                const party = $(this).text();
-                $('select[name="position"]').val(party).trigger('change');
+            // Add click handler for political badges
+            $(document).on('click', '.political-badge', function() {
+                const partyName = $(this).data('party');
+                // Update the search input
+                $('input[name="search"]').val(partyName);
+                // Filter the table
+                table.search(partyName).draw();
             });
         });
     </script>
