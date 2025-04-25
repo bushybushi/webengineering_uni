@@ -245,12 +245,7 @@ try {
     <div class="pt-5">
         <!-- Main Content -->
         <main class="container my-5">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Statistics & Analysis</h1>
-                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#compareModal">
-                    <i class="bi bi-arrow-left-right"></i> Compare Declarations
-                </button>
-            </div>
+            <h1 class="mb-4">Statistics & Analysis</h1>
 
             <!-- Summary Stats -->
             <div class="stats-summary">
@@ -381,104 +376,6 @@ try {
                 }
             }
         });
-
-        // Compare functionality
-        $(document).ready(function() {
-            function loadDeclaration(id, targetDiv) {
-                if (!id) return;
-                
-                $.ajax({
-                    url: '../submit_module/view-declaration.php',
-                    method: 'GET',
-                    data: { id: id },
-                    success: function(response) {
-                        // Extract the main content from the response
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = response;
-                        const mainContent = tempDiv.querySelector('.card-body');
-                        
-                        if (mainContent) {
-                            $(targetDiv).html(mainContent.innerHTML);
-                        }
-                    },
-                    error: function() {
-                        $(targetDiv).html('<div class="alert alert-danger">Error loading declaration</div>');
-                    }
-                });
-            }
-
-            $('#firstPolitician').change(function() {
-                loadDeclaration($(this).val(), '#firstDeclaration');
-            });
-
-            $('#secondPolitician').change(function() {
-                loadDeclaration($(this).val(), '#secondDeclaration');
-            });
-        });
     </script>
-
-    <!-- Compare Modal -->
-    <div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="compareModalLabel">Compare Declarations</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">First Politician</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Select Politician</label>
-                                        <select class="form-select" id="firstPolitician">
-                                            <option value="">Choose...</option>
-                                            <?php
-                                            $stmt = $conn->query("SELECT id, name, political_affiliation FROM people ORDER BY name");
-                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                echo "<option value='{$row['id']}'>{$row['name']} ({$row['political_affiliation']})</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                    <div id="firstDeclaration" class="declaration-content">
-                                        <!-- First declaration will be loaded here -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">Second Politician</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Select Politician</label>
-                                        <select class="form-select" id="secondPolitician">
-                                            <option value="">Choose...</option>
-                                            <?php
-                                            $stmt = $conn->query("SELECT id, name, political_affiliation FROM people ORDER BY name");
-                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                echo "<option value='{$row['id']}'>{$row['name']} ({$row['political_affiliation']})</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                    <div id="secondDeclaration" class="declaration-content">
-                                        <!-- Second declaration will be loaded here -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html> 
