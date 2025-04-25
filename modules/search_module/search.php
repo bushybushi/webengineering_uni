@@ -362,11 +362,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                     {
                         targets: [1, 3, 4], // Title, Political Affiliation, and Actions
                         orderable: false
-                    },
-                    {
-                        targets: [1, 3, 4], // Title, Political Affiliation, and Actions
-                        searchable: false // Disable search for these columns
-                    }   
+                    }
                 ]
             });
 
