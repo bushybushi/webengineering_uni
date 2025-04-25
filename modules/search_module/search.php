@@ -301,6 +301,7 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
             $('.table').DataTable({
                 order: [[2, 'desc']], // Sort by Submission Date column (index 2) by default
                 pageLength: 10,
+                dom: '<"row"<"col-12"l>>rtip', // Remove search field (f) from dom
                 language: {
                     search: "", // Remove the "Quick Search:" label
                     lengthMenu: "Show _MENU_ entries per page",
