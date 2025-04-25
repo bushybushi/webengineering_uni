@@ -302,7 +302,7 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                 order: [[2, 'desc']], // Sort by Submission Date column (index 2) by default
                 pageLength: 10,
                 language: {
-                    search: "Quick Search:",
+                    search: "",
                     lengthMenu: "Show _MENU_ entries per page",
                     info: "Showing _START_ to _END_ of _TOTAL_ entries",
                     infoEmpty: "Showing 0 to 0 of 0 entries",
