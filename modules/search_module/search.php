@@ -202,7 +202,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                     <form class="row g-3" method="GET">
                         <div class="col-md-6">
                             <label class="form-label">Search</label>
-                            <input type="text" name="search" class="form-control" placeholder="Search by name, position, or email" value="<?php echo $search; ?>">
+                            <input type="text" name="search" class="form-control" placeholder="Search by name" value="<?php echo $search; ?>">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Year</label>
