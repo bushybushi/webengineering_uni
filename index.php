@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ΠΟΘΕΝ ΕΣΧΕΣ - Asset Declaration System</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="assets/images/iconlogo.png">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -11,7 +13,7 @@
     <!-- Flag Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
     <!-- Custom CSS -->
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="./assets/css/style.css" rel="stylesheet">
     <style>
     
         .lang-btn {
@@ -43,8 +45,8 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="index.html">
-                <img src="assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
+            <a class="navbar-brand d-flex align-items-center" href="./index.php">
+                <img src="./assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
                 <span class="fw-bold">ΠΟΘΕΝ ΕΣΧΕΣ</span>
             </a>
             
@@ -57,16 +59,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
+                        <a class="nav-link" href="./index.php">Αρχική</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="modules/search_module/search.php">Search</a>
+                        <a class="nav-link" href="./modules/search_module/search.php">Αναζήτηση</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="modules/search_module/statistics.php">Statistics</a>
+                        <a class="nav-link" href="./modules/search_module/statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="modules/submit_module/declaration-form.php">Submit</a>
+                        <a class="nav-link" href="./modules/submit_module/declaration-form.php">Υποβολή</a>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -85,8 +87,8 @@
                                 <i class="bi bi-person-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="modules/login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
-                                <li><a class="dropdown-item" href="modules/login_module/register.php"><i class="bi bi-person-plus"></i> Register</a></li>
+                                <li><a class="dropdown-item" href="./modules/login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Σύνδεση</a></li>
+                                <li><a class="dropdown-item" href="./modules/login_module/register.php"><i class="bi bi-person-plus"></i> Εγγραφή</a></li>
                             </ul>
                         </div>
                     </li>
@@ -96,35 +98,35 @@
             <!-- Mobile Menu (Offcanvas) -->
             <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
                 <div class="offcanvas-header border-bottom">
-                    <h5 class="offcanvas-title" id="mobileMenuLabel">Menu</h5>
+                    <h5 class="offcanvas-title" id="mobileMenuLabel">Μενού</h5>
                     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="index.php">
-                                <i class="bi bi-house"></i> Home
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="./index.php">
+                                <i class="bi bi-house"></i> Αρχική
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="modules/search_module/search.php">
-                                <i class="bi bi-search"></i> Search
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="./modules/search_module/search.php">
+                                <i class="bi bi-search"></i> Αναζήτηση
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="modules/search_module/statistics.php">
-                                <i class="bi bi-graph-up"></i> Statistics
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="./modules/search_module/statistics.php">
+                                <i class="bi bi-graph-up"></i> Στατιστικά
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-3" href="modules/submit_module/declaration-form.php">
-                                <i class="bi bi-file-earmark-text"></i> Submit
+                            <a class="nav-link d-flex align-items-center gap-2 mb-3" href="./modules/submit_module/declaration-form.php">
+                                <i class="bi bi-file-earmark-text"></i> Υποβολή
                             </a>
                         </li>
                         <li class="nav-item border-top pt-3">
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <i class="bi bi-translate"></i>
-                                <span class="fw-medium">Language</span>
+                                <span class="fw-medium">Γλώσσα</span>
                             </div>
                             <div class="d-flex flex-column gap-2">
                                 <a href="?lang=en" class="nav-link py-2">
@@ -138,14 +140,14 @@
                         <li class="nav-item border-top pt-3">
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <i class="bi bi-person-circle"></i>
-                                <span class="fw-medium">Account</span>
+                                <span class="fw-medium">Λογαριασμός</span>
                             </div>
                             <div class="d-flex flex-column gap-2">
-                                <a href="module/login_module/login.php" class="nav-link py-2">
-                                    <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                                <a href="./modules/login_module/login.php" class="nav-link py-2">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i> Σύνδεση
                                 </a>
-                                <a href="module/login_module/register.php" class="nav-link py-2">
-                                    <i class="bi bi-person-plus me-2"></i> Register
+                                <a href="./modules/login_module/register.php" class="nav-link py-2">
+                                    <i class="bi bi-person-plus me-2"></i> Εγγραφή
                                 </a>
                             </div>
                         </li>
@@ -157,14 +159,21 @@
 
     <!-- Hero Section -->
     <section class="hero-section">
+        <video autoplay muted loop class="hero-video">
+            <source src="assets/images/background.mp4" type="video/mp4">
+        </video>
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 col-md-8">
-                    <h1 class="hero-title">Monitor Asset Declarations</h1>
-                    <p class="hero-subtitle">Subtitle</p>
+                    <h1 class="hero-title">Παρακολούθησε τις Δηλώσεις Πόθεν Έσχες</h1>
+                    <div class="search-box-container mb-4">
+                        <form id="searchForm" action="./modules/search_module/search.php" method="GET" class="d-flex gap-2">
+                            <input type="text" class="form-control form-control-lg" name="q" placeholder="Αναζήτηση Δηλώσεων . . ." aria-label="Αναζήτηση Δηλώσεων">
+                            <button type="submit" form="searchForm" class="btn btn-light btn-lg px-4"><i class="bi bi-search"></i></button>
+                        </form>
+                    </div>
                     <div class="d-flex flex-column flex-sm-row gap-3">
-                        <a href="modules/search_module/search.php" class="btn btn-light btn-lg px-4">Search Declarations</a>
-                        <a href="modules/login_module/register.php" class="btn btn-outline-light btn-lg px-4">Get Started</a>
+                        <a href="./modules/login_module/register.php" class="btn btn-light btn-lg px-4">Εγγραφή</a>
                     </div>
                 </div>
             </div>
@@ -178,19 +187,19 @@
             <div class="col-md-4">
                 <div class="stats-card text-center h-100">
                     <div class="stat-number">500+</div>
-                    <div class="stat-label">Public Officials</div>
+                    <div class="stat-label">Δημοσίοι Αξιωματούχοι</div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stats-card text-center h-100">
                     <div class="stat-number">8</div>
-                    <div class="stat-label">Political Parties</div>
+                    <div class="stat-label">Πολιτικά Κόμματα</div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stats-card text-center h-100">
                     <div class="stat-number">2025</div>
-                    <div class="stat-label">Latest Declarations</div>
+                    <div class="stat-label">Τελευταίες Δηλώσεις</div>
                 </div>
             </div>
         </div>
@@ -201,9 +210,9 @@
                 <div class="card feature-card h-100">
                     <div class="card-body text-center p-4">
                         <i class="bi bi-search feature-icon"></i>
-                        <h5 class="card-title">Public Search</h5>
-                        <p class="card-text">Text</p>
-                        <a href="modules/search_module/search.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Search Now</a>
+                        <h5 class="card-title">Δημόσια Αναζήτηση</h5>
+                        <p class="card-text">Αναζητήστε δηλώσεις με βάση το όνομα, το πολιτικό κόμμα ή τη θέση. Αποκτήστε πλήρη πληροφόρηση για την περιουσιακή κατάσταση των Δημοσίων Αξιωματούχων.</p>
+                        <a href="./modules/search_module/search.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Αναζήτησε Τώρα</a>
                     </div>
                 </div>
             </div>
@@ -211,9 +220,9 @@
                 <div class="card feature-card h-100">
                     <div class="card-body text-center p-4">
                         <i class="bi bi-file-earmark-text feature-icon"></i>
-                        <h5 class="card-title">Declaration Submission</h5>
-                        <p class="card-text">Text</p>
-                        <a href="modules/submit_module/declaration-form.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Submit Declaration</a>
+                        <h5 class="card-title">Υποβολή Δήλωσης</h5>
+                        <p class="card-text">Οι δημόσιοι λειτουργοί μπορούν να υποβάλουν τις δηλώσεις τους μέσω της ασφαλούς μας πλατφόρμας. Παρακολούθηση κατάστασης και ειδοποιήσεις.</p>
+                        <a href="./modules/submit_module/declaration-form.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Υποβολή Δήλωσης</a>
                     </div>
                 </div>
             </div>
@@ -221,9 +230,9 @@
                 <div class="card feature-card h-100">
                     <div class="card-body text-center p-4">
                         <i class="bi bi-graph-up feature-icon"></i>
-                        <h5 class="card-title">Statistics & Analysis</h5>
-                        <p class="card-text">Text</p>
-                        <a href="modules/search_module/statistics.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">View Statistics</a>
+                        <h5 class="card-title">Στατιστικά & Ανάλυση</h5>
+                        <p class="card-text">Δείτε συγκεντρωτικά δεδομένα και στατιστικά στοιχεία για τις δηλώσεις ανά έτος, κόμμα και θέση.</p>
+                        <a href="./modules/search_module/statistics.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Προβολή Στατιστικών</a>
                     </div>
                 </div>
             </div>
@@ -234,13 +243,13 @@
             <div class="col-lg-8">
                 <div class="card feature-card h-100">
                     <div class="card-body">
-                        <h5 class="card-title mb-4">Recent Declarations</h5>
+                        <h5 class="card-title mb-4">Πρόσφατες Δηλώσεις</h5>
                         <div class="declaration-item">
                             <div class="d-flex align-items-center">
                                 <div class="avatar-circle">A</div>
                                 <div class="ms-3">
-                                    <h6 class="mb-1">Name</h6>
-                                    <small class="text-muted">Member of Parliament - 15/03/2024</small>
+                                    <h6 class="mb-1">Ανδρέας Αθανασιάδης</h6>
+                                    <small class="text-muted">Μελος του Κοινοβουλίου - 15/03/2024</small>
                                 </div>
                             </div>
                         </div>
@@ -248,8 +257,8 @@
                             <div class="d-flex align-items-center">
                                 <div class="avatar-circle">M</div>
                                 <div class="ms-3">
-                                    <h6 class="mb-1">Name</h6>
-                                    <small class="text-muted">Minister - 14/03/2024</small>
+                                    <h6 class="mb-1">Μαρία Μιχαηλίδου</h6>
+                                    <small class="text-muted">Υπουργός - 14/03/2024</small>
                                 </div>
                             </div>
                         </div>
@@ -257,8 +266,8 @@
                             <div class="d-flex align-items-center">
                                 <div class="avatar-circle">G</div>
                                 <div class="ms-3">
-                                    <h6 class="mb-1">Name</h6>
-                                    <small class="text-muted">Deputy Minister - 13/03/2024</small>
+                                    <h6 class="mb-1">Γεώργιος Γεωργίου</h6>
+                                    <small class="text-muted">Αναπληρωτής Υπουργός - 13/03/2024</small>
                                 </div>
                             </div>
                         </div>
@@ -266,8 +275,8 @@
                             <div class="d-flex align-items-center">
                                 <div class="avatar-circle">E</div>
                                 <div class="ms-3">
-                                    <h6 class="mb-1">Name</h6>
-                                    <small class="text-muted">Member of Parliament - 12/03/2024</small>
+                                    <h6 class="mb-1">Ελένη Παπαδοπούλου</h6>
+                                    <small class="text-muted">Μελος του Κοινοβουλίου - 12/03/2024</small>
                                 </div>
                             </div>
                         </div>
@@ -275,8 +284,8 @@
                             <div class="d-flex align-items-center">
                                 <div class="avatar-circle">N</div>
                                 <div class="ms-3">
-                                    <h6 class="mb-1">Name</h6>
-                                    <small class="text-muted">Minister - 11/03/2024</small>
+                                    <h6 class="mb-1">Νίκος Νικολαίου</h6>
+                                    <small class="text-muted">Υπουργός - 11/03/2024</small>
                                 </div>
                             </div>
                         </div>
@@ -286,14 +295,14 @@
             <div class="col-lg-4">
                 <div class="card feature-card h-100">
                     <div class="card-body">
-                        <h5 class="card-title mb-4">Need Help?</h5>
-                        <p class="card-text">Get assistance with declarations or learn more about the system's features and requirements.</p>
+                        <h5 class="card-title mb-4">Χρειάζεστε Βοήθεια?</h5>
+                        <p class="card-text">Χρειάζεστε βοήθεια με τις δηλώσεις; Μάθετε περισσότερα για το σύστημα και τις λειτουργίες του εδώ.</p>
                         <div class="d-grid gap-2">
                             <a href="contact.html" class="btn btn-primary" style="background-color: #ED9635; border-color: #ED9635;">
-                                <i class="bi bi-envelope"></i> Contact Support
+                                <i class="bi bi-envelope"></i> Επικοινωνία
                             </a>
                             <a href="about.html" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">
-                                <i class="bi bi-info-circle"></i> Learn More
+                                <i class="bi bi-info-circle"></i> Μάθε Περισσότερα
                             </a>
                         </div>
                     </div>
@@ -307,13 +316,13 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0">&copy; 2025 Asset Declaration System. All rights reserved.</p>
+                    <p class="mb-0"> 2025 Πόθεν Εσχες &copy; all rights reserved.</p>
                 </div>
                 <div class="col-12 col-md-6 text-center text-md-end">
                     <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.html" class="text-decoration-none">About</a>
-                        <a href="contact.html" class="text-decoration-none">Contact</a>
-                        <a href="privacy.html" class="text-decoration-none">Privacy Policy</a>
+                        <a href="about.html" class="text-decoration-none">Ποιοι είμαστε</a>
+                        <a href="contact.html" class="text-decoration-none">Επικοινωνία</a>
+                        <a href="privacy.html" class="text-decoration-none">Πολιτική Απορρήτου</a>
                     </div>
                 </div>
             </div>
