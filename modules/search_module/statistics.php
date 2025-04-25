@@ -123,6 +123,23 @@ try {
             color: #6c757d;
             font-size: 0.9rem;
         }
+        /* Custom button styles */
+        .btn-compare {
+            background-color: #ED9635;
+            border-color: #ED9635;
+            color: white;
+        }
+        .btn-compare:hover {
+            background-color: #d67b1f;
+            border-color: #d67b1f;
+            color: white;
+        }
+        .btn-compare:disabled {
+            background-color: #ED9635;
+            border-color: #ED9635;
+            color: white;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -245,7 +262,9 @@ try {
     <div class="pt-5">
         <!-- Main Content -->
         <main class="container my-5">
-            <h1 class="mb-4">Statistics & Analysis</h1>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Statistics & Analysis</h1>
+            </div>
 
             <!-- Summary Stats -->
             <div class="stats-summary">
@@ -303,6 +322,53 @@ try {
                 </div>
             </div>
         </main>
+
+        <!-- Comparison Section -->
+        <div class="container mb-5">
+            <h2 class="mb-4">Compare Declarations</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">First Person</h5>
+                            <select class="form-select mb-3" id="person1">
+                                <option value="">Select person...</option>
+                                <?php
+                                $stmt = $conn->query("SELECT id, name FROM people ORDER BY name");
+                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    echo "<option value='{$row['id']}'>{$row['name']}</option>";
+                                }
+                                ?>
+                            </select>
+                            <div id="declaration1"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Second Person</h5>
+                            <select class="form-select mb-3" id="person2">
+                                <option value="">Select person...</option>
+                                <?php
+                                $stmt = $conn->query("SELECT id, name FROM people ORDER BY name");
+                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    echo "<option value='{$row['id']}'>{$row['name']}</option>";
+                                }
+                                ?>
+                            </select>
+                            <div id="declaration2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <button id="compareBtn" class="btn btn-compare me-2" disabled>Compare Declarations</button>
+                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -375,6 +441,56 @@ try {
                     }
                 }
             }
+        });
+
+        const person1Select = document.getElementById('person1');
+        const person2Select = document.getElementById('person2');
+        const compareBtn = document.getElementById('compareBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        // Function to check if both people are selected
+        function checkSelections() {
+            compareBtn.disabled = !(person1Select.value && person2Select.value);
+        }
+
+        // Add event listeners to both selects
+        person1Select.addEventListener('change', checkSelections);
+        person2Select.addEventListener('change', checkSelections);
+
+        // Add click event to compare button
+        compareBtn.addEventListener('click', function() {
+            if (person1Select.value && person2Select.value) {
+                // Load first declaration
+                fetch(`../submit_module/view-declaration.php?id=${person1Select.value}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('declaration1').innerHTML = html;
+                    });
+
+                // Load second declaration
+                fetch(`../submit_module/view-declaration.php?id=${person2Select.value}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('declaration2').innerHTML = html;
+                        // Hide compare button after loading declarations
+                        compareBtn.style.display = 'none';
+                    });
+            }
+        });
+
+        // Add click event to clear button
+        clearBtn.addEventListener('click', function() {
+            // Reset selects
+            person1Select.value = '';
+            person2Select.value = '';
+            
+            // Clear declarations
+            document.getElementById('declaration1').innerHTML = '';
+            document.getElementById('declaration2').innerHTML = '';
+            
+            // Show compare button again
+            compareBtn.style.display = 'inline-block';
+            compareBtn.disabled = true;
         });
     </script>
 </body>
