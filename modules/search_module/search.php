@@ -87,12 +87,33 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
         background: #000000;
         color: white;
     }
-    /* Custom pagination button style */
-    .paginate_button.page-item.active {
-        background-color: #ffc107 !important; /* Bootstrap warning color */
-        border-color: #ffc107 !important;
-        color: #000 !important;
-    }
+    
+    .pagination {
+    --bs-pagination-padding-x: 0.75rem;
+    --bs-pagination-padding-y: 0.375rem;
+    --bs-pagination-font-size: 1rem;
+    --bs-pagination-color: #ffc107;
+    --bs-pagination-bg: var(--bs-body-bg);
+    --bs-pagination-border-width: var(--bs-border-width);
+    --bs-pagination-border-color: var(--bs-border-color);
+    --bs-pagination-border-radius: var(--bs-border-radius);
+    --bs-pagination-hover-color: #ffc107;
+    --bs-pagination-hover-bg: var(--bs-tertiary-bg);
+    --bs-pagination-hover-border-color: var(--bs-border-color);
+    --bs-pagination-focus-color: #ffc107;
+    --bs-pagination-focus-bg: var(--bs-secondary-bg);
+    --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    --bs-pagination-active-color: #fff;
+    --bs-pagination-active-bg: #ffc107;
+    --bs-pagination-active-border-color: #ffc107;
+    --bs-pagination-disabled-color: var(--bs-secondary-color);
+    --bs-pagination-disabled-bg: var(--bs-secondary-bg);
+    --bs-pagination-disabled-border-color: var(--bs-border-color);
+    display: flex
+;
+    padding-left: 0;
+    list-style: none;
+}
 </style>
 <body>
     <!-- Navigation -->
