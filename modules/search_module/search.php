@@ -206,7 +206,7 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
             <div class="card feature-card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table id="declarationsTable" class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width: 40%">Person Details</th>
@@ -298,7 +298,7 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
     <script src="../../assets/js/main.js"></script>
     <script>
         $(document).ready(function() {
-            $('.table').DataTable({
+           $('#declarationsTable').DataTable({
                 order: [], // No default sorting
                 pageLength: 10,
                 dom: '<"row"<"col-12"l>>rtip', // Remove search field (f) from dom
