@@ -299,18 +299,16 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
     <script>
         $(document).ready(function() {
             $('.table').DataTable({
-                order: [[2, 'desc']], // Sort by Submission Date column (index 2) by default
+                ordering: false, // Disable sorting
                 pageLength: 10,
+                pagingType: "simple", // Only show previous/next buttons
                 language: {
-                    
                     lengthMenu: "Show _MENU_ entries per page",
                     info: "Showing _START_ to _END_ of _TOTAL_ entries",
                     infoEmpty: "Showing 0 to 0 of 0 entries",
                     infoFiltered: "(filtered from _MAX_ total entries)",
                     zeroRecords: "No matching records found",
                     paginate: {
-                        first: "First",
-                        last: "Last",
                         next: "Next",
                         previous: "Previous"
                     }
