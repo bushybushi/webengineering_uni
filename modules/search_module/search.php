@@ -206,7 +206,7 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
             <div class="card feature-card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="declarationsTable" class="table table-hover align-middle">
+                        <table class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width: 40%">Person Details</th>
@@ -217,6 +217,40 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php foreach ($declarations as $declaration): ?>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <div class="avatar-circle"><?php echo substr($declaration['name'], 0, 1); ?></div>
+                                                </div>
+                                                <div class="ms-3">
+                                                    <h6 class="mb-1"><?php echo htmlspecialchars($declaration['name']); ?></h6>
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-building"></i> <?php echo htmlspecialchars($declaration['office']); ?>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['title']); ?></span>
+                                        </td>
+                                        <td>
+                                            <strong><?php echo date('Y', strtotime($declaration['date_of_submission'])); ?></strong>
+                                            <div class="small text-muted">
+                                                Submitted: <?php echo date('d/m/Y', strtotime($declaration['date_of_submission'])); ?>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['political_affiliation']); ?></span>
+                                        </td>
+                                        <td>
+                                            <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="View Declaration Details">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
                                 <?php if ($totalResults === 0): ?>
                                     <tr>
                                         <td colspan="5" class="text-center py-4">
@@ -226,41 +260,6 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                                             </div>
                                         </td>
                                     </tr>
-                                <?php else: ?>
-                                    <?php foreach ($declarations as $declaration): ?>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-shrink-0">
-                                                        <div class="avatar-circle"><?php echo substr($declaration['name'], 0, 1); ?></div>
-                                                    </div>
-                                                    <div class="ms-3">
-                                                        <h6 class="mb-1"><?php echo htmlspecialchars($declaration['name']); ?></h6>
-                                                        <small class="text-muted">
-                                                            <i class="bi bi-building"></i> <?php echo htmlspecialchars($declaration['office']); ?>
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['title']); ?></span>
-                                            </td>
-                                            <td>
-                                                <strong><?php echo date('Y', strtotime($declaration['date_of_submission'])); ?></strong>
-                                                <div class="small text-muted">
-                                                    Submitted: <?php echo date('d/m/Y', strtotime($declaration['date_of_submission'])); ?>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['political_affiliation']); ?></span>
-                                            </td>
-                                            <td>
-                                                <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="View Declaration Details">
-                                                    <i class="bi bi-eye"></i> View
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -299,13 +298,7 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
     <script src="../../assets/js/main.js"></script>
     <script>
         $(document).ready(function() {
-                        // Debug: Log the number of columns in header and first row
-            var headerCols = $('#declarationsTable thead th').length;
-            var firstRowCols = $('#declarationsTable tbody tr:first-child td').length;
-            console.log('Header columns:', headerCols);
-            console.log('First row columns:', firstRowCols);
-
-           $('#declarationsTable').DataTable({
+            $('.table').DataTable({
                 order: [], // No default sorting
                 pageLength: 10,
                 dom: '<"row"<"col-12"l>>rtip', // Remove search field (f) from dom
@@ -333,6 +326,13 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                         targets: [1, 3, 4], // Title, Political Affiliation, and Actions
                         orderable: false
                     }
+                ],
+                columns: [
+                    { data: 'person_details' }, // Person Details
+                    { data: 'title' }, // Title
+                    { data: 'submission_date' }, // Submission Date
+                    { data: 'political_affiliation' }, // Political Affiliation
+                    { data: 'actions' } // Actions
                 ]
             });
         });
