@@ -1,6 +1,9 @@
+/* Flag icon styling */
 .fi {
     border-radius: 0.3rem;
 }
+
+/* Navigation bar styling */
 .navbar {
     height: 76px;
     padding: 0.5rem 0;
@@ -21,49 +24,130 @@
     color: #ED9635;
 }
 
+/* Hero section styling - Main banner with video background */
 .hero-section {
-    background: linear-gradient(135deg, #ED9635 0%, #f0a85a 100%);
+    position: relative;
     color: white;
     padding: 6rem 0;
     margin-bottom: 4rem;
     margin-top: 70px;
+    overflow: hidden;
 }
+
+/* Video background styling */
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+/* Dark overlay for better text readability */
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+}
+
+/* Container positioning for hero content */
+.hero-section .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Hero title styling */
 .hero-title {
     font-size: 3.5rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 1px;
 }
+
+/* Hero subtitle styling */
 .hero-subtitle {
     font-size: 1.25rem;
     opacity: 0.9;
     margin-bottom: 2rem;
 }
+
+.hero-section .btn-light {
+    background-color: #ED9635;
+    border-color: #ED9635;
+    color: white;
+}
+
+.hero-section .btn-light:hover {
+    background-color: #d67b1f;
+    border-color: #d67b1f;
+    color: white;
+}
+
+.hero-section .btn-outline-light {
+    border-color: #ED9635;
+    color: #ED9635;
+}
+
+.hero-section .btn-outline-light:hover {
+    background-color: #ED9635;
+    color: white;
+}
+
+.hero-section .form-control {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid #ED9635;
+}
+
+.hero-section .form-control:focus {
+    border-color: #ED9635;
+    box-shadow: 0 0 0 0.25rem rgba(237, 150, 53, 0.25);
+}
+
 .feature-card {
     border: none;
     border-radius: 15px;
     transition: transform 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .feature-card:hover {
     transform: translateY(-5px);
 }
+
+/* Feature icons styling */
 .feature-icon {
     font-size: 2.5rem;
     color: #ED9635;
     margin-bottom: 1rem;
 }
+
+/* Latest declarations section styling */
 .latest-declarations {
     background: #f8f9fa;
     border-radius: 15px;
     padding: 1.5rem;
 }
+
+/* Declaration items styling */
 .declaration-item {
     padding: 1rem 0;
     border-bottom: 1px solid #dee2e6;
 }
+
 .declaration-item:last-child {
     border-bottom: none;
 }
+
+/* Avatar circle styling for user images */
 .avatar-circle {
     width: 45px;
     height: 45px;
@@ -75,21 +159,29 @@
     font-weight: 600;
     color: #000000;
 }
+
+/* Stats cards styling */
 .stats-card {
     background: white;
     border-radius: 15px;
     padding: 1.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+/* Stats numbers styling */
 .stat-number {
     font-size: 2rem;
     font-weight: 700;
     color: #ED9635;
 }
+
+/* Stats labels styling */
 .stat-label {
     color: #6c757d;
     font-size: 0.9rem;
 }
+
+/* Profile button styling */
 .profile-btn {
     width: 40px;
     height: 40px;
@@ -105,30 +197,38 @@
     transition: all 0.3s ease;
     margin: 0 0.5rem;
 }
+
 .profile-btn:hover {
     background: #dee2e6;
     transform: scale(1.05);
 }
+
+/* Dropdown menu styling */
 .dropdown-menu {
     border: none;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     padding: 0.5rem;
 }
+
 .dropdown-item {
     border-radius: 5px;
     padding: 0.5rem 1rem;
     color: #212529;
 }
+
 .dropdown-item:hover {
     background-color: #f8f9fa;
     color: #ED9635;
 }
+
 .dropdown-item i {
     margin-right: 0.5rem;
     width: 1.2rem;
     text-align: center;
 }
+
+/* Language button styling */
 .lang-btn {
     width: 40px;
     height: 40px;
@@ -144,10 +244,12 @@
     transition: all 0.3s ease;
     margin: 0 0.5rem;
 }
+
 .lang-btn:hover {
     background: #dee2e6;
     transform: scale(1.05);
 }
+
 .lang-btn.active {
     background: #000000;
     color: white;
@@ -166,16 +268,21 @@
     height: 300px;
     margin-bottom: 2rem;
 }
+
+/* Stats summary section styling */
 .stats-summary {
     background: #f8f9fa;
     border-radius: 10px;
     padding: 1.5rem;
     margin-bottom: 2rem;
 }
+
+/* Stats item styling */
 .stat-item {
     text-align: center;
     padding: 1rem;
 }
+
 .stat-value {
     font-size: 2rem;
     font-weight: bold;
@@ -190,18 +297,20 @@
     border-color: #ED9635;
     color: white !important;
 }
+
 .btn-primary:hover {
     background-color: #d67b1f;
     border-color: #d67b1f;
     color: white !important;
 }
+
 .btn-light:hover {
     background-color: #f8f9fa;
     border-color: #f8f9fa;
     color: #ED9635 !important;
 }
 
-/* Responsive Styles */
+/* Responsive styles for tablets and smaller devices */
 @media (max-width: 768px) {
     .hero-section {
         padding: 4rem 0;
@@ -243,8 +352,8 @@
     }
 }
 
+/* Responsive styles for mobile devices */
 @media (max-width: 576px) {
-
     .navbar {
         height: 66px;
     }
@@ -275,7 +384,7 @@
     }
 }
 
-/* Mobile Navigation Styles */
+/* Mobile navigation styles */
 @media (max-width: 991px) {
     .navbar-toggler {
         padding: 0.5rem;
@@ -293,7 +402,7 @@
         height: 1.5rem;
     }
 
-    /* Offcanvas Styles */
+    /* Offcanvas menu styling */
     .offcanvas {
         width: 300px;
         border-left: 1px solid #dee2e6;
@@ -391,7 +500,7 @@
     max-width: 70%;
 }
 
-/* Footer Styles */
+/* Footer styling */
 footer {
     background-color: #f8f9fa;
     border-top: 1px solid #dee2e6;
