@@ -317,8 +317,8 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                     }
                 },
                 columnDefs: [{
-                    targets: '_all', // Apply to all columns
-                    orderSequence: ['asc', 'desc', ''] // Add empty string for no sort
+                        targets: [0, 2], // Person Details (0) and Submission Date (2)
+                        orderSequence: ['asc', 'desc', ''] // Add empty string for no sort
                 }]
             });
         });
