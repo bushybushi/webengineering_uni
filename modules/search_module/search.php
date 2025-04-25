@@ -206,14 +206,14 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
             <div class="card feature-card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="declarationsTable" class="table table-hover align-middle">
+                        <table class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Person Details</th>
-                                    <th>Title</th>
-                                    <th>Submission Date</th>
-                                    <th>Political Affiliation</th>
-                                    <th>Actions</th>
+                                    <th style="width: 40%">Person Details</th>
+                                    <th style="width: 20%">Title</th>
+                                    <th style="width: 15%">Submission Date</th>
+                                    <th style="width: 15%">Political Affiliation</th>
+                                    <th style="width: 10%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -298,7 +298,7 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
     <script src="../../assets/js/main.js"></script>
     <script>
         $(document).ready(function() {
-            $('#declarationsTable').DataTable({
+            $('.table').DataTable({
                 order: [], // No default sorting
                 pageLength: 10,
                 dom: '<"row"<"col-12"l>>rtip', // Remove search field (f) from dom
@@ -326,6 +326,13 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                         targets: [1, 3, 4], // Title, Political Affiliation, and Actions
                         orderable: false
                     }
+                ],
+                columns: [
+                    { data: 'person_details' }, // Person Details
+                    { data: 'title' }, // Title
+                    { data: 'submission_date' }, // Submission Date
+                    { data: 'political_affiliation' }, // Political Affiliation
+                    { data: 'actions' } // Actions
                 ]
             });
         });
