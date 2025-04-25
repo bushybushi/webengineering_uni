@@ -302,6 +302,68 @@ try {
                     </div>
                 </div>
             </div>
+                        <!-- Comparison Section -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card feature-card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Compare Declarations</h5>
+                            <form id="comparisonForm" class="row g-3">
+                                <div class="col-md-5">
+                                    <label class="form-label">Select First Person</label>
+                                    <select class="form-select" name="person1" id="person1">
+                                        <option value="">Choose a person...</option>
+                                        <?php
+                                        $stmt = $conn->query("SELECT id, name, office FROM people ORDER BY name");
+                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                            echo "<option value='{$row['id']}'>{$row['name']} ({$row['office']})</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label">Select Second Person</label>
+                                    <select class="form-select" name="person2" id="person2">
+                                        <option value="">Choose a person...</option>
+                                        <?php
+                                        $stmt->execute(); // Reset the statement
+                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                            echo "<option value='{$row['id']}'>{$row['name']} ({$row['office']})</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="submit" class="btn btn-warning w-100">Compare</button>
+                                </div>
+                            </form>
+
+                            <!-- Comparison Results -->
+                            <div id="comparisonResults" class="mt-4" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title" id="person1Name"></h6>
+                                                <div id="person1Details"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title" id="person2Name"></h6>
+                                                <div id="person2Details"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -375,6 +437,49 @@ try {
                     }
                 }
             }
+        });
+
+                // Comparison functionality
+        document.getElementById('comparisonForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const person1 = document.getElementById('person1').value;
+            const person2 = document.getElementById('person2').value;
+
+            if (!person1 || !person2) {
+                alert('Please select both people to compare');
+                return;
+            }
+
+            // Fetch comparison data
+            fetch(`get_comparison.php?person1=${person1}&person2=${person2}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('comparisonResults').style.display = 'block';
+                    document.getElementById('person1Name').textContent = data.person1.name;
+                    document.getElementById('person2Name').textContent = data.person2.name;
+                    
+                    // Display person 1 details
+                    let person1Html = `
+                        <p><strong>Office:</strong> ${data.person1.office}</p>
+                        <p><strong>Political Affiliation:</strong> ${data.person1.political_affiliation}</p>
+                        <p><strong>Total Assets:</strong> ${data.person1.total_assets}</p>
+                        <p><strong>Submission Date:</strong> ${data.person1.date_of_submission}</p>
+                    `;
+                    document.getElementById('person1Details').innerHTML = person1Html;
+
+                    // Display person 2 details
+                    let person2Html = `
+                        <p><strong>Office:</strong> ${data.person2.office}</p>
+                        <p><strong>Political Affiliation:</strong> ${data.person2.political_affiliation}</p>
+                        <p><strong>Total Assets:</strong> ${data.person2.total_assets}</p>
+                        <p><strong>Submission Date:</strong> ${data.person2.date_of_submission}</p>
+                    `;
+                    document.getElementById('person2Details').innerHTML = person2Html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error fetching comparison data');
+                });
         });
     </script>
 </body>
