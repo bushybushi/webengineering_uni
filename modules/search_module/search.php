@@ -217,40 +217,6 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($declarations as $declaration): ?>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shrink-0">
-                                                    <div class="avatar-circle"><?php echo substr($declaration['name'], 0, 1); ?></div>
-                                                </div>
-                                                <div class="ms-3">
-                                                    <h6 class="mb-1"><?php echo htmlspecialchars($declaration['name']); ?></h6>
-                                                    <small class="text-muted">
-                                                        <i class="bi bi-building"></i> <?php echo htmlspecialchars($declaration['office']); ?>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['title']); ?></span>
-                                        </td>
-                                        <td>
-                                            <strong><?php echo date('Y', strtotime($declaration['date_of_submission'])); ?></strong>
-                                            <div class="small text-muted">
-                                                Submitted: <?php echo date('d/m/Y', strtotime($declaration['date_of_submission'])); ?>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['political_affiliation']); ?></span>
-                                        </td>
-                                        <td>
-                                            <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="View Declaration Details">
-                                                <i class="bi bi-eye"></i> View
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
                                 <?php if ($totalResults === 0): ?>
                                     <tr>
                                         <td colspan="5" class="text-center py-4">
@@ -260,6 +226,41 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                                             </div>
                                         </td>
                                     </tr>
+                                <?php else: ?>
+                                    <?php foreach ($declarations as $declaration): ?>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <div class="avatar-circle"><?php echo substr($declaration['name'], 0, 1); ?></div>
+                                                    </div>
+                                                    <div class="ms-3">
+                                                        <h6 class="mb-1"><?php echo htmlspecialchars($declaration['name']); ?></h6>
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-building"></i> <?php echo htmlspecialchars($declaration['office']); ?>
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['title']); ?></span>
+                                            </td>
+                                            <td>
+                                                <strong><?php echo date('Y', strtotime($declaration['date_of_submission'])); ?></strong>
+                                                <div class="small text-muted">
+                                                    Submitted: <?php echo date('d/m/Y', strtotime($declaration['date_of_submission'])); ?>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['political_affiliation']); ?></span>
+                                            </td>
+                                            <td>
+                                                <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="View Declaration Details">
+                                                    <i class="bi bi-eye"></i> View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
                                 <?php endif; ?>
                             </tbody>
                         </table>
