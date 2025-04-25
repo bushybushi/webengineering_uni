@@ -326,13 +326,6 @@ $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
                         targets: [1, 3, 4], // Title, Political Affiliation, and Actions
                         orderable: false
                     }
-                ],
-                columns: [
-                    { data: 'person_details' }, // Person Details
-                    { data: 'title' }, // Title
-                    { data: 'submission_date' }, // Submission Date
-                    { data: 'political_affiliation' }, // Political Affiliation
-                    { data: 'actions' } // Actions
                 ]
             });
         });
