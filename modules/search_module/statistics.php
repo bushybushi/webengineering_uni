@@ -245,7 +245,12 @@ try {
     <div class="pt-5">
         <!-- Main Content -->
         <main class="container my-5">
-            <h1 class="mb-4">Statistics & Analysis</h1>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Statistics & Analysis</h1>
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#compareModal">
+                    <i class="bi bi-arrow-left-right"></i> Compare Declarations
+                </button>
+            </div>
 
             <!-- Summary Stats -->
             <div class="stats-summary">
@@ -297,63 +302,6 @@ try {
                             <h5 class="card-title mb-4">Asset Value Distribution</h5>
                             <div class="chart-container">
                                 <canvas id="valueDistributionChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Comparison Section -->
-            <div class="card feature-card mt-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">Compare Declarations</h5>
-                    <form id="compareForm" class="row g-3">
-                        <div class="col-md-5">
-                            <label class="form-label">Select First Politician</label>
-                            <select class="form-select" name="person1" id="person1">
-                                <option value="">Choose...</option>
-                                <?php
-                                $stmt = $conn->query("SELECT id, name, political_affiliation FROM people ORDER BY name");
-                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                    echo "<option value='" . $row['id'] . "'>" . htmlspecialchars($row['name']) . " (" . htmlspecialchars($row['political_affiliation']) . ")</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label">Select Second Politician</label>
-                            <select class="form-select" name="person2" id="person2">
-                                <option value="">Choose...</option>
-                                <?php
-                                $stmt = $conn->query("SELECT id, name, political_affiliation FROM people ORDER BY name");
-                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                    echo "<option value='" . $row['id'] . "'>" . htmlspecialchars($row['name']) . " (" . htmlspecialchars($row['political_affiliation']) . ")</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">&nbsp;</label>
-                            <button type="submit" class="btn btn-warning w-100">Compare</button>
-                        </div>
-                    </form>
-
-                    <!-- Comparison Results -->
-                    <div id="comparisonResults" class="row mt-4" style="display: none;">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title" id="person1Name"></h6>
-                                    <div id="person1Content"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title" id="person2Name"></h6>
-                                    <div id="person2Content"></div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -434,35 +382,103 @@ try {
             }
         });
 
-        // Comparison functionality
+        // Compare functionality
         $(document).ready(function() {
-            $('#compareForm').on('submit', function(e) {
-                e.preventDefault();
+            function loadDeclaration(id, targetDiv) {
+                if (!id) return;
                 
-                const person1 = $('#person1').val();
-                const person2 = $('#person2').val();
-                
-                if (!person1 || !person2) {
-                    alert('Please select both politicians to compare');
-                    return;
-                }
-                
-                // Load first person's declaration
-                $.get('../submit_module/view-declaration.php', { id: person1 }, function(data) {
-                    $('#person1Content').html(data);
-                    $('#person1Name').text($('#person1 option:selected').text());
+                $.ajax({
+                    url: '../submit_module/view-declaration.php',
+                    method: 'GET',
+                    data: { id: id },
+                    success: function(response) {
+                        // Extract the main content from the response
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = response;
+                        const mainContent = tempDiv.querySelector('.card-body');
+                        
+                        if (mainContent) {
+                            $(targetDiv).html(mainContent.innerHTML);
+                        }
+                    },
+                    error: function() {
+                        $(targetDiv).html('<div class="alert alert-danger">Error loading declaration</div>');
+                    }
                 });
-                
-                // Load second person's declaration
-                $.get('../submit_module/view-declaration.php', { id: person2 }, function(data) {
-                    $('#person2Content').html(data);
-                    $('#person2Name').text($('#person2 option:selected').text());
-                });
-                
-                // Show comparison results
-                $('#comparisonResults').show();
+            }
+
+            $('#firstPolitician').change(function() {
+                loadDeclaration($(this).val(), '#firstDeclaration');
+            });
+
+            $('#secondPolitician').change(function() {
+                loadDeclaration($(this).val(), '#secondDeclaration');
             });
         });
     </script>
+
+    <!-- Compare Modal -->
+    <div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="compareModalLabel">Compare Declarations</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">First Politician</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Select Politician</label>
+                                        <select class="form-select" id="firstPolitician">
+                                            <option value="">Choose...</option>
+                                            <?php
+                                            $stmt = $conn->query("SELECT id, name, political_affiliation FROM people ORDER BY name");
+                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                echo "<option value='{$row['id']}'>{$row['name']} ({$row['political_affiliation']})</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div id="firstDeclaration" class="declaration-content">
+                                        <!-- First declaration will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Second Politician</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Select Politician</label>
+                                        <select class="form-select" id="secondPolitician">
+                                            <option value="">Choose...</option>
+                                            <?php
+                                            $stmt = $conn->query("SELECT id, name, political_affiliation FROM people ORDER BY name");
+                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                echo "<option value='{$row['id']}'>{$row['name']} ({$row['political_affiliation']})</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div id="secondDeclaration" class="declaration-content">
+                                        <!-- Second declaration will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html> 
