@@ -140,6 +140,61 @@ try {
             color: white;
             opacity: 1;
         }
+        .search-container {
+            position: relative;
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .search-result-item {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .selected-politicians {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .selected-politician {
+            background-color: #ED9635;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .selected-politician button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 0;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        .selected-politician button:hover {
+            color: #f8f9fa;
+        }
     </style>
 </head>
 <body>
@@ -369,6 +424,38 @@ try {
                 </div>
             </div>
         </div>
+
+        <!-- Financial Comparison Chart Section -->
+        <div class="container mb-5">
+            <h2 class="mb-4">Financial Comparison</h2>
+            
+            <!-- Search and Selection Area -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="search-container">
+                                <input type="text" class="form-control" id="politicianSearch" placeholder="Search politicians...">
+                                <div id="searchResults" class="search-results"></div>
+                            </div>
+                            <div id="selectedPoliticians" class="selected-politicians mt-3">
+                                <!-- Selected politicians will appear here -->
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button id="clearSelection" class="btn btn-secondary">Clear All</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Area -->
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="financialChart"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -492,6 +579,268 @@ try {
             compareBtn.style.display = 'inline-block';
             compareBtn.disabled = true;
         });
+
+        // Financial Chart Code
+        const ctx = document.getElementById('financialChart').getContext('2d');
+        let financialChart = null;
+        let selectedPoliticians = new Map(); // Store selected politicians
+
+        // Function to fetch financial data
+        async function fetchFinancialData(politicianIds) {
+            try {
+                const response = await fetch('./get_financial_data.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ids: politicianIds })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Fetched data:', data); // Debug log
+                
+                if (data.error) {
+                    console.error('Server error:', data.error);
+                    return null;
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('Error fetching financial data:', error);
+                return null;
+            }
+        }
+
+        // Function to update chart
+        function updateChart(data) {
+            console.log('Updating chart with data:', data); // Debug log
+            
+            if (!data || data.length === 0) {
+                // Show empty chart with axes
+                if (financialChart) {
+                    financialChart.destroy();
+                }
+                
+                financialChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: [
+                            {
+                                label: 'Real Estate Value (€)',
+                                data: [],
+                                backgroundColor: 'rgba(237, 150, 53, 0.8)',
+                                borderColor: 'rgba(237, 150, 53, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Stocks Value (€)',
+                                data: [],
+                                backgroundColor: 'rgba(214, 123, 31, 0.8)',
+                                borderColor: 'rgba(214, 123, 31, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Deposits Value (€)',
+                                data: [],
+                                backgroundColor: 'rgba(240, 168, 90, 0.8)',
+                                borderColor: 'rgba(240, 168, 90, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                stacked: false,
+                                title: {
+                                    display: true,
+                                    text: 'Politicians'
+                                }
+                            },
+                            y: {
+                                stacked: false,
+                                title: {
+                                    display: true,
+                                    text: 'Value (€)'
+                                },
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Financial Comparison'
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+
+            if (financialChart) {
+                financialChart.destroy();
+            }
+
+            const labels = data.map(item => item.name);
+            const realEstateData = data.map(item => parseFloat(item.real_estate) || 0);
+            const stocksData = data.map(item => parseFloat(item.stocks) || 0);
+            const depositsData = data.map(item => parseFloat(item.deposits) || 0);
+
+            financialChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Real Estate Value (€)',
+                            data: realEstateData,
+                            backgroundColor: 'rgba(237, 150, 53, 0.8)',
+                            borderColor: 'rgba(237, 150, 53, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Stocks Value (€)',
+                            data: stocksData,
+                            backgroundColor: 'rgba(214, 123, 31, 0.8)',
+                            borderColor: 'rgba(214, 123, 31, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Deposits Value (€)',
+                            data: depositsData,
+                            backgroundColor: 'rgba(240, 168, 90, 0.8)',
+                            borderColor: 'rgba(240, 168, 90, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            stacked: false,
+                            title: {
+                                display: true,
+                                text: 'Politicians'
+                            }
+                        },
+                        y: {
+                            stacked: false,
+                            title: {
+                                display: true,
+                                text: 'Value (€)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Financial Comparison'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('politicianSearch');
+        const searchResults = document.getElementById('searchResults');
+        const selectedPoliticiansContainer = document.getElementById('selectedPoliticians');
+
+        searchInput.addEventListener('input', async function() {
+            const query = this.value.trim();
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`./search_politicians.php?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                searchResults.innerHTML = '';
+                data.forEach(politician => {
+                    if (!selectedPoliticians.has(politician.id)) {
+                        const div = document.createElement('div');
+                        div.className = 'search-result-item';
+                        div.textContent = politician.name;
+                        div.addEventListener('click', () => addPolitician(politician));
+                        searchResults.appendChild(div);
+                    }
+                });
+                
+                searchResults.style.display = data.length > 0 ? 'block' : 'none';
+            } catch (error) {
+                console.error('Error searching politicians:', error);
+            }
+        });
+
+        function addPolitician(politician) {
+            if (!selectedPoliticians.has(politician.id)) {
+                selectedPoliticians.set(politician.id, politician);
+                updateSelectedPoliticiansList();
+                updateChartWithSelectedPoliticians();
+            }
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+        }
+
+        function removePolitician(id) {
+            selectedPoliticians.delete(id);
+            updateSelectedPoliticiansList();
+            updateChartWithSelectedPoliticians();
+        }
+
+        function updateSelectedPoliticiansList() {
+            selectedPoliticiansContainer.innerHTML = '';
+            selectedPoliticians.forEach((politician, id) => {
+                const div = document.createElement('div');
+                div.className = 'selected-politician';
+                div.innerHTML = `
+                    ${politician.name}
+                    <button onclick="removePolitician(${id})">&times;</button>
+                `;
+                selectedPoliticiansContainer.appendChild(div);
+            });
+        }
+
+        async function updateChartWithSelectedPoliticians() {
+            console.log('Selected politicians:', Array.from(selectedPoliticians.keys())); // Debug log
+            const ids = Array.from(selectedPoliticians.keys());
+            if (ids.length > 0) {
+                const data = await fetchFinancialData(ids);
+                console.log('Chart data:', data); // Debug log
+                if (data) {
+                    updateChart(data);
+                }
+            } else {
+                updateChart([]);
+            }
+        }
+
+        // Event listener for clear button
+        document.getElementById('clearSelection').addEventListener('click', function() {
+            selectedPoliticians.clear();
+            updateSelectedPoliticiansList();
+            updateChart([]);
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Initialize empty chart
+        updateChart([]);
     </script>
 </body>
 </html> 
