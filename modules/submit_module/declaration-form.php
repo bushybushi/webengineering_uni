@@ -422,15 +422,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Χρόνος απόκτησης</label>
-                                                        <select name="properties[0][acquisition_date]" class="form-select" required>
-                                                            <option value="">Επιλέξτε Χρόνο</option>
-                                                            <?php
-                                                            $currentYear = date('Y');
-                                                            for ($year = $currentYear; $year >= 1900; $year--) {
-                                                                echo "<option value='$year'>$year</option>";
-                                                            }
-                                                            ?>
-                                                        </select>
+                                                     <input type="date" name="properties[0][acquisition_date]" class="form-control" required>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Αξία απόκτησης (€)</label>
@@ -765,9 +757,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Χρόνος απόκτησης</label>
-                            <select name="properties[${index}][acquisition_date]" class="form-select" required>
-                                ${yearOptions}
-                            </select>
+                             <input type="date" name="properties[0][acquisition_date]" class="form-control" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Αξία απόκτησης (€)</label>
