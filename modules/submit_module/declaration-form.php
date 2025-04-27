@@ -387,14 +387,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
                                                         <label class="form-label">Είδος</label>
-                                                        <select name="properties[0][type]" class="form-select property-type" required>
-                                                            <option value="">Επιλέξτε</option>
-                                                            <option value="House">Σπίτι</option>
-                                                            <option value="Apartment">Διαμέρισμα</option>
-                                                            <option value="Land">Οικόπεδο</option>
-                                                            <option value="Plot">Χωράφι</option>
-                                                            <option value="Other">Άλλο</option>
-                                                        </select>
+                                                        <select name="properties[${index}][type]" class="form-select property-type" required>
+                                <option value="">Επιλέξτε</option>
+                                <option value="Σπίτι">Σπίτι</option>
+                                <option value="Διαμέρισμα">Διαμέρισμα</option>
+                                <option value="Οικόπεδο">Οικόπεδο</option>
+                                <option value="Χωράφι">Χωράφι</option>
+                                <option value="Άλλο">Άλλο</option>
+                            </select>
                                                         <div class="other-property-type mt-2" style="display: none;">
                                                             <label class="form-label">Καθορίστε το είδος της ιδιοκτησίας</label>
                                                             <input type="text" name="properties[0][type]" class="form-control">
@@ -722,13 +722,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Είδος</label>
-                            <select name="properties[${index}][type]" class="form-select property-type" required>
+                           <select name="properties[${index}][type]" class="form-select property-type" required>
                                 <option value="">Επιλέξτε</option>
-                                <option value="House">Σπίτι</option>
-                                <option value="Apartment">Διαμέρισμα</option>
-                                <option value="Land">Οικόπεδο</option>
-                                <option value="Plot">Χωράφι</option>
-                                <option value="Other">Άλλο</option>
+                                <option value="Σπίτι">Σπίτι</option>
+                                <option value="Διαμέρισμα">Διαμέρισμα</option>
+                                <option value="Οικόπεδο">Οικόπεδο</option>
+                                <option value="Χωράφι">Χωράφι</option>
+                                <option value="Άλλο">Άλλο</option>
                             </select>
                             <div class="other-property-type mt-2" style="display: none;">
                                 <label class="form-label">Καθορίστε το είδος της ιδιοκτησίας</label>
