@@ -484,12 +484,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                         <label class="form-label">Είδος Κινητής Αξίας</label>
                                                         <select name="liquid_assets[0][type]" class="form-select" required>
                                                             <option value="">Επιλέξτε Είδος</option>
-                                                            <option value="">Μετοχές</option>
-                                                            <option value="">Χρεωστικά Ομόλογα</option>
-                                                            <option value="">Ομολογίες</option>
-                                                            <option value="">Τίτλοι</option>
-                                                            <option value="">Μετοχές</option>
-                                                            <option value="">Μερίσματα</option>
+                                                            <option value="Χρεόγραφα">Χρεόγραφα</option>
+                                                            <option value="Χρεωστικά Ομόλογα">Χρεωστικά Ομόλογα</option>
+                                                            <option value="Ομολογίες">Ομολογίες</option>
+                                                            <option value="Τίτλοι">Τίτλοι</option>
+                                                            <option value="Μετοχές">Μετοχές</option>
+                                                            <option value="Μερίσματα">Μερίσματα</option>
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">
@@ -829,12 +829,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                             <label class="form-label">Είδος Κινητής Αξίας</label>
                             <select name="liquid_assets[${index}][type]" class="form-select" required>
                                 <option value="">Επιλέξτε Είδος</option>
-                                <option value="">Μετοχές</option>
-                                <option value="">Χρεωστικά Ομόλογα</option>
-                                <option value="">Ομολογίες</option>
-                                <option value="">Τίτλοι</option>
-                                <option value="">Μετοχές</option>
-                                <option value="">Μερίσματα</option>
+                                <option value="Χρεόγραφα">Χρεόγραφα</option>
+                                <option value="Χρεωστικά Ομόλογα">Χρεωστικά Ομόλογα</option>
+                                <option value="Ομολογίες">Ομολογίες</option>
+                                <option value="Τίτλοι">Τίτλοι</option>
+                                <option value="Μετοχές">Μετοχές</option>
+                                <option value="Μερίσματα">Μερίσματα</option>
                             </select>
                         </div>
                         <div class="col-md-6">
