@@ -387,14 +387,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
                                                         <label class="form-label">Είδος</label>
-                                                        <select name="properties[${index}][type]" class="form-select property-type" required>
-                                <option value="">Επιλέξτε</option>
-                                <option value="Σπίτι">Σπίτι</option>
-                                <option value="Διαμέρισμα">Διαμέρισμα</option>
-                                <option value="Οικόπεδο">Οικόπεδο</option>
-                                <option value="Χωράφι">Χωράφι</option>
-                                <option value="Άλλο">Άλλο</option>
-                            </select>
+                                                        <select name="properties[0][type]" class="form-select property-type" required>
+                                                            <option value="">Επιλέξτε</option>
+                                                            <option value="Σπίτι">Σπίτι</option>
+                                                            <option value="Διαμέρισμα">Διαμέρισμα</option>
+                                                            <option value="Οικόπεδο">Οικόπεδο</option>
+                                                            <option value="Χωράφι">Χωράφι</option>
+                                                        </select>
                                                         <div class="other-property-type mt-2" style="display: none;">
                                                             <label class="form-label">Καθορίστε το είδος της ιδιοκτησίας</label>
                                                             <input type="text" name="properties[0][type]" class="form-control">
@@ -682,36 +681,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script>
-        // Function to handle property type selection
-        function handlePropertyTypeChange(selectElement) {
-            const otherTypeDiv = selectElement.parentElement.querySelector('.other-property-type');
-            if (selectElement.value === 'Άλλο') {
-                otherTypeDiv.style.display = 'block';
-                otherTypeDiv.querySelector('input').required = true;
-                // Disable the select when "Άλλο" is selected
-                selectElement.disabled = true;
-                // Clear the select value to prevent it from being submitted
-                selectElement.value = '';
-            } else {
-                otherTypeDiv.style.display = 'none';
-                otherTypeDiv.querySelector('input').required = false;
-                // Re-enable the select if it was disabled
-                selectElement.disabled = false;
-                // Clear the input value
-                otherTypeDiv.querySelector('input').value = '';
-            }
-        }
-
-        // Add event listeners to existing property type selects
-        document.addEventListener('DOMContentLoaded', function() {
-            const propertyTypeSelects = document.querySelectorAll('.property-type');
-            propertyTypeSelects.forEach(select => {
-                select.addEventListener('change', function() {
-                    handlePropertyTypeChange(this);
-                });
-            });
-        });
-
         // Modify addPropertyEntry function to include the event listener
         function addPropertyEntry() {
             const container = document.getElementById('properties-container');
@@ -730,14 +699,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Είδος</label>
-                           <select name="properties[${index}][type]" class="form-select property-type" required>
-                                <option value="">Επιλέξτε</option>
-                                <option value="Σπίτι">Σπίτι</option>
-                                <option value="Διαμέρισμα">Διαμέρισμα</option>
-                                <option value="Οικόπεδο">Οικόπεδο</option>
-                                <option value="Χωράφι">Χωράφι</option>
-                                <option value="Άλλο">Άλλο</option>
-                            </select>
+                           <select name="properties[0][type]" class="form-select property-type" required>
+                                                            <option value="">Επιλέξτε</option>
+                                                            <option value="Σπίτι">Σπίτι</option>
+                                                            <option value="Διαμέρισμα">Διαμέρισμα</option>
+                                                            <option value="Οικόπεδο">Οικόπεδο</option>
+                                                            <option value="Χωράφι">Χωράφι</option>
+                                                        </select>
                             <div class="other-property-type mt-2" style="display: none;">
                                 <label class="form-label">Καθορίστε το είδος της ιδιοκτησίας</label>
                                 <input type="text" name="properties[${index}][type]" class="form-control">
@@ -779,12 +747,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', template);
-            
-            // Add event listener to the new property type select
-            const newSelect = container.lastElementChild.querySelector('.property-type');
-            newSelect.addEventListener('change', function() {
-                handlePropertyTypeChange(this);
-            });
         }
 
         // Function to add new vehicle entry
