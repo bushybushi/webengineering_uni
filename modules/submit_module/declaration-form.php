@@ -364,12 +364,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Οικογενειακή Κατάσταση</label>
-                                                <select name="marital_status" class="form-select" required>
+                                               <select name="marital_status" class="form-select" required>
                                                     <option value="">Επιλέξτε Κατάσταση</option>
-                                                    <option value="Single">Άγαμος/η</option>
-                                                    <option value="Married">Έγγαμος/η</option>
-                                                    <option value="Divorced">Διαζευγμένος/η</option>
-                                                    <option value="Other">Άλλο</option>
+                                                    <option value="Άγαμος/η">Άγαμος/η</option>
+                                                    <option value="Έγγαμος/η">Έγγαμος/η</option>
+                                                    <option value="Διαζευγμένος/η">Διαζευγμένος/η</option>
+                                                    <option value="Άλλο">Άλλο</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-6">
@@ -683,14 +683,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     <!-- Custom JS -->
     <script>
         // Function to handle property type selection
-        function handlePropertyTypeChange(selectElement) {
+       function handlePropertyTypeChange(selectElement) {
             const otherTypeDiv = selectElement.parentElement.querySelector('.other-property-type');
-            if (selectElement.value === 'Other') {
+            if (selectElement.value === 'Άλλο') {
                 otherTypeDiv.style.display = 'block';
                 otherTypeDiv.querySelector('input').required = true;
+                // Disable the select when "Άλλο" is selected
+                selectElement.disabled = true;
             } else {
                 otherTypeDiv.style.display = 'none';
                 otherTypeDiv.querySelector('input').required = false;
+                // Re-enable the select if it was disabled
+                selectElement.disabled = false;
             }
         }
 
