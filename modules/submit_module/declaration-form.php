@@ -683,18 +683,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     <!-- Custom JS -->
     <script>
         // Function to handle property type selection
-       function handlePropertyTypeChange(selectElement) {
+        function handlePropertyTypeChange(selectElement) {
             const otherTypeDiv = selectElement.parentElement.querySelector('.other-property-type');
             if (selectElement.value === 'Άλλο') {
                 otherTypeDiv.style.display = 'block';
                 otherTypeDiv.querySelector('input').required = true;
                 // Disable the select when "Άλλο" is selected
                 selectElement.disabled = true;
+                // Clear the select value to prevent it from being submitted
+                selectElement.value = '';
             } else {
                 otherTypeDiv.style.display = 'none';
                 otherTypeDiv.querySelector('input').required = false;
                 // Re-enable the select if it was disabled
                 selectElement.disabled = false;
+                // Clear the input value
+                otherTypeDiv.querySelector('input').value = '';
             }
         }
 
