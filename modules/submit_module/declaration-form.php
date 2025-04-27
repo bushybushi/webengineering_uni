@@ -394,10 +394,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                             <option value="Οικόπεδο">Οικόπεδο</option>
                                                             <option value="Χωράφι">Χωράφι</option>
                                                         </select>
-                                                        <div class="other-property-type mt-2" style="display: none;">
-                                                            <label class="form-label">Καθορίστε το είδος της ιδιοκτησίας</label>
-                                                            <input type="text" name="properties[0][type]" class="form-control">
-                                                        </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Τοποθεσία</label>
@@ -706,10 +702,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                             <option value="Οικόπεδο">Οικόπεδο</option>
                                                             <option value="Χωράφι">Χωράφι</option>
                                                         </select>
-                            <div class="other-property-type mt-2" style="display: none;">
-                                <label class="form-label">Καθορίστε το είδος της ιδιοκτησίας</label>
-                                <input type="text" name="properties[${index}][type]" class="form-control">
-                            </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Τοποθεσία</label>
