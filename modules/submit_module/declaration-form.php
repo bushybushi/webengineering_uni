@@ -1,101 +1,177 @@
 <?php
-// Database connection - using server connection
+// Database connection
 require_once '../../config/db_connection.php';
 
 // Initialize variables
 $success_message = '';
 $error_message = '';
 
+// Ensure database connection is established
+if (!isset($pdo)) {
+    try {
+        $pdo = new PDO("mysql:host=localhost;dbname=pothen_esxes", "root", "");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        $error_message = "Database connection failed: " . $e->getMessage();
+    }
+}
+
 // Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     try {
         $pdo->beginTransaction();
 
-        // Insert person's information
-        $stmt = $pdo->prepare("INSERT INTO people (name, title, office, address, dob, id_number, marital_status, num_of_dependents, date_of_submission, political_affiliation) 
-                              VALUES (:name, :title, :office, :address, :dob, :id_number, :marital_status, :num_of_dependents, :date_of_submission, :political_affiliation)");
+        // Insert declaration (empty for now as per requirements)
+        $stmt = $pdo->prepare("INSERT INTO declarations (submission_date, title) VALUES (CURDATE(), :title)");
+        $stmt->execute([
+            ':title' => $_POST['full_name']
+        ]);
+        $declaration_id = $pdo->lastInsertId();
+
+        // Insert personal data
+        $stmt = $pdo->prepare("INSERT INTO personal_data (declaration_id, full_name, office, address, dob, id_number, marital_status, dependants) 
+                              VALUES (:declaration_id, :full_name, :office, :address, :dob, :id_number, :marital_status, :dependants)");
         
         $stmt->execute([
-            ':name' => $_POST['name'],
-            ':title' => $_POST['title'],
+            ':declaration_id' => $declaration_id,
+            ':full_name' => $_POST['full_name'],
             ':office' => $_POST['office'],
             ':address' => $_POST['address'],
             ':dob' => $_POST['dob'],
             ':id_number' => $_POST['id_number'],
             ':marital_status' => $_POST['marital_status'],
-            ':num_of_dependents' => $_POST['num_of_dependents'],
-            ':date_of_submission' => date('Y-m-d H:i:s'),
-            ':political_affiliation' => $_POST['political_affiliation']
+            ':dependants' => $_POST['dependants']
         ]);
-        
-        $person_id = $pdo->lastInsertId();
-        
+
         // Insert properties
         if (isset($_POST['properties'])) {
-            $stmt = $pdo->prepare("INSERT INTO properties (person_id, type, location, topographic_data, acquisition_method, acquisition_year) 
-                                  VALUES (:person_id, :type, :location, :topographic_data, :acquisition_method, :acquisition_year)");
+            $stmt = $pdo->prepare("INSERT INTO properties (declaration_id, location, type, area, topographic_data, rights_burdens, acquisition_mode, acquisition_date, acquisition_value, current_value) 
+                                  VALUES (:declaration_id, :location, :type, :area, :topographic_data, :rights_burdens, :acquisition_mode, :acquisition_date, :acquisition_value, :current_value)");
             foreach ($_POST['properties'] as $property) {
                 $stmt->execute([
-                    ':person_id' => $person_id,
-                    ':type' => $property['type'],
+                    ':declaration_id' => $declaration_id,
                     ':location' => $property['location'],
+                    ':type' => $property['type'],
+                    ':area' => $property['area'],
                     ':topographic_data' => $property['topographic_data'],
-                    ':acquisition_method' => $property['acquisition_method'],
-                    ':acquisition_year' => $property['acquisition_year']
+                    ':rights_burdens' => $property['rights_burdens'],
+                    ':acquisition_mode' => $property['acquisition_mode'],
+                    ':acquisition_date' => $property['acquisition_date'],
+                    ':acquisition_value' => $property['acquisition_value'],
+                    ':current_value' => $property['current_value']
                 ]);
             }
-        }
-
-        // Insert liquid assets
-        if (isset($_POST['asset_type'])) {
-            $stmt = $pdo->prepare("INSERT INTO liquid_assets (person_id, asset_type, description, amount) 
-                                  VALUES (:person_id, :asset_type, :description, :amount)");
-            for ($i = 0; $i < count($_POST['asset_type']); $i++) {
-                // Debug: Log each liquid asset before insert
-                error_log("Inserting liquid asset: " . print_r([
-                    'person_id' => $person_id,
-                    'asset_type' => $_POST['asset_type'][$i],
-                    'description' => $_POST['asset_description'][$i],
-                    'amount' => $_POST['asset_amount'][$i]
-                ], true));
-
-                $stmt->execute([
-                    ':person_id' => $person_id,
-                    ':asset_type' => $_POST['asset_type'][$i],
-                    ':description' => $_POST['asset_description'][$i],
-                    ':amount' => $_POST['asset_amount'][$i]
-                ]);
-            }
-        } else {
-            // Debug: Log if no liquid assets were submitted
-            error_log("No liquid assets submitted in the form");
         }
 
         // Insert vehicles
         if (isset($_POST['vehicles'])) {
-            $stmt = $pdo->prepare("INSERT INTO vehicles (person_id, description, value) 
-                                  VALUES (:person_id, :description, :value)");
+            $stmt = $pdo->prepare("INSERT INTO vehicles (declaration_id, brand, manu_year, value) 
+                                  VALUES (:declaration_id, :brand, :manu_year, :value)");
             foreach ($_POST['vehicles'] as $vehicle) {
                 $stmt->execute([
-                    ':person_id' => $person_id,
-                    ':description' => $vehicle['description'],
+                    ':declaration_id' => $declaration_id,
+                    ':brand' => $vehicle['brand'],
+                    ':manu_year' => $vehicle['manu_year'],
                     ':value' => $vehicle['value']
                 ]);
             }
         }
 
+        // Insert liquid assets
+        if (isset($_POST['liquid_assets'])) {
+            $stmt = $pdo->prepare("INSERT INTO liquid_assets (declaration_id, type, description, amount) 
+                                  VALUES (:declaration_id, :type, :description, :amount)");
+            foreach ($_POST['liquid_assets'] as $asset) {
+                $stmt->execute([
+                    ':declaration_id' => $declaration_id,
+                    ':type' => $asset['type'],
+                    ':description' => $asset['description'],
+                    ':amount' => $asset['amount']
+                ]);
+            }
+        }
+
+        // Insert deposits
+        if (isset($_POST['deposits'])) {
+            $stmt = $pdo->prepare("INSERT INTO deposits (declaration_id, bank_name, amount) 
+                                  VALUES (:declaration_id, :bank_name, :amount)");
+            foreach ($_POST['deposits'] as $deposit) {
+                $stmt->execute([
+                    ':declaration_id' => $declaration_id,
+                    ':bank_name' => $deposit['bank_name'],
+                    ':amount' => $deposit['amount']
+                ]);
+            }
+        }
+
+        // Insert insurance
+        if (isset($_POST['insurance'])) {
+            $stmt = $pdo->prepare("INSERT INTO insurance (declaration_id, insurance_name, contract_num, earnings) 
+                                  VALUES (:declaration_id, :insurance_name, :contract_num, :earnings)");
+            foreach ($_POST['insurance'] as $insurance) {
+                $stmt->execute([
+                    ':declaration_id' => $declaration_id,
+                    ':insurance_name' => $insurance['insurance_name'],
+                    ':contract_num' => $insurance['contract_num'],
+                    ':earnings' => $insurance['earnings']
+                ]);
+            }
+        }
+
+        // Insert debts
+        if (isset($_POST['debts'])) {
+            $stmt = $pdo->prepare("INSERT INTO debts (declaration_id, creditor_name, type, amount) 
+                                  VALUES (:declaration_id, :creditor_name, :type, :amount)");
+            foreach ($_POST['debts'] as $debt) {
+                $stmt->execute([
+                    ':declaration_id' => $declaration_id,
+                    ':creditor_name' => $debt['creditor_name'],
+                    ':type' => $debt['type'],
+                    ':amount' => $debt['amount']
+                ]);
+            }
+        }
+
+        // Insert business participations
+        if (isset($_POST['business'])) {
+            $stmt = $pdo->prepare("INSERT INTO bussiness (declaration_id, business_name, business_type, participation_type) 
+                                  VALUES (:declaration_id, :business_name, :business_type, :participation_type)");
+            foreach ($_POST['business'] as $business) {
+                $stmt->execute([
+                    ':declaration_id' => $declaration_id,
+                    ':business_name' => $business['business_name'],
+                    ':business_type' => $business['business_type'],
+                    ':participation_type' => $business['participation_type']
+                ]);
+            }
+        }
+
+        // Insert differences
+        if (isset($_POST['differences'])) {
+            $stmt = $pdo->prepare("INSERT INTO differences (declaration_id, content) 
+                                  VALUES (:declaration_id, :content)");
+            $stmt->execute([
+                ':declaration_id' => $declaration_id,
+                ':content' => $_POST['differences']
+            ]);
+        }
+
+        // Insert previous incomes
+        if (isset($_POST['previous_incomes'])) {
+            $stmt = $pdo->prepare("INSERT INTO previous_incomes (declaration_id, html_content) 
+                                  VALUES (:declaration_id, :html_content)");
+            $stmt->execute([
+                ':declaration_id' => $declaration_id,
+                ':html_content' => $_POST['previous_incomes']
+            ]);
+        }
+
         $pdo->commit();
         $success_message = "Declaration submitted successfully!";
-        
-        // Debug: Log successful submission
-        error_log("Declaration submitted successfully for person_id: " . $person_id);
         
     } catch (PDOException $e) {
         $pdo->rollBack();
         $error_message = "Error: " . $e->getMessage();
-        
-        // Debug: Log error
-        error_log("Error submitting declaration: " . $e->getMessage());
     }
 }
 ?>
@@ -110,6 +186,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+    <!-- CKEditor -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
     <!-- Custom CSS -->
     <link href="../../assets/css/style.css" rel="stylesheet">
     <style>
@@ -135,6 +213,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: #000000;
             color: white;
         }
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .remove-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+        .entry-container {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -155,16 +256,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="../../index.php">Home</a>
+                        <a class="nav-link" href="../../index.php">Αρχική</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../search_module/search.php">Search</a>
+                        <a class="nav-link" href="../search_module/search.php">Αναζήτηση</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../search_module/statistics.php">Statistics</a>
+                        <a class="nav-link" href="../search_module/statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="./declaration-form.php">Submit</a>
+                        <a class="nav-link active" href="./declaration-form.php">Υποβολή</a>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -198,10 +299,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Main Content -->
         <main class="container my-5">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Declaration Form</h1>
+                <h1>Υποβολή Δήλωσης</h1>
                 <div>
                     <a href="../../index.php" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Back to Main Page
+                        <i class="bi bi-arrow-left"></i> Πίσω στην Αρχική
                     </a>
                 </div>
             </div>
@@ -225,178 +326,338 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <form method="POST" class="needs-validation" novalidate>
                                     <!-- Personal Information -->
                                     <div class="mb-5">
-                                        <h4 class="mb-4">1. Personal Information</h4>
-                                        <div class="row g-3">
+                                        <h4 class="mb-4">1. Προσωπικά Στοιχεία</h4>
+                                        <div class="row border rounded p-3 mb-3">
                                             <div class="col-md-6">
-                                                <label class="form-label">Full Name</label>
-                                                <input type="text" name="name" class="form-control" required>
+                                                <label class="form-label">Ονοματεπώνυμο</label>
+                                                <input type="text" name="full_name" class="form-control" required>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Title</label>
-                                                <input type="text" name="title" class="form-control" required>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Role</label>
-                                                <input type="text" name="office" class="form-control" required>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">ID Number</label>
-                                                <input type="text" name="id_number" class="form-control" required>
+                                                <label class="form-label">Ιδιοτήτα/Αξίωμα</label>
+                                                <select name="office" class="form-select" required>
+                                                    <option value="">Επιλέξτε Ιδιοτήτα/Αξίωμα</option>
+                                                    <option value="Πρόεδρος της Δημοκρατίας">Πρόεδρος της Δημοκρατίας</option>
+                                                    <option value="Πρόεδρος της Βουλής των Αντιπροσώπων">Πρόεδρος της Βουλής των Αντιπροσώπων</option>
+                                                    <option value="Υπουργοί">Υπουργός</option>
+                                                    <option value="Βουλευτές">Βουλευτής</option>
+                                                    <option value="Ευρωβουλευτές">Ευρωβουλευτής</option>
+                                                    <option value="Υφυπουργοί">Υφυπουργός</option>
+                                                    <option value="Τέως Πρόεδρος της Δημοκρατίας">Τέως Πρόεδρος της Δημοκρατίας</option>
+                                                    <option value="Τέως Πρόεδρος της Βουλής των Αντιπροσώπων">Τέως Πρόεδρος της Βουλής των Αντιπροσώπων</option>
+                                                    <option value="Τέως Υπουργοί">Τέως Υπουργός</option>
+                                                    <option value="Τέως Βουλευτές">Τέως Βουλευτής</option>
+                                                    <option value="Τέως Ευρωβουλευτές">Τέως Ευρωβουλευτής</option>
+                                                    <option value="Τέως Υφυπουργοί">Τέως Υφυπουργός</option>
+                                                </select>
                                             </div>
                                             <div class="col-md-12">
-                                                <label class="form-label">Address</label>
+                                                <label class="form-label">Διεύθυνση</label>
                                                 <textarea name="address" class="form-control" rows="3" required></textarea>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Date of Birth</label>
+                                                <label class="form-label">Ημερομηνία Γέννησης</label>
                                                 <input type="date" name="dob" class="form-control" required>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Marital Status</label>
+                                                <label class="form-label">Αριθμος ταυτότητας</label>
+                                                <input type="text" name="id_number" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Οικογενειακή Κατάσταση</label>
                                                 <select name="marital_status" class="form-select" required>
-                                                    <option value="">Select status</option>
-                                                    <option value="Single">Single</option>
-                                                    <option value="Married">Married</option>
-                                                    <option value="Divorced">Divorced</option>
-                                                    <option value="Widowed">Widowed</option>
+                                                    <option value="">Επιλέξτε Κατάσταση</option>
+                                                    <option value="Single">Άγαμος/η</option>
+                                                    <option value="Married">Έγγαμος/η</option>
+                                                    <option value="Divorced">Διαζευγμένος/η</option>
+                                                    <option value="Other">Άλλο</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Number of Dependents</label>
-                                                <input type="number" name="num_of_dependents" class="form-control" min="0" required>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Political Affiliation</label>
-                                                <input type="text" name="political_affiliation" class="form-control" required>
+                                                <label class="form-label">Αριθμος ανηλίκων τεκνών</label>
+                                                <input type="number" name="dependants" class="form-control" min="0" required>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Real Estate Properties -->
                                     <div class="mb-5">
-                                        <h4 class="mb-4">2. Real Estate Properties</h4>
+                                        <h4 class="mb-4">2. Ακίνητη Ιδιοκτησία</h4>
                                         <div id="properties-container">
-                                            <div class="property-entry border rounded p-3 mb-3">
+                                            <div class="property-entry entry-container border rounded p-3 mb-3">
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Property Type</label>
-                                                        <select name="properties[0][type]" class="form-select" required>
-                                                            <option value="">Select type</option>
-                                                            <option>House</option>
-                                                            <option>Apartment</option>
-                                                            <option>Land</option>
-                                                            <option>Commercial Property</option>
+                                                        <label class="form-label">Είδος</label>
+                                                        <select name="properties[0][type]" class="form-select property-type" required>
+                                                            <option value="">Επιλέξτε</option>
+                                                            <option value="House">Σπίτι</option>
+                                                            <option value="Apartment">Διαμέρισμα</option>
+                                                            <option value="Land">Οικόπεδο</option>
+                                                            <option value="Plot">Χωράφι</option>
+                                                            <option value="Other">Άλλο</option>
                                                         </select>
+                                                        <div class="other-property-type mt-2" style="display: none;">
+                                                            <label class="form-label">Καθορίστε το είδος της ιδιοκτησίας</label>
+                                                            <input type="text" name="properties[0][type]" class="form-control">
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Location</label>
+                                                        <label class="form-label">Τοποθεσία</label>
                                                         <textarea name="properties[0][location]" class="form-control" rows="2" required></textarea>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Topographic Data</label>
+                                                        <label class="form-label">Εκταση (m²)</label>
+                                                        <input type="number" name="properties[0][area]" class="form-control" step="0.01" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Τοπογραφικά Στοιχεία</label>
                                                         <input type="text" name="properties[0][topographic_data]" class="form-control">
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Acquisition Method</label>
-                                                        <select name="properties[0][acquisition_method]" class="form-select" required>
-                                                            <option value="">Select method</option>
-                                                            <option>Purchase</option>
-                                                            <option>Inheritance</option>
-                                                            <option>Gift</option>
-                                                            <option>Exchange</option>
-                                                            <option>Other</option>
+                                                        <label class="form-label">Εμπράγματα δικαιώματα και βάρη επ' αυτής</label>
+                                                        <textarea name="properties[0][rights_burdens]" class="form-control" rows="2"></textarea>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Τρόπος απόκτησης</label>
+                                                        <input type="text" name="properties[0][acquisition_mode]" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Χρόνος απόκτησης</label>
+                                                        <select name="properties[0][acquisition_date]" class="form-select" required>
+                                                            <option value="">Επιλέξτε Χρόνο</option>
+                                                            <?php
+                                                            $currentYear = date('Y');
+                                                            for ($year = $currentYear; $year >= 1900; $year--) {
+                                                                echo "<option value='$year'>$year</option>";
+                                                            }
+                                                            ?>
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Acquisition Year</label>
-                                                        <input type="text" name="properties[0][acquisition_year]" class="form-control" required>
+                                                        <label class="form-label">Αξία απόκτησης (€)</label>
+                                                        <input type="text" name="properties[0][acquisition_value]" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Τρέχουσα αξία (€)</label>
+                                                        <input type="text" name="properties[0][current_value]" class="form-control" required>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <button type="button" class="btn btn-outline-warning" onclick="addPropertyEntry()">
-                                            <i class="bi bi-plus-circle"></i> Add Another Property
-                                        </button>
-                                    </div>
-
-                                    <!-- Financial Assets -->
-                                    <div class="mb-5">
-                                        <h4 class="mb-4">3. Financial Assets</h4>
-                                        <div id="financial-assets-container">
-                                            <div class="financial-entry border rounded p-3 mb-3">
-                                                <div class="row g-3">
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Asset Type</label>
-                                                        <select name="asset_type[]" class="form-select" required>
-                                                            <option value="">Select type</option>
-                                                            <option value="Bank Account">Bank Account</option>
-                                                            <option value="Stocks">Stocks</option>
-                                                            <option value="Bonds">Bonds</option>
-                                                            <option value="Investment Fund">Investment Fund</option>
-                                                            <option value="Cryptocurrency">Cryptocurrency</option>
-                                                            <option value="Other">Other</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Description</label>
-                                                        <textarea name="asset_description[]" class="form-control" rows="2" required></textarea>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Amount (€)</label>
-                                                        <input type="number" name="asset_amount[]" class="form-control" step="0.01" required>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn btn-outline-warning" onclick="addFinancialEntry()">
-                                            <i class="bi bi-plus-circle"></i> Add Another Financial Asset
+                                            <i class="bi bi-plus-circle"></i> Προσθήκη Άλλης Ιδιοκτησίας
                                         </button>
                                     </div>
 
                                     <!-- Vehicles -->
                                     <div class="mb-5">
-                                        <h4 class="mb-4">4. Vehicles</h4>
+                                        <h4 class="mb-4">3. Μηχανοκίνητα μεταφορικά μέσα</h4>
                                         <div id="vehicles-container">
-                                            <div class="vehicle-entry border rounded p-3 mb-3">
+                                            <div class="vehicle-entry entry-container border rounded p-3 mb-3">
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Description</label>
-                                                        <textarea name="vehicles[0][description]" class="form-control" rows="2" required></textarea>
+                                                        <label class="form-label">Μάρκα</label>
+                                                        <input type="text" name="vehicles[0][brand]" class="form-control" required>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">Value (€)</label>
+                                                        <label class="form-label">Χρονολογία παραγωγής</label>
+                                                        <select name="vehicles[0][manu_year]" class="form-select" required>
+                                                            <option value="">Επιλέξτε Χρόνο</option>
+                                                            <?php
+                                                            $currentYear = date('Y');
+                                                            for ($year = $currentYear; $year >= 1900; $year--) {
+                                                                echo "<option value='$year'>$year</option>";
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Αξία (€)</label>
                                                         <input type="number" name="vehicles[0][value]" class="form-control" step="0.01" required>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <button type="button" class="btn btn-outline-warning" onclick="addVehicleEntry()">
-                                            <i class="bi bi-plus-circle"></i> Add Another Vehicle
+                                            <i class="bi bi-plus-circle"></i> Προσθήκη Άλλου Μηχανοκίνητου Μεταφορικού Μέσου
                                         </button>
                                     </div>
 
-                                
+                                    <!-- Liquid Assets -->
+                                    <div class="mb-5">
+                                        <h4 class="mb-4">4.  Εισοδήματα και περιουσιακά στοιχεία σε κινητές αξίες και τίτλους</h4>
+                                        <div id="liquid-assets-container">
+                                            <div class="liquid-asset-entry entry-container border rounded p-3 mb-3">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Είδος Κινητής Αξίας</label>
+                                                        <select name="liquid_assets[0][type]" class="form-select" required>
+                                                            <option value="">Επιλέξτε Είδος</option>
+                                                            <option value="">Μετοχές</option>
+                                                            <option value="">Χρεωστικά Ομόλογα</option>
+                                                            <option value="">Ομολογίες</option>
+                                                            <option value="">Τίτλοι</option>
+                                                            <option value="">Μετοχές</option>
+                                                            <option value="">Μερίσματα</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Περιγραφή</label>
+                                                        <textarea name="liquid_assets[0][description]" class="form-control" rows="2" required></textarea>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <label class="form-label">Αριθμός σε Κατοχή</label>
+                                                        <input type="text" name="liquid_assets[0][amount]" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-warning" onclick="addLiquidAssetEntry()">
+                                            <i class="bi bi-plus-circle"></i> Προσθήκη Άλλης Κινητής Αξίας
+                                        </button>
+                                    </div>
+
+                                    <!-- Bank Deposits -->
+                                    <div class="mb-5">
+                                        <h4 class="mb-4">5. Καταθέσεις σε Τράπεζες</h4>
+                                        <div id="deposits-container">
+                                            <div class="deposit-entry entry-container border rounded p-3 mb-3">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Όνομα Τράπεζας</label>
+                                                        <input type="text" name="deposits[0][bank_name]" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Ποσό Κατάθεσης (€)</label>
+                                                        <input type="number" name="deposits[0][amount]" class="form-control" step="0.01" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-warning" onclick="addDepositEntry()">
+                                            <i class="bi bi-plus-circle"></i> Προσθήκη Άλλης Κατάθεσης σε Τράπεζα
+                                        </button>
+                                    </div>
+
+                                    <!-- Insurance -->
+                                    <div class="mb-5">
+                                        <h4 class="mb-4">6. Ασφαλιστικά Συμβόλαια</h4>
+                                        <div id="insurance-container">
+                                            <div class="insurance-entry entry-container border rounded p-3 mb-3">
+                                                <div class="row g-3">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Όνομα Ασφαλιστικής Εταιρείας</label>
+                                                        <input type="text" name="insurance[0][insurance_name]" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Αριθμός Συμβολαίου</label>
+                                                        <input type="text" name="insurance[0][contract_num]" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Εισοδήματα (€)</label>
+                                                        <input type="number" name="insurance[0][earnings]" class="form-control" step="0.01" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-warning" onclick="addInsuranceEntry()">
+                                            <i class="bi bi-plus-circle"></i> Προσθήκη Άλλου Ασφαλιστικού Συμβολαίου
+                                        </button>
+                                    </div>
+
+                                    <!-- Debts -->
+                                    <div class="mb-5">
+                                        <h4 class="mb-4">7. Χρέη</h4>
+                                        <div id="debts-container">
+                                            <div class="debt-entry entry-container border rounded p-3 mb-3">
+                                                <div class="row g-3">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Όνομα Πιστωτή</label>
+                                                        <input type="text" name="debts[0][creditor_name]" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Είδος Χρέους</label>
+                                                        <input type="text" name="debts[0][type]" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Ποσό Χρέους (€)</label>
+                                                        <input type="number" name="debts[0][amount]" class="form-control" step="0.01" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-warning" onclick="addDebtEntry()">
+                                            <i class="bi bi-plus-circle"></i> Προσθήκη Άλλου Χρέους
+                                        </button>
+                                    </div>
+
+                                    <!-- Business Participations -->
+                                    <div class="mb-5">
+                                        <h4 class="mb-4">8. Συμμετοχές σε Επιχειρήσεις</h4>
+                                        <div id="business-container">
+                                            <div class="business-entry entry-container border rounded p-3 mb-3">
+                                                <div class="row g-3">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Όνομα Επιχειρήσης</label>
+                                                        <input type="text" name="business[0][business_name]" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Είδος Επιχειρήσης</label>
+                                                        <input type="text" name="business[0][business_type]" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Είδος Συμμετοχής</label>
+                                                        <input type="text" name="business[0][participation_type]" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-warning" onclick="addBusinessEntry()">
+                                            <i class="bi bi-plus-circle"></i> Προσθήκη Άλλης Επιχειρήσης
+                                        </button>
+                                    </div>
+
+                                    <!-- Differences -->
+                                    <div class="mb-5">
+                                        <h4 class="mb-4">9. Διαφορές στα περιουσιακά στοιχεία</h4>
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label">Παρακαλούμε να εξηγήσετε οποιεσδήποτε διαφορές στα περιουσιακά στοιχεία σας</label>
+                                                <textarea name="differences" class="form-control" rows="4"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Previous Incomes -->
+                                    <div class="mb-5">
+                                        <h4 class="mb-4">10. Εισοδήματα προηγούμενων ετών</h4>
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label">Παρακαλούμε καταχωρήστε τα εισοδήματα των προηγούμενων ετών</label>
+                                                <textarea id="previous_incomes" name="previous_incomes" class="form-control" rows="4"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <!-- Declaration -->
                                     <div class="mb-5">
-                                        <h4 class="mb-4">6. Declaration</h4>
+                                        <h4 class="mb-4">11. Δήλωση</h4>
                                         <div class="form-check mb-3">
                                             <input class="form-check-input" type="checkbox" required>
                                             <label class="form-check-label">
-                                                I declare that all information provided is true and accurate to the best of my knowledge.
+                                                Θέλω να δηλώσω ότι όλα τα παραπάνω περιουσιακά στοιχεία είναι αληθινά και ακριβή.
                                             </label>
                                         </div>
                                         <div class="form-check mb-3">
                                             <input class="form-check-input" type="checkbox" required>
                                             <label class="form-check-label">
-                                                I understand that providing false information may result in legal consequences.
+                                                Ενημερώνομαι ότι η παράδοση ψευδών πληροφοριών μπορεί να οδηγήσει σε νομικές συνέπειες.
                                             </label>
                                         </div>
                                     </div>
 
                                     <!-- Submit Button -->
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-warning btn-lg text-dark">Submit Declaration</button>
+                                        <button type="submit" class="btn btn-warning btn-lg text-dark">Αποθήκευση</button>
                                     </div>
                                 </form>
                             </div>
@@ -429,99 +690,278 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script>
-        // Function to add new property entry
+        // Function to handle property type selection
+        function handlePropertyTypeChange(selectElement) {
+            const otherTypeDiv = selectElement.parentElement.querySelector('.other-property-type');
+            if (selectElement.value === 'Other') {
+                otherTypeDiv.style.display = 'block';
+                otherTypeDiv.querySelector('input').required = true;
+            } else {
+                otherTypeDiv.style.display = 'none';
+                otherTypeDiv.querySelector('input').required = false;
+            }
+        }
+
+        // Add event listeners to existing property type selects
+        document.addEventListener('DOMContentLoaded', function() {
+            const propertyTypeSelects = document.querySelectorAll('.property-type');
+            propertyTypeSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    handlePropertyTypeChange(this);
+                });
+            });
+        });
+
+        // Modify addPropertyEntry function to include the event listener
         function addPropertyEntry() {
             const container = document.getElementById('properties-container');
             const index = container.children.length;
+            const currentYear = new Date().getFullYear();
+            let yearOptions = '<option value="">Επιλέξτε Χρόνο</option>';
+            for (let year = currentYear; year >= 1900; year--) {
+                yearOptions += `<option value="${year}">${year}</option>`;
+            }
+            
             const template = `
-                <div class="property-entry border rounded p-3 mb-3">
+                <div class="property-entry entry-container border rounded p-3 mb-3">
+                    <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x"></i>
+                    </button>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Property Type</label>
-                            <select name="properties[${index}][type]" class="form-select" required>
-                                <option value="">Select type</option>
-                                <option>House</option>
-                                <option>Apartment</option>
-                                <option>Land</option>
-                                <option>Commercial Property</option>
+                            <label class="form-label">Είδος</label>
+                            <select name="properties[${index}][type]" class="form-select property-type" required>
+                                <option value="">Επιλέξτε</option>
+                                <option value="House">Σπίτι</option>
+                                <option value="Apartment">Διαμέρισμα</option>
+                                <option value="Land">Οικόπεδο</option>
+                                <option value="Plot">Χωράφι</option>
+                                <option value="Other">Άλλο</option>
                             </select>
+                            <div class="other-property-type mt-2" style="display: none;">
+                                <label class="form-label">Καθορίστε το είδος της ιδιοκτησίας</label>
+                                <input type="text" name="properties[${index}][type]" class="form-control">
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Location</label>
+                            <label class="form-label">Τοποθεσία</label>
                             <textarea name="properties[${index}][location]" class="form-control" rows="2" required></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Topographic Data</label>
+                            <label class="form-label">Εκταση (m²)</label>
+                            <input type="number" name="properties[${index}][area]" class="form-control" step="0.01" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Τοπογραφικά Στοιχεία</label>
                             <input type="text" name="properties[${index}][topographic_data]" class="form-control">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Acquisition Method</label>
-                            <select name="properties[${index}][acquisition_method]" class="form-select" required>
-                                <option value="">Select method</option>
-                                <option>Purchase</option>
-                                <option>Inheritance</option>
-                                <option>Gift</option>
-                                <option>Exchange</option>
-                                <option>Other</option>
+                            <label class="form-label">Εμπράγματα δικαιώματα και βάρη επ' αυτής</label>
+                            <textarea name="properties[${index}][rights_burdens]" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Τρόπος απόκτησης</label>
+                            <input type="text" name="properties[${index}][acquisition_mode]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Χρόνος απόκτησης</label>
+                            <select name="properties[${index}][acquisition_date]" class="form-select" required>
+                                ${yearOptions}
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Acquisition Year</label>
-                            <input type="text" name="properties[${index}][acquisition_year]" class="form-control" required>
+                            <label class="form-label">Αξία απόκτησης (€)</label>
+                            <input type="text" name="properties[${index}][acquisition_value]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Τρέχουσα αξία (€)</label>
+                            <input type="text" name="properties[${index}][current_value]" class="form-control" required>
                         </div>
                     </div>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', template);
-        }
-
-        // Function to add new financial asset entry
-        function addFinancialEntry() {
-            const container = document.getElementById('financial-assets-container');
-            const index = container.children.length;
-            const template = `
-                <div class="financial-entry border rounded p-3 mb-3">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Asset Type</label>
-                            <select name="asset_type[]" class="form-select" required>
-                                <option value="">Select type</option>
-                                <option value="Bank Account">Bank Account</option>
-                                <option value="Stocks">Stocks</option>
-                                <option value="Bonds">Bonds</option>
-                                <option value="Investment Fund">Investment Fund</option>
-                                <option value="Cryptocurrency">Cryptocurrency</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Description</label>
-                            <textarea name="asset_description[]" class="form-control" rows="2" required></textarea>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Amount (€)</label>
-                            <input type="number" name="asset_amount[]" class="form-control" step="0.01" required>
-                        </div>
-                    </div>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', template);
+            
+            // Add event listener to the new property type select
+            const newSelect = container.lastElementChild.querySelector('.property-type');
+            newSelect.addEventListener('change', function() {
+                handlePropertyTypeChange(this);
+            });
         }
 
         // Function to add new vehicle entry
         function addVehicleEntry() {
             const container = document.getElementById('vehicles-container');
             const index = container.children.length;
+            const currentYear = new Date().getFullYear();
+            let yearOptions = '<option value="">Επιλέξτε Χρόνο</option>';
+            for (let year = currentYear; year >= 1900; year--) {
+                yearOptions += `<option value="${year}">${year}</option>`;
+            }
+            
             const template = `
-                <div class="vehicle-entry border rounded p-3 mb-3">
+                <div class="vehicle-entry entry-container border rounded p-3 mb-3">
+                    <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x"></i>
+                    </button>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Description</label>
-                            <textarea name="vehicles[${index}][description]" class="form-control" rows="2" required></textarea>
+                            <label class="form-label">Μάρκα</label>
+                            <input type="text" name="vehicles[${index}][brand]" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Value (€)</label>
+                            <label class="form-label">Χρονολογία παραγωγής</label>
+                            <select name="vehicles[${index}][manu_year]" class="form-select" required>
+                                ${yearOptions}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Αξία (€)</label>
                             <input type="number" name="vehicles[${index}][value]" class="form-control" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', template);
+        }
+
+        // Function to add new liquid asset entry
+        function addLiquidAssetEntry() {
+            const container = document.getElementById('liquid-assets-container');
+            const index = container.children.length;
+            const template = `
+                <div class="liquid-asset-entry entry-container border rounded p-3 mb-3">
+                    <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Είδος Κινητής Αξίας</label>
+                            <select name="liquid_assets[${index}][type]" class="form-select" required>
+                                <option value="">Επιλέξτε Είδος</option>
+                                <option value="">Μετοχές</option>
+                                <option value="">Χρεωστικά Ομόλογα</option>
+                                <option value="">Ομολογίες</option>
+                                <option value="">Τίτλοι</option>
+                                <option value="">Μετοχές</option>
+                                <option value="">Μερίσματα</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Περιγραφή</label>
+                            <textarea name="liquid_assets[${index}][description]" class="form-control" rows="2" required></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Αριθμός σε Κατοχή</label>
+                            <input type="text" name="liquid_assets[${index}][amount]" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', template);
+        }
+
+        // Function to add new deposit entry
+        function addDepositEntry() {
+            const container = document.getElementById('deposits-container');
+            const index = container.children.length;
+            const template = `
+                <div class="deposit-entry entry-container border rounded p-3 mb-3">
+                    <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Όνομα Τράπεζας</label>
+                            <input type="text" name="deposits[${index}][bank_name]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ποσό Κατάθεσης (€)</label>
+                            <input type="number" name="deposits[${index}][amount]" class="form-control" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', template);
+        }
+
+        // Function to add new insurance entry
+        function addInsuranceEntry() {
+            const container = document.getElementById('insurance-container');
+            const index = container.children.length;
+            const template = `
+                <div class="insurance-entry entry-container border rounded p-3 mb-3">
+                    <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Όνομα Ασφαλιστικής Εταιρείας</label>
+                            <input type="text" name="insurance[${index}][insurance_name]" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Αριθμός Συμβολαίου</label>
+                            <input type="text" name="insurance[${index}][contract_num]" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Εισοδήματα (€)</label>
+                            <input type="number" name="insurance[${index}][earnings]" class="form-control" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', template);
+        }
+
+        // Function to add new debt entry
+        function addDebtEntry() {
+            const container = document.getElementById('debts-container');
+            const index = container.children.length;
+            const template = `
+                <div class="debt-entry entry-container border rounded p-3 mb-3">
+                    <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Όνομα Πιστωτή</label>
+                            <input type="text" name="debts[${index}][creditor_name]" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Είδος Χρέους</label>
+                            <input type="text" name="debts[${index}][type]" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ποσό Χρέους (€)</label>
+                            <input type="number" name="debts[${index}][amount]" class="form-control" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', template);
+        }
+
+        // Function to add new business entry
+        function addBusinessEntry() {
+            const container = document.getElementById('business-container');
+            const index = container.children.length;
+            const template = `
+                <div class="business-entry entry-container border rounded p-3 mb-3">
+                    <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Όνομα Επιχειρήσης</label>
+                            <input type="text" name="business[${index}][business_name]" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Είδος Επιχειρήσης</label>
+                            <input type="text" name="business[${index}][business_type]" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Είδος Συμμετοχής</label>
+                            <input type="text" name="business[${index}][participation_type]" class="form-control" required>
                         </div>
                     </div>
                 </div>
