@@ -5,11 +5,12 @@ require_once '../../config/db_connection.php';
 // Initialize variables
 $success_message = '';
 $error_message = '';
+$validation_errors = [];
 
 // Fetch parties for dropdown
 $parties = [];
 try {
-    $stmt = $pdo->query("SELECT id, name FROM parties ORDER BY name");
+    $stmt = $pdo->query("SELECT id, name FROM parties ORDER BY id");
     $parties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $error_message = "Error fetching parties: " . $e->getMessage();
@@ -28,8 +29,6 @@ if (!isset($pdo)) {
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     try {
-        $pdo->beginTransaction();
-
         // Validate required fields
         $required_fields = [
             'full_name' => 'Ονοματεπώνυμο',
@@ -41,162 +40,170 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
 
         foreach ($required_fields as $field => $label) {
             if (empty($_POST[$field])) {
-                throw new Exception("Το πεδίο '$label' είναι υποχρεωτικό");
+                $validation_errors[] = "Το πεδίο '$label' είναι υποχρεωτικό";
             }
         }
 
-        // Insert declaration (empty for now as per requirements)
-        $stmt = $pdo->prepare("INSERT INTO declarations (submission_date, title) VALUES (CURDATE(), :title)");
-        $stmt->execute([
-            ':title' => $_POST['full_name']
-        ]);
-        $declaration_id = $pdo->lastInsertId();
+        // If there are validation errors, show them and stop processing
+        if (!empty($validation_errors)) {
+            $error_message = implode("<br>", $validation_errors);
+        } else {
+            $pdo->beginTransaction();
 
-        // Insert personal data
-        $stmt = $pdo->prepare("INSERT INTO personal_data (declaration_id, full_name, office, address, dob, id_number, marital_status, dependants, party_id) 
-                              VALUES (:declaration_id, :full_name, :office, :address, :dob, :id_number, :marital_status, :dependants, :party_id)");
-        
-        $stmt->execute([
-            ':declaration_id' => $declaration_id,
-            ':full_name' => $_POST['full_name'],
-            ':office' => $_POST['office'],
-            ':address' => $_POST['address'],
-            ':dob' => $_POST['dob'] ?: null,
-            ':id_number' => $_POST['id_number'],
-            ':marital_status' => $_POST['marital_status'],
-            ':dependants' => $_POST['dependants'],
-            ':party_id' => $_POST['party_id']
-        ]);
+            // Insert declaration (empty for now as per requirements)
+            $stmt = $pdo->prepare("INSERT INTO declarations (submission_date, title) VALUES (CURDATE(), :title)");
+            $stmt->execute([
+                ':title' => $_POST['full_name']
+            ]);
+            $declaration_id = $pdo->lastInsertId();
 
-        // Insert properties
-        if (isset($_POST['properties'])) {
-            $stmt = $pdo->prepare("INSERT INTO properties (declaration_id, location, type, area, topographic_data, rights_burdens, acquisition_mode, acquisition_date, acquisition_value, current_value) 
-                                  VALUES (:declaration_id, :location, :type, :area, :topographic_data, :rights_burdens, :acquisition_mode, :acquisition_date, :acquisition_value, :current_value)");
-            foreach ($_POST['properties'] as $property) {
-                $stmt->execute([
-                    ':declaration_id' => $declaration_id,
-                    ':location' => $property['location'],
-                    ':type' => $property['type'],
-                    ':area' => $property['area'],
-                    ':topographic_data' => $property['topographic_data'],
-                    ':rights_burdens' => $property['rights_burdens'],
-                    ':acquisition_mode' => $property['acquisition_mode'],
-                    ':acquisition_date' => $property['acquisition_date'],
-                    ':acquisition_value' => $property['acquisition_value'],
-                    ':current_value' => $property['current_value']
-                ]);
-            }
-        }
-
-        // Insert vehicles
-        if (isset($_POST['vehicles'])) {
-            $stmt = $pdo->prepare("INSERT INTO vehicles (declaration_id, brand, manu_year, value) 
-                                  VALUES (:declaration_id, :brand, :manu_year, :value)");
-            foreach ($_POST['vehicles'] as $vehicle) {
-                $stmt->execute([
-                    ':declaration_id' => $declaration_id,
-                    ':brand' => $vehicle['brand'],
-                    ':manu_year' => $vehicle['manu_year'],
-                    ':value' => $vehicle['value']
-                ]);
-            }
-        }
-
-        // Insert liquid assets
-        if (isset($_POST['liquid_assets'])) {
-            $stmt = $pdo->prepare("INSERT INTO liquid_assets (declaration_id, type, description, amount) 
-                                  VALUES (:declaration_id, :type, :description, :amount)");
-            foreach ($_POST['liquid_assets'] as $asset) {
-                $stmt->execute([
-                    ':declaration_id' => $declaration_id,
-                    ':type' => $asset['type'],
-                    ':description' => $asset['description'],
-                    ':amount' => $asset['amount']
-                ]);
-            }
-        }
-
-        // Insert deposits
-        if (isset($_POST['deposits'])) {
-            $stmt = $pdo->prepare("INSERT INTO deposits (declaration_id, bank_name, amount) 
-                                  VALUES (:declaration_id, :bank_name, :amount)");
-            foreach ($_POST['deposits'] as $deposit) {
-                $stmt->execute([
-                    ':declaration_id' => $declaration_id,
-                    ':bank_name' => $deposit['bank_name'],
-                    ':amount' => $deposit['amount']
-                ]);
-            }
-        }
-
-        // Insert insurance
-        if (isset($_POST['insurance'])) {
-            $stmt = $pdo->prepare("INSERT INTO insurance (declaration_id, insurance_name, contract_num, earnings) 
-                                  VALUES (:declaration_id, :insurance_name, :contract_num, :earnings)");
-            foreach ($_POST['insurance'] as $insurance) {
-                $stmt->execute([
-                    ':declaration_id' => $declaration_id,
-                    ':insurance_name' => $insurance['insurance_name'],
-                    ':contract_num' => $insurance['contract_num'],
-                    ':earnings' => $insurance['earnings']
-                ]);
-            }
-        }
-
-        // Insert debts
-        if (isset($_POST['debts'])) {
-            $stmt = $pdo->prepare("INSERT INTO debts (declaration_id, creditor_name, type, amount) 
-                                  VALUES (:declaration_id, :creditor_name, :type, :amount)");
-            foreach ($_POST['debts'] as $debt) {
-                $stmt->execute([
-                    ':declaration_id' => $declaration_id,
-                    ':creditor_name' => $debt['creditor_name'],
-                    ':type' => $debt['type'],
-                    ':amount' => $debt['amount']
-                ]);
-            }
-        }
-
-        // Insert business participations
-        if (isset($_POST['business'])) {
-            $stmt = $pdo->prepare("INSERT INTO bussiness (declaration_id, business_name, business_type, participation_type) 
-                                  VALUES (:declaration_id, :business_name, :business_type, :participation_type)");
-            foreach ($_POST['business'] as $business) {
-                $stmt->execute([
-                    ':declaration_id' => $declaration_id,
-                    ':business_name' => $business['business_name'],
-                    ':business_type' => $business['business_type'],
-                    ':participation_type' => $business['participation_type']
-                ]);
-            }
-        }
-
-        // Insert differences
-        if (isset($_POST['differences'])) {
-            $stmt = $pdo->prepare("INSERT INTO differences (declaration_id, content) 
-                                  VALUES (:declaration_id, :content)");
+            // Insert personal data
+            $stmt = $pdo->prepare("INSERT INTO personal_data (declaration_id, full_name, office, address, dob, id_number, marital_status, dependants, party_id) 
+                                  VALUES (:declaration_id, :full_name, :office, :address, :dob, :id_number, :marital_status, :dependants, :party_id)");
+            
             $stmt->execute([
                 ':declaration_id' => $declaration_id,
-                ':content' => $_POST['differences']
+                ':full_name' => $_POST['full_name'],
+                ':office' => $_POST['office'],
+                ':address' => $_POST['address'],
+                ':dob' => $_POST['dob'] ?: null,
+                ':id_number' => $_POST['id_number'],
+                ':marital_status' => $_POST['marital_status'],
+                ':dependants' => $_POST['dependants'],
+                ':party_id' => $_POST['party_id']
             ]);
-        }
 
-        // Insert previous incomes
-        if (isset($_POST['previous_incomes'])) {
-            $stmt = $pdo->prepare("INSERT INTO previous_incomes (declaration_id, html_content) 
-                                  VALUES (:declaration_id, :html_content)");
-            $stmt->execute([
-                ':declaration_id' => $declaration_id,
-                ':html_content' => $_POST['previous_incomes']
-            ]);
-        }
+            // Insert properties
+            if (isset($_POST['properties'])) {
+                $stmt = $pdo->prepare("INSERT INTO properties (declaration_id, location, type, area, topographic_data, rights_burdens, acquisition_mode, acquisition_date, acquisition_value, current_value) 
+                                      VALUES (:declaration_id, :location, :type, :area, :topographic_data, :rights_burdens, :acquisition_mode, :acquisition_date, :acquisition_value, :current_value)");
+                foreach ($_POST['properties'] as $property) {
+                    $stmt->execute([
+                        ':declaration_id' => $declaration_id,
+                        ':location' => $property['location'],
+                        ':type' => $property['type'],
+                        ':area' => $property['area'],
+                        ':topographic_data' => $property['topographic_data'],
+                        ':rights_burdens' => $property['rights_burdens'],
+                        ':acquisition_mode' => $property['acquisition_mode'],
+                        ':acquisition_date' => $property['acquisition_date'],
+                        ':acquisition_value' => $property['acquisition_value'],
+                        ':current_value' => $property['current_value']
+                    ]);
+                }
+            }
 
-        $pdo->commit();
-        $success_message = "Declaration submitted successfully!";
-        
+            // Insert vehicles
+            if (isset($_POST['vehicles'])) {
+                $stmt = $pdo->prepare("INSERT INTO vehicles (declaration_id, brand, manu_year, value) 
+                                      VALUES (:declaration_id, :brand, :manu_year, :value)");
+                foreach ($_POST['vehicles'] as $vehicle) {
+                    $stmt->execute([
+                        ':declaration_id' => $declaration_id,
+                        ':brand' => $vehicle['brand'],
+                        ':manu_year' => $vehicle['manu_year'],
+                        ':value' => $vehicle['value']
+                    ]);
+                }
+            }
+
+            // Insert liquid assets
+            if (isset($_POST['liquid_assets'])) {
+                $stmt = $pdo->prepare("INSERT INTO liquid_assets (declaration_id, type, description, amount) 
+                                      VALUES (:declaration_id, :type, :description, :amount)");
+                foreach ($_POST['liquid_assets'] as $asset) {
+                    $stmt->execute([
+                        ':declaration_id' => $declaration_id,
+                        ':type' => $asset['type'],
+                        ':description' => $asset['description'],
+                        ':amount' => $asset['amount']
+                    ]);
+                }
+            }
+
+            // Insert deposits
+            if (isset($_POST['deposits'])) {
+                $stmt = $pdo->prepare("INSERT INTO deposits (declaration_id, bank_name, amount) 
+                                      VALUES (:declaration_id, :bank_name, :amount)");
+                foreach ($_POST['deposits'] as $deposit) {
+                    $stmt->execute([
+                        ':declaration_id' => $declaration_id,
+                        ':bank_name' => $deposit['bank_name'],
+                        ':amount' => $deposit['amount']
+                    ]);
+                }
+            }
+
+            // Insert insurance
+            if (isset($_POST['insurance'])) {
+                $stmt = $pdo->prepare("INSERT INTO insurance (declaration_id, insurance_name, contract_num, earnings) 
+                                      VALUES (:declaration_id, :insurance_name, :contract_num, :earnings)");
+                foreach ($_POST['insurance'] as $insurance) {
+                    $stmt->execute([
+                        ':declaration_id' => $declaration_id,
+                        ':insurance_name' => $insurance['insurance_name'],
+                        ':contract_num' => $insurance['contract_num'],
+                        ':earnings' => $insurance['earnings']
+                    ]);
+                }
+            }
+
+            // Insert debts
+            if (isset($_POST['debts'])) {
+                $stmt = $pdo->prepare("INSERT INTO debts (declaration_id, creditor_name, type, amount) 
+                                      VALUES (:declaration_id, :creditor_name, :type, :amount)");
+                foreach ($_POST['debts'] as $debt) {
+                    $stmt->execute([
+                        ':declaration_id' => $declaration_id,
+                        ':creditor_name' => $debt['creditor_name'],
+                        ':type' => $debt['type'],
+                        ':amount' => $debt['amount']
+                    ]);
+                }
+            }
+
+            // Insert business participations
+            if (isset($_POST['business'])) {
+                $stmt = $pdo->prepare("INSERT INTO bussiness (declaration_id, business_name, business_type, participation_type) 
+                                      VALUES (:declaration_id, :business_name, :business_type, :participation_type)");
+                foreach ($_POST['business'] as $business) {
+                    $stmt->execute([
+                        ':declaration_id' => $declaration_id,
+                        ':business_name' => $business['business_name'],
+                        ':business_type' => $business['business_type'],
+                        ':participation_type' => $business['participation_type']
+                    ]);
+                }
+            }
+
+            // Insert differences
+            if (isset($_POST['differences'])) {
+                $stmt = $pdo->prepare("INSERT INTO differences (declaration_id, content) 
+                                      VALUES (:declaration_id, :content)");
+                $stmt->execute([
+                    ':declaration_id' => $declaration_id,
+                    ':content' => $_POST['differences']
+                ]);
+            }
+
+            // Insert previous incomes
+            if (isset($_POST['previous_incomes'])) {
+                $stmt = $pdo->prepare("INSERT INTO previous_incomes (declaration_id, html_content) 
+                                      VALUES (:declaration_id, :html_content)");
+                $stmt->execute([
+                    ':declaration_id' => $declaration_id,
+                    ':html_content' => $_POST['previous_incomes']
+                ]);
+            }
+
+            $pdo->commit();
+            $success_message = "Η δήλωση υποβλήθηκε επιτυχώς!";
+        }
     } catch (PDOException $e) {
-        $pdo->rollBack();
-        $error_message = "Error: " . $e->getMessage();
+        if (isset($pdo) && $pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        $error_message = "Σφάλμα κατά την υποβολή της δήλωσης: " . $e->getMessage();
     }
 }
 ?>
@@ -340,7 +347,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
             <?php endif; ?>
 
             <?php if ($error_message): ?>
-                <div class="alert alert-danger"><?php echo $error_message; ?></div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?php echo $error_message; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             <?php endif; ?>
 
             <div class="container py-5">
