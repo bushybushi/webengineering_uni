@@ -17,15 +17,6 @@ try {
     $error_message = "Error fetching parties: " . $e->getMessage();
 }
 
-// Ensure database connection is established
-if (!isset($pdo)) {
-    try {
-        $pdo = new PDO("mysql:host=localhost;dbname=pothen_esxes", "root", "");
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        $error_message = "Database connection failed: " . $e->getMessage();
-    }
-}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
@@ -35,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
             'full_name' => 'Ονοματεπώνυμο',
             'office' => 'Ιδιοτήτα/Αξίωμα',
             'marital_status' => 'Οικογενειακή Κατάσταση',
-            'dependants' => 'Αριθμός ανηλίκων τεκνών',
             'dob' => 'Ημερομηνία Γέννησης'
         ];
 
@@ -60,6 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
             $stmt = $pdo->prepare("INSERT INTO personal_data (declaration_id, full_name, office, address, dob, id_number, marital_status, dependants, party_id) 
                                   VALUES (:declaration_id, :full_name, :office, :address, :dob, :id_number, :marital_status, :dependants, :party_id)");
             
+            $party_id = !empty($_POST['party_id']) ? $_POST['party_id'] : null;
+            
             $stmt->execute([
                 ':declaration_id' => $declaration_id,
                 ':full_name' => $_POST['full_name'],
@@ -69,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 ':id_number' => $_POST['id_number'],
                 ':marital_status' => $_POST['marital_status'],
                 ':dependants' => $_POST['dependants'],
-                ':party_id' => $_POST['party_id']
+                ':party_id' => $party_id
             ]);
 
             // Insert properties
@@ -423,20 +415,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Αριθμος ανηλίκων τεκνών *</label>
-                                                <input type="number" name="dependants" class="form-control <?php echo isset($field_errors['dependants']) ? 'is-invalid' : ''; ?>" 
+                                                <label class="form-label">Αριθμος ανηλίκων τεκνών</label>
+                                                <input type="number" name="dependants" class="form-control" 
                                                        value="<?php echo isset($_POST['dependants']) ? htmlspecialchars($_POST['dependants']) : ''; ?>"
-                                                       min="0" required>
-                                                <div class="invalid-feedback">
-                                                    Παρακαλώ εισάγετε αριθμό ανηλίκων τεκνών
-                                                </div>
+                                                       min="0">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Πολιτικό Κόμμα/Παράταξη</label>
                                                 <select name="party_id" class="form-select">
                                                     <option value="">Επιλέξτε Κόμμα</option>
                                                     <?php foreach ($parties as $party): ?>
-                                                        <option value="<?php echo htmlspecialchars($party['id']); ?>">
+                                                        <option value="<?php echo htmlspecialchars($party['id']); ?>" 
+                                                            <?php echo (isset($_POST['party_id']) && $_POST['party_id'] == $party['id']) ? 'selected' : ''; ?>>
                                                             <?php echo htmlspecialchars($party['name']); ?>
                                                         </option>
                                                     <?php endforeach; ?>
@@ -453,7 +443,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
                                                         <label class="form-label">Είδος</label>
-                                                        <select name="properties[0][type]" class="form-select property-type" required>
+                                                        <select name="properties[0][type]" class="form-select property-type" >
                                                             <option value="">Επιλέξτε</option>
                                                             <option value="Σπίτι">Σπίτι</option>
                                                             <option value="Διαμέρισμα">Διαμέρισμα</option>
@@ -463,11 +453,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Τοποθεσία</label>
-                                                        <textarea name="properties[0][location]" class="form-control" rows="2" required></textarea>
+                                                        <textarea name="properties[0][location]" class="form-control" rows="2" ></textarea>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Εκταση (m²)</label>
-                                                        <input type="number" name="properties[0][area]" class="form-control" step="0.01" required>
+                                                        <input type="number" name="properties[0][area]" class="form-control">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Τοπογραφικά Στοιχεία</label>
@@ -479,11 +469,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Τρόπος απόκτησης</label>
-                                                        <input type="text" name="properties[0][acquisition_mode]" class="form-control" required>
+                                                        <input type="text" name="properties[0][acquisition_mode]" class="form-control" >
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Χρόνος απόκτησης</label>
-                                                        <select name="properties[0][acquisition_date]" class="form-select" required>
+                                                        <select name="properties[0][acquisition_date]" class="form-select" >
                                                             <option value="">Επιλέξτε Χρόνο</option>
                                                             <?php
                                                             $currentYear = date('Y');
@@ -495,11 +485,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Αξία απόκτησης (€)</label>
-                                                        <input type="text" name="properties[0][acquisition_value]" class="form-control" required>
+                                                        <input type="text" name="properties[0][acquisition_value]" class="form-control" >
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Τρέχουσα αξία (€)</label>
-                                                        <input type="text" name="properties[0][current_value]" class="form-control" required>
+                                                        <input type="text" name="properties[0][current_value]" class="form-control" >
                                                     </div>
                                                 </div>
                                             </div>
@@ -517,11 +507,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
                                                         <label class="form-label">Μάρκα</label>
-                                                        <input type="text" name="vehicles[0][brand]" class="form-control" required>
+                                                        <input type="text" name="vehicles[0][brand]" class="form-control" >
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Χρονολογία παραγωγής</label>
-                                                        <select name="vehicles[0][manu_year]" class="form-select" required>
+                                                        <select name="vehicles[0][manu_year]" class="form-select" >
                                                             <option value="">Επιλέξτε Χρόνο</option>
                                                             <?php
                                                             $currentYear = date('Y');
@@ -533,7 +523,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Αξία (€)</label>
-                                                        <input type="number" name="vehicles[0][value]" class="form-control" step="0.01" required>
+                                                        <input type="number" name="vehicles[0][value]" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -551,7 +541,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
                                                         <label class="form-label">Είδος Κινητής Αξίας</label>
-                                                        <select name="liquid_assets[0][type]" class="form-select" required>
+                                                        <select name="liquid_assets[0][type]" class="form-select" >
                                                             <option value="">Επιλέξτε Είδος</option>
                                                             <option value="Χρεόγραφα">Χρεόγραφα</option>
                                                             <option value="Χρεωστικά Ομόλογα">Χρεωστικά Ομόλογα</option>
@@ -563,11 +553,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Περιγραφή</label>
-                                                        <textarea name="liquid_assets[0][description]" class="form-control" rows="2" required></textarea>
+                                                        <textarea name="liquid_assets[0][description]" class="form-control" rows="2" ></textarea>
                                                     </div>
                                                     <div class="col-md-12">
                                                         <label class="form-label">Αριθμός σε Κατοχή</label>
-                                                        <input type="text" name="liquid_assets[0][amount]" class="form-control" required>
+                                                        <input type="text" name="liquid_assets[0][amount]" class="form-control" >
                                                     </div>
                                                 </div>
                                             </div>
@@ -585,11 +575,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
                                                         <label class="form-label">Όνομα Τράπεζας</label>
-                                                        <input type="text" name="deposits[0][bank_name]" class="form-control" required>
+                                                        <input type="text" name="deposits[0][bank_name]" class="form-control" >
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Ποσό Κατάθεσης (€)</label>
-                                                        <input type="number" name="deposits[0][amount]" class="form-control" step="0.01" required>
+                                                        <input type="number" name="deposits[0][amount]" class="form-control" >
                                                     </div>
                                                 </div>
                                             </div>
@@ -607,15 +597,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 <div class="row g-3">
                                                     <div class="col-md-4">
                                                         <label class="form-label">Όνομα Ασφαλιστικής Εταιρείας</label>
-                                                        <input type="text" name="insurance[0][insurance_name]" class="form-control" required>
+                                                        <input type="text" name="insurance[0][insurance_name]" class="form-control" >
                                                     </div>
                                                     <div class="col-md-4">
                                                         <label class="form-label">Αριθμός Συμβολαίου</label>
-                                                        <input type="text" name="insurance[0][contract_num]" class="form-control" required>
+                                                        <input type="text" name="insurance[0][contract_num]" class="form-control" >
                                                     </div>
                                                     <div class="col-md-4">
                                                         <label class="form-label">Εισοδήματα (€)</label>
-                                                        <input type="number" name="insurance[0][earnings]" class="form-control" step="0.01" required>
+                                                        <input type="number" name="insurance[0][earnings]" class="form-control" >
                                                     </div>
                                                 </div>
                                             </div>
@@ -633,15 +623,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 <div class="row g-3">
                                                     <div class="col-md-4">
                                                         <label class="form-label">Όνομα Πιστωτή</label>
-                                                        <input type="text" name="debts[0][creditor_name]" class="form-control" required>
+                                                        <input type="text" name="debts[0][creditor_name]" class="form-control" >
                                                     </div>
                                                     <div class="col-md-4">
                                                         <label class="form-label">Είδος Χρέους</label>
-                                                        <input type="text" name="debts[0][type]" class="form-control" required>
+                                                        <input type="text" name="debts[0][type]" class="form-control" >
                                                     </div>
                                                     <div class="col-md-4">
                                                         <label class="form-label">Ποσό Χρέους (€)</label>
-                                                        <input type="number" name="debts[0][amount]" class="form-control" step="0.01" required>
+                                                        <input type="number" name="debts[0][amount]" class="form-control" >
                                                     </div>
                                                 </div>
                                             </div>
@@ -659,15 +649,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 <div class="row g-3">
                                                     <div class="col-md-4">
                                                         <label class="form-label">Όνομα Επιχειρήσης</label>
-                                                        <input type="text" name="business[0][business_name]" class="form-control" required>
+                                                        <input type="text" name="business[0][business_name]" class="form-control" >
                                                     </div>
                                                     <div class="col-md-4">
                                                         <label class="form-label">Είδος Επιχειρήσης</label>
-                                                        <input type="text" name="business[0][business_type]" class="form-control" required>
+                                                        <input type="text" name="business[0][business_type]" class="form-control" >
                                                     </div>
                                                     <div class="col-md-4">
                                                         <label class="form-label">Είδος Συμμετοχής</label>
-                                                        <input type="text" name="business[0][participation_type]" class="form-control" required>
+                                                        <input type="text" name="business[0][participation_type]" class="form-control" >
                                                     </div>
                                                 </div>
                                             </div>
@@ -703,13 +693,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                     <div class="mb-5">
                                         <h4 class="mb-4">11. Δήλωση</h4>
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="checkbox" required>
+                                            <input class="form-check-input" type="checkbox" >
                                             <label class="form-check-label">
                                                 Θέλω να δηλώσω ότι όλα τα παραπάνω περιουσιακά στοιχεία είναι αληθινά και ακριβή.
                                             </label>
                                         </div>
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="checkbox" required>
+                                            <input class="form-check-input" type="checkbox" >
                                             <label class="form-check-label">
                                                 Ενημερώνομαι ότι η παράδοση ψευδών πληροφοριών μπορεί να οδηγήσει σε νομικές συνέπειες.
                                             </label>
@@ -779,7 +769,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Είδος</label>
-                            <select name="properties[${index}][type]" class="form-select property-type" required>
+                            <select name="properties[${index}][type]" class="form-select property-type" >
                                 <option value="">Επιλέξτε</option>
                                 <option value="Σπίτι">Σπίτι</option>
                                 <option value="Διαμέρισμα">Διαμέρισμα</option>
@@ -789,11 +779,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Τοποθεσία</label>
-                            <textarea name="properties[${index}][location]" class="form-control" rows="2" required></textarea>
+                            <textarea name="properties[${index}][location]" class="form-control" rows="2"></textarea>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Εκταση (m²)</label>
-                            <input type="number" name="properties[${index}][area]" class="form-control" step="0.01" required>
+                            <input type="number" name="properties[${index}][area]" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Τοπογραφικά Στοιχεία</label>
@@ -805,21 +795,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Τρόπος απόκτησης</label>
-                            <input type="text" name="properties[${index}][acquisition_mode]" class="form-control" required>
+                            <input type="text" name="properties[${index}][acquisition_mode]" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Χρόνος απόκτησης</label>
-                            <select name="properties[${index}][acquisition_date]" class="form-select" required>
+                            <select name="properties[${index}][acquisition_date]" class="form-select">
                                 ${yearOptions}
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Αξία απόκτησης (€)</label>
-                            <input type="text" name="properties[${index}][acquisition_value]" class="form-control" required>
+                            <input type="text" name="properties[${index}][acquisition_value]" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Τρέχουσα αξία (€)</label>
-                            <input type="text" name="properties[${index}][current_value]" class="form-control" required>
+                            <input type="text" name="properties[${index}][current_value]" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -845,17 +835,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Μάρκα</label>
-                            <input type="text" name="vehicles[${index}][brand]" class="form-control" required>
+                            <input type="text" name="vehicles[${index}][brand]" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Χρονολογία παραγωγής</label>
-                            <select name="vehicles[${index}][manu_year]" class="form-select" required>
+                            <select name="vehicles[${index}][manu_year]" class="form-select">
                                 ${yearOptions}
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Αξία (€)</label>
-                            <input type="number" name="vehicles[${index}][value]" class="form-control" step="0.01" required>
+                            <input type="number" name="vehicles[${index}][value]" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -875,7 +865,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Είδος Κινητής Αξίας</label>
-                            <select name="liquid_assets[${index}][type]" class="form-select" required>
+                            <select name="liquid_assets[${index}][type]" class="form-select">
                                 <option value="">Επιλέξτε Είδος</option>
                                 <option value="Χρεόγραφα">Χρεόγραφα</option>
                                 <option value="Χρεωστικά Ομόλογα">Χρεωστικά Ομόλογα</option>
@@ -887,11 +877,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Περιγραφή</label>
-                            <textarea name="liquid_assets[${index}][description]" class="form-control" rows="2" required></textarea>
+                            <textarea name="liquid_assets[${index}][description]" class="form-control" rows="2"></textarea>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">Αριθμός σε Κατοχή</label>
-                            <input type="text" name="liquid_assets[${index}][amount]" class="form-control" required>
+                            <input type="text" name="liquid_assets[${index}][amount]" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -911,11 +901,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Όνομα Τράπεζας</label>
-                            <input type="text" name="deposits[${index}][bank_name]" class="form-control" required>
+                            <input type="text" name="deposits[${index}][bank_name]" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Ποσό Κατάθεσης (€)</label>
-                            <input type="number" name="deposits[${index}][amount]" class="form-control" step="0.01" required>
+                            <input type="number" name="deposits[${index}][amount]" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -935,15 +925,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Όνομα Ασφαλιστικής Εταιρείας</label>
-                            <input type="text" name="insurance[${index}][insurance_name]" class="form-control" required>
+                            <input type="text" name="insurance[${index}][insurance_name]" class="form-control" >
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Αριθμός Συμβολαίου</label>
-                            <input type="text" name="insurance[${index}][contract_num]" class="form-control" required>
+                            <input type="text" name="insurance[${index}][contract_num]" class="form-control" >
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Εισοδήματα (€)</label>
-                            <input type="number" name="insurance[${index}][earnings]" class="form-control" step="0.01" required>
+                            <input type="number" name="insurance[${index}][earnings]" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -963,15 +953,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Όνομα Πιστωτή</label>
-                            <input type="text" name="debts[${index}][creditor_name]" class="form-control" required>
+                            <input type="text" name="debts[${index}][creditor_name]" class="form-control">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Είδος Χρέους</label>
-                            <input type="text" name="debts[${index}][type]" class="form-control" required>
+                            <input type="text" name="debts[${index}][type]" class="form-control">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Ποσό Χρέους (€)</label>
-                            <input type="number" name="debts[${index}][amount]" class="form-control" step="0.01" required>
+                            <input type="number" name="debts[${index}][amount]" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -991,15 +981,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Όνομα Επιχειρήσης</label>
-                            <input type="text" name="business[${index}][business_name]" class="form-control" required>
+                            <input type="text" name="business[${index}][business_name]" class="form-control">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Είδος Επιχειρήσης</label>
-                            <input type="text" name="business[${index}][business_type]" class="form-control" required>
+                            <input type="text" name="business[${index}][business_type]" class="form-control">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Είδος Συμμετοχής</label>
-                            <input type="text" name="business[${index}][participation_type]" class="form-control" required>
+                            <input type="text" name="business[${index}][participation_type]" class="form-control">
                         </div>
                     </div>
                 </div>
