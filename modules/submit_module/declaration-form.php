@@ -1,25 +1,12 @@
 <?php
 // Database connection
-require_once '../../config/db_connection_local.php';
+require_once '../../config/db_connection.php';
 
 // Initialize variables
 $success_message = '';
 $error_message = '';
 $validation_errors = [];
 $field_errors = []; // New array to store field-specific errors
-
-
-
-// Ensure database connection is established
-if (!isset($pdo)) {
-    try {
-        $pdo = new PDO("mysql:host=localhost;dbname=pothen_esxes", "root", "");
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        $error_message = "Database connection failed: " . $e->getMessage();
-    }
-}
-
 
 // Fetch parties for dropdown
 $parties = [];
