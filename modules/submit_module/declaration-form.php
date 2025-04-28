@@ -17,7 +17,6 @@ try {
     $error_message = "Error fetching parties: " . $e->getMessage();
 }
 
-
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     try {
@@ -70,17 +69,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 $stmt = $pdo->prepare("INSERT INTO properties (declaration_id, location, type, area, topographic_data, rights_burdens, acquisition_mode, acquisition_date, acquisition_value, current_value) 
                                       VALUES (:declaration_id, :location, :type, :area, :topographic_data, :rights_burdens, :acquisition_mode, :acquisition_date, :acquisition_value, :current_value)");
                 foreach ($_POST['properties'] as $property) {
+                    // Convert empty strings to NULL for numeric fields
+                    $area = !empty($property['area']) ? (float)$property['area'] : null;
+                    $acquisition_value = !empty($property['acquisition_value']) ? (float)$property['acquisition_value'] : null;
+                    $current_value = !empty($property['current_value']) ? (float)$property['current_value'] : null;
+                    
+                    // Handle acquisition date - if it's just a year, convert to full date
+                    $acquisition_date = null;
+                    if (!empty($property['acquisition_date'])) {
+                        if (strlen($property['acquisition_date']) === 4) {
+                            // If only year is provided, use January 1st of that year
+                            $acquisition_date = $property['acquisition_date'] . '-01-01';
+                        } else {
+                            $acquisition_date = $property['acquisition_date'];
+                        }
+                    }
+                    
                     $stmt->execute([
                         ':declaration_id' => $declaration_id,
-                        ':location' => $property['location'],
-                        ':type' => $property['type'],
-                        ':area' => $property['area'],
-                        ':topographic_data' => $property['topographic_data'],
-                        ':rights_burdens' => $property['rights_burdens'],
-                        ':acquisition_mode' => $property['acquisition_mode'],
-                        ':acquisition_date' => $property['acquisition_date'],
-                        ':acquisition_value' => $property['acquisition_value'],
-                        ':current_value' => $property['current_value']
+                        ':location' => !empty($property['location']) ? $property['location'] : null,
+                        ':type' => !empty($property['type']) ? $property['type'] : null,
+                        ':area' => $area,
+                        ':topographic_data' => !empty($property['topographic_data']) ? $property['topographic_data'] : null,
+                        ':rights_burdens' => !empty($property['rights_burdens']) ? $property['rights_burdens'] : null,
+                        ':acquisition_mode' => !empty($property['acquisition_mode']) ? $property['acquisition_mode'] : null,
+                        ':acquisition_date' => $acquisition_date,
+                        ':acquisition_value' => $acquisition_value,
+                        ':current_value' => $current_value
                     ]);
                 }
             }
