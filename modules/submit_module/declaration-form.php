@@ -1,12 +1,25 @@
 <?php
 // Database connection
-require_once '../../config/db_connection.php';
+require_once '../../config/db_connection_local.php';
 
 // Initialize variables
 $success_message = '';
 $error_message = '';
 $validation_errors = [];
 $field_errors = []; // New array to store field-specific errors
+
+
+
+// Ensure database connection is established
+if (!isset($pdo)) {
+    try {
+        $pdo = new PDO("mysql:host=localhost;dbname=pothen_esxes", "root", "");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        $error_message = "Database connection failed: " . $e->getMessage();
+    }
+}
+
 
 // Fetch parties for dropdown
 $parties = [];
@@ -1029,22 +1042,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
         document.addEventListener('DOMContentLoaded', function() {
             const successAlert = document.getElementById('successAlert');
             if (successAlert) {
-                // Clear all form inputs
-                const form = document.querySelector('form');
-                form.reset();
-                
-                // Remove any validation classes
-                form.classList.remove('was-validated');
-                
-                // Remove any invalid classes from inputs
-                const invalidInputs = form.querySelectorAll('.is-invalid');
-                invalidInputs.forEach(input => input.classList.remove('is-invalid'));
-                
-                // Auto-dismiss success message after 5 seconds
                 setTimeout(function() {
                     const alert = new bootstrap.Alert(successAlert);
                     alert.close();
-                }, 5000);
+                }, 5000); // 5000 milliseconds = 5 seconds
             }
         });
 
