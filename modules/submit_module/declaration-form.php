@@ -1,6 +1,6 @@
 <?php
 // Database connection
-require_once '../../config/db_connection_local.php';
+require_once '../../config/db_connection.php';
 
 // Initialize variables
 $success_message = '';
