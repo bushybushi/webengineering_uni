@@ -138,10 +138,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 $stmt = $pdo->prepare("INSERT INTO deposits (declaration_id, bank_name, amount) 
                                       VALUES (:declaration_id, :bank_name, :amount)");
                 foreach ($_POST['deposits'] as $deposit) {
+                    $amount = !empty($deposit['amount']) ? (float)$deposit['amount'] : null;
+                    
                     $stmt->execute([
                         ':declaration_id' => $declaration_id,
-                        ':bank_name' => $deposit['bank_name'],
-                        ':amount' => $deposit['amount']
+                        ':bank_name' => !empty($deposit['bank_name']) ? $deposit['bank_name'] : null,
+                        ':amount' => $amount
                     ]);
                 }
             }
@@ -167,11 +169,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 $stmt = $pdo->prepare("INSERT INTO debts (declaration_id, creditor_name, type, amount) 
                                       VALUES (:declaration_id, :creditor_name, :type, :amount)");
                 foreach ($_POST['debts'] as $debt) {
+                    $amount = !empty($debt['amount']) ? (float)$debt['amount'] : null;
+                    
                     $stmt->execute([
                         ':declaration_id' => $declaration_id,
-                        ':creditor_name' => $debt['creditor_name'],
-                        ':type' => $debt['type'],
-                        ':amount' => $debt['amount']
+                        ':creditor_name' => !empty($debt['creditor_name']) ? $debt['creditor_name'] : null,
+                        ':type' => !empty($debt['type']) ? $debt['type'] : null,
+                        ':amount' => $amount
                     ]);
                 }
             }
