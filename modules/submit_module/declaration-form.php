@@ -51,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                   VALUES (:declaration_id, :full_name, :office, :address, :dob, :id_number, :marital_status, :dependants, :party_id)");
             
             $party_id = !empty($_POST['party_id']) ? $_POST['party_id'] : null;
+            $dependants = !empty($_POST['dependants']) ? (int)$_POST['dependants'] : null;
             
             $stmt->execute([
                 ':declaration_id' => $declaration_id,
@@ -60,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 ':dob' => $_POST['dob'] ?: null,
                 ':id_number' => $_POST['id_number'],
                 ':marital_status' => $_POST['marital_status'],
-                ':dependants' => $_POST['dependants'],
+                ':dependants' => $dependants,
                 ':party_id' => $party_id
             ]);
 
