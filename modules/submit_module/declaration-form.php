@@ -19,7 +19,7 @@ if (!isset($pdo)) {
 // Fetch parties for dropdown
 $parties = [];
 try {
-    $stmt = $pdo->query("SELECT id, name FROM parties ORDER BY name");
+    $stmt = $pdo->query("SELECT id, name FROM parties ORDER BY id");
     $parties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $error_message = "Error fetching parties: " . $e->getMessage();
