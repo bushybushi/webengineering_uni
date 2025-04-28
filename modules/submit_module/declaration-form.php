@@ -1029,10 +1029,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
         document.addEventListener('DOMContentLoaded', function() {
             const successAlert = document.getElementById('successAlert');
             if (successAlert) {
+                // Clear all form inputs
+                const form = document.querySelector('form');
+                form.reset();
+                
+                // Remove any validation classes
+                form.classList.remove('was-validated');
+                
+                // Remove any invalid classes from inputs
+                const invalidInputs = form.querySelectorAll('.is-invalid');
+                invalidInputs.forEach(input => input.classList.remove('is-invalid'));
+                
+                // Auto-dismiss success message after 5 seconds
                 setTimeout(function() {
                     const alert = new bootstrap.Alert(successAlert);
                     alert.close();
-                }, 5000); // 5000 milliseconds = 5 seconds
+                }, 5000);
             }
         });
 
