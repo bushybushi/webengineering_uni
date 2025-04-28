@@ -1,12 +1,25 @@
 <?php
 // Database connection
-require_once '../../config/db_connection.php';
+require_once '../../config/db_connection_local.php';
 
 // Initialize variables
 $success_message = '';
 $error_message = '';
 $validation_errors = [];
 $field_errors = []; // New array to store field-specific errors
+
+
+
+// Ensure database connection is established
+if (!isset($pdo)) {
+    try {
+        $pdo = new PDO("mysql:host=localhost;dbname=pothen_esxes", "root", "");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        $error_message = "Database connection failed: " . $e->getMessage();
+    }
+}
+
 
 // Fetch parties for dropdown
 $parties = [];
@@ -17,6 +30,15 @@ try {
     $error_message = "Error fetching parties: " . $e->getMessage();
 }
 
+// Fetch submission periods for dropdown
+$submission_periods = [];
+try {
+    $stmt = $pdo->query("SELECT id, year FROM submission_periods WHERE is_active = TRUE ORDER BY year DESC");
+    $submission_periods = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $error_message = "Error fetching submission periods: " . $e->getMessage();
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     try {
@@ -25,7 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
             'full_name' => 'Ονοματεπώνυμο',
             'office' => 'Ιδιοτήτα/Αξίωμα',
             'marital_status' => 'Οικογενειακή Κατάσταση',
-            'dob' => 'Ημερομηνία Γέννησης'
+            'dob' => 'Ημερομηνία Γέννησης',
+            'submission_period_id' => 'Περίοδος Υποβολής'
         ];
 
         foreach ($required_fields as $field => $label) {
@@ -38,10 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
         if (empty($field_errors)) {
             $pdo->beginTransaction();
 
-            // Insert declaration (empty for now as per requirements)
-            $stmt = $pdo->prepare("INSERT INTO declarations (submission_date, title) VALUES (CURDATE(), :title)");
+            // Insert declaration
+            $stmt = $pdo->prepare("INSERT INTO declarations (submission_date, title, submission_period_id) VALUES (CURDATE(), :title, :submission_period_id)");
             $stmt->execute([
-                ':title' => $_POST['full_name']
+                ':title' => $_POST['full_name'],
+                ':submission_period_id' => $_POST['submission_period_id']
             ]);
             $declaration_id = $pdo->lastInsertId();
 
@@ -231,6 +255,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asset Declaration Form - ΠΟΘΕΝ ΕΣΧΕΣ</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../../assets/images/iconlogo.png">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -381,6 +407,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                     <div class="mb-5">
                                         <h4 class="mb-4">1. Προσωπικά Στοιχεία</h4>
                                         <div class="row border rounded p-3 mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Περίοδος Υποβολής *</label>
+                                                <select name="submission_period_id" class="form-select <?php echo isset($field_errors['submission_period_id']) ? 'is-invalid' : ''; ?>" required>
+                                                    <option value="">Επιλέξτε Περίοδο</option>
+                                                    <?php foreach ($submission_periods as $period): ?>
+                                                        <option value="<?php echo htmlspecialchars($period['id']); ?>" 
+                                                            <?php echo (isset($_POST['submission_period_id']) && $_POST['submission_period_id'] == $period['id']) ? 'selected' : ''; ?>>
+                                                            <?php echo htmlspecialchars($period['year']); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    Παρακαλώ επιλέξτε περίοδο υποβολής
+                                                </div>
+                                            </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Ονοματεπώνυμο *</label>
                                                 <input type="text" name="full_name" class="form-control <?php echo isset($field_errors['full_name']) ? 'is-invalid' : ''; ?>" 
@@ -751,13 +792,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0">&copy; 2025 Asset Declaration System. All rights reserved.</p>
+                    <p class="mb-0"> 2025 Πόθεν Εσχες &copy; all rights reserved.</p>
                 </div>
                 <div class="col-12 col-md-6 text-center text-md-end">
                     <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.php" class="text-decoration-none">About</a>
-                        <a href="contact.php" class="text-decoration-none">Contact</a>
-                        <a href="privacy.php" class="text-decoration-none">Privacy Policy</a>
+                        <a href="about.html" class="text-decoration-none">Ποιοι είμαστε</a>
+                        <a href="contact.html" class="text-decoration-none">Επικοινωνία</a>
+                        <a href="privacy.html" class="text-decoration-none">Πολιτική Απορρήτου</a>
                     </div>
                 </div>
             </div>
@@ -1032,6 +1073,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     const alert = new bootstrap.Alert(successAlert);
                     alert.close();
                 }, 5000); // 5000 milliseconds = 5 seconds
+            }
+        });
+
+        // Form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        // Handle form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const submissionPeriod = document.querySelector('select[name="submission_period_id"]');
+            if (!submissionPeriod.value) {
+                e.preventDefault();
+                submissionPeriod.classList.add('is-invalid');
+                return false;
             }
         });
     </script>
