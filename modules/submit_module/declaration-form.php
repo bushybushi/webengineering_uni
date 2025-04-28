@@ -105,11 +105,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 $stmt = $pdo->prepare("INSERT INTO vehicles (declaration_id, brand, manu_year, value) 
                                       VALUES (:declaration_id, :brand, :manu_year, :value)");
                 foreach ($_POST['vehicles'] as $vehicle) {
+                    $manu_year = !empty($vehicle['manu_year']) ? (int)$vehicle['manu_year'] : null;
+                    $value = !empty($vehicle['value']) ? (float)$vehicle['value'] : null;
+                    
                     $stmt->execute([
                         ':declaration_id' => $declaration_id,
-                        ':brand' => $vehicle['brand'],
-                        ':manu_year' => $vehicle['manu_year'],
-                        ':value' => $vehicle['value']
+                        ':brand' => !empty($vehicle['brand']) ? $vehicle['brand'] : null,
+                        ':manu_year' => $manu_year,
+                        ':value' => $value
                     ]);
                 }
             }
@@ -119,11 +122,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 $stmt = $pdo->prepare("INSERT INTO liquid_assets (declaration_id, type, description, amount) 
                                       VALUES (:declaration_id, :type, :description, :amount)");
                 foreach ($_POST['liquid_assets'] as $asset) {
+                    $amount = !empty($asset['amount']) ? (float)$asset['amount'] : null;
+                    
                     $stmt->execute([
                         ':declaration_id' => $declaration_id,
-                        ':type' => $asset['type'],
-                        ':description' => $asset['description'],
-                        ':amount' => $asset['amount']
+                        ':type' => !empty($asset['type']) ? $asset['type'] : null,
+                        ':description' => !empty($asset['description']) ? $asset['description'] : null,
+                        ':amount' => $amount
                     ]);
                 }
             }
@@ -146,11 +151,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 $stmt = $pdo->prepare("INSERT INTO insurance (declaration_id, insurance_name, contract_num, earnings) 
                                       VALUES (:declaration_id, :insurance_name, :contract_num, :earnings)");
                 foreach ($_POST['insurance'] as $insurance) {
+                    $earnings = !empty($insurance['earnings']) ? (float)$insurance['earnings'] : null;
+                    
                     $stmt->execute([
                         ':declaration_id' => $declaration_id,
-                        ':insurance_name' => $insurance['insurance_name'],
-                        ':contract_num' => $insurance['contract_num'],
-                        ':earnings' => $insurance['earnings']
+                        ':insurance_name' => !empty($insurance['insurance_name']) ? $insurance['insurance_name'] : null,
+                        ':contract_num' => !empty($insurance['contract_num']) ? $insurance['contract_num'] : null,
+                        ':earnings' => $earnings
                     ]);
                 }
             }
