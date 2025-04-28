@@ -31,11 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     try {
         // Validate required fields
         $required_fields = [
-            'full_name' => 'Ονοματεπώνυμο',
-            'office' => 'Ιδιοτήτα/Αξίωμα',
-            'marital_status' => 'Οικογενειακή Κατάσταση',
-            'dob' => 'Ημερομηνία Γέννησης',
-            'submission_period_id' => 'Περίοδος Υποβολής'
+            'full_name' => 'Ονοματεπώνυμο'
         ];
 
         foreach ($required_fields as $field => $label) {
@@ -403,8 +399,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Ιδιοτήτα/Αξίωμα *</label>
-                                                <select name="office" class="form-select <?php echo isset($field_errors['office']) ? 'is-invalid' : ''; ?>" required>
+                                                <label class="form-label">Ιδιοτήτα/Αξίωμα</label>
+                                                <select name="office" class="form-select">
                                                     <option value="">Επιλέξτε Ιδιοτήτα/Αξίωμα</option>
                                                     <option value="Πρόεδρος της Δημοκρατίας" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Πρόεδρος της Δημοκρατίας') ? 'selected' : ''; ?>>Πρόεδρος της Δημοκρατίας</option>
                                                     <option value="Πρόεδρος της Βουλής των Αντιπροσώπων" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Πρόεδρος της Βουλής των Αντιπροσώπων') ? 'selected' : ''; ?>>Πρόεδρος της Βουλής των Αντιπροσώπων</option>
@@ -419,22 +415,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                     <option value="Τέως Ευρωβουλευτές" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Ευρωβουλευτές') ? 'selected' : ''; ?>>Τέως Ευρωβουλευτής</option>
                                                     <option value="Τέως Υφυπουργοί" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Υφυπουργοί') ? 'selected' : ''; ?>>Τέως Υφυπουργός</option>
                                                 </select>
-                                                <div class="invalid-feedback">
-                                                    Παρακαλώ επιλέξτε ιδιοτήτα/αξίωμα
-                                                </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <label class="form-label">Διεύθυνση </label>
                                                 <textarea name="address" class="form-control" rows="3"><?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?></textarea>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Ημερομηνία Γέννησης *</label>
-                                                <input type="date" name="dob" class="form-control <?php echo isset($field_errors['dob']) ? 'is-invalid' : ''; ?>" 
+                                                <label class="form-label">Ημερομηνία Γέννησης</label>
+                                                <input type="date" name="dob" class="form-control" 
                                                        value="<?php echo isset($_POST['dob']) ? htmlspecialchars($_POST['dob']) : ''; ?>"
-                                                       min="1900-01-01" max="<?php echo date('Y-m-d'); ?>" required>
-                                                <div class="invalid-feedback">
-                                                    Παρακαλώ εισάγετε έγκυρη ημερομηνία γέννησης
-                                                </div>
+                                                       min="1900-01-01" max="<?php echo date('Y-m-d'); ?>">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Αριθμος ταυτότητας</label>
@@ -442,17 +432,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                        value="<?php echo isset($_POST['id_number']) ? htmlspecialchars($_POST['id_number']) : ''; ?>">
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Οικογενειακή Κατάσταση *</label>
-                                                <select name="marital_status" class="form-select <?php echo isset($field_errors['marital_status']) ? 'is-invalid' : ''; ?>" required>
+                                                <label class="form-label">Οικογενειακή Κατάσταση</label>
+                                                <select name="marital_status" class="form-select">
                                                     <option value="">Επιλέξτε Κατάσταση</option>
                                                     <option value="Άγαμος/η" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Άγαμος/η') ? 'selected' : ''; ?>>Άγαμος/η</option>
                                                     <option value="Έγγαμος/η" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Έγγαμος/η') ? 'selected' : ''; ?>>Έγγαμος/η</option>
                                                     <option value="Διαζευγμένος/η" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Διαζευγμένος/η') ? 'selected' : ''; ?>>Διαζευγμένος/η</option>
                                                     <option value="Άλλο" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Άλλο') ? 'selected' : ''; ?>>Άλλο</option>
                                                 </select>
-                                                <div class="invalid-feedback">
-                                                    Παρακαλώ επιλέξτε οικογενειακή κατάσταση
-                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Αριθμος ανηλίκων τεκνών</label>
@@ -731,10 +718,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
 
                                     <!-- Submission Period -->
                                     <div class="mb-5">
-                                        <h4 class="mb-4">11. Περίοδος Υποβολής *</h4>
+                                        <h4 class="mb-4">11. Περίοδος Υποβολής</h4>
                                         <div class="row border rounded p-3 mb-3">
                                             <div class="col-md-6">
-                                                <select name="submission_period_id" class="form-select <?php echo isset($field_errors['submission_period_id']) ? 'is-invalid' : ''; ?>" required>
+                                                <select name="submission_period_id" class="form-select">
                                                     <option value="">Επιλέξτε Περίοδο</option>
                                                     <?php foreach ($submission_periods as $period): ?>
                                                         <option value="<?php echo htmlspecialchars($period['id']); ?>" 
@@ -743,9 +730,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
-                                                <div class="invalid-feedback">
-                                                    Παρακαλώ επιλέξτε περίοδο υποβολής
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
