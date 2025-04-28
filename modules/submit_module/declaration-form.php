@@ -16,6 +16,15 @@ if (!isset($pdo)) {
     }
 }
 
+// Fetch parties for dropdown
+$parties = [];
+try {
+    $stmt = $pdo->query("SELECT id, name FROM parties ORDER BY name");
+    $parties = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $error_message = "Error fetching parties: " . $e->getMessage();
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     try {
@@ -28,9 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
         ]);
         $declaration_id = $pdo->lastInsertId();
 
-        // Insert personal data
-        $stmt = $pdo->prepare("INSERT INTO personal_data (declaration_id, full_name, office, address, dob, id_number, marital_status, dependants) 
-                              VALUES (:declaration_id, :full_name, :office, :address, :dob, :id_number, :marital_status, :dependants)");
+       // Insert personal data
+        $stmt = $pdo->prepare("INSERT INTO personal_data (declaration_id, full_name, office, address, dob, id_number, marital_status, dependants, party_id) 
+                              VALUES (:declaration_id, :full_name, :office, :address, :dob, :id_number, :marital_status, :dependants, :party_id)");
         
         $stmt->execute([
             ':declaration_id' => $declaration_id,
@@ -40,7 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
             ':dob' => $_POST['dob'],
             ':id_number' => $_POST['id_number'],
             ':marital_status' => $_POST['marital_status'],
-            ':dependants' => $_POST['dependants']
+            ':dependants' => $_POST['dependants'],
+            ':party_id' => $_POST['party_id']
         ]);
 
         // Insert properties
@@ -375,6 +385,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                             <div class="col-md-6">
                                                 <label class="form-label">Αριθμος ανηλίκων τεκνών</label>
                                                 <input type="number" name="dependants" class="form-control" min="0" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Πολιτικό Κόμμα/Παράταξη</label>
+                                                <select name="party_id" class="form-select">
+                                                    <option value="">Επιλέξτε Κόμμα</option>
+                                                    <?php foreach ($parties as $party): ?>
+                                                        <option value="<?php echo htmlspecialchars($party['id']); ?>">
+                                                            <?php echo htmlspecialchars($party['name']); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
