@@ -6,6 +6,7 @@ require_once '../../config/db_connection.php';
 $success_message = '';
 $error_message = '';
 $validation_errors = [];
+$field_errors = []; // New array to store field-specific errors
 
 // Fetch parties for dropdown
 $parties = [];
@@ -41,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
         foreach ($required_fields as $field => $label) {
             if (empty($_POST[$field])) {
                 $validation_errors[] = "Το πεδίο '$label' είναι υποχρεωτικό";
+                $field_errors[$field] = true; // Mark this field as having an error
             }
         }
 
@@ -365,31 +367,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                         <div class="row border rounded p-3 mb-3">
                                             <div class="col-md-6">
                                                 <label class="form-label">Ονοματεπώνυμο *</label>
-                                                <input type="text" name="full_name" class="form-control" required
-                                                       oninvalid="this.setCustomValidity('Παρακαλώ εισάγετε το ονοματεπώνυμο')"
-                                                       oninput="this.setCustomValidity('')">
+                                                <input type="text" name="full_name" class="form-control <?php echo isset($field_errors['full_name']) ? 'is-invalid' : ''; ?>" 
+                                                       value="<?php echo isset($_POST['full_name']) ? htmlspecialchars($_POST['full_name']) : ''; ?>" required>
                                                 <div class="invalid-feedback">
                                                     Παρακαλώ εισάγετε το ονοματεπώνυμο
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Ιδιοτήτα/Αξίωμα *</label>
-                                                <select name="office" class="form-select" required
-                                                        oninvalid="this.setCustomValidity('Παρακαλώ επιλέξτε ιδιοτήτα/αξίωμα')"
-                                                        oninput="this.setCustomValidity('')">
+                                                <select name="office" class="form-select <?php echo isset($field_errors['office']) ? 'is-invalid' : ''; ?>" required>
                                                     <option value="">Επιλέξτε Ιδιοτήτα/Αξίωμα</option>
-                                                    <option value="Πρόεδρος της Δημοκρατίας">Πρόεδρος της Δημοκρατίας</option>
-                                                    <option value="Πρόεδρος της Βουλής των Αντιπροσώπων">Πρόεδρος της Βουλής των Αντιπροσώπων</option>
-                                                    <option value="Υπουργοί">Υπουργός</option>
-                                                    <option value="Βουλευτές">Βουλευτής</option>
-                                                    <option value="Ευρωβουλευτές">Ευρωβουλευτής</option>
-                                                    <option value="Υφυπουργοί">Υφυπουργός</option>
-                                                    <option value="Τέως Πρόεδρος της Δημοκρατίας">Τέως Πρόεδρος της Δημοκρατίας</option>
-                                                    <option value="Τέως Πρόεδρος της Βουλής των Αντιπροσώπων">Τέως Πρόεδρος της Βουλής των Αντιπροσώπων</option>
-                                                    <option value="Τέως Υπουργοί">Τέως Υπουργός</option>
-                                                    <option value="Τέως Βουλευτές">Τέως Βουλευτής</option>
-                                                    <option value="Τέως Ευρωβουλευτές">Τέως Ευρωβουλευτής</option>
-                                                    <option value="Τέως Υφυπουργοί">Τέως Υφυπουργός</option>
+                                                    <option value="Πρόεδρος της Δημοκρατίας" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Πρόεδρος της Δημοκρατίας') ? 'selected' : ''; ?>>Πρόεδρος της Δημοκρατίας</option>
+                                                    <option value="Πρόεδρος της Βουλής των Αντιπροσώπων" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Πρόεδρος της Βουλής των Αντιπροσώπων') ? 'selected' : ''; ?>>Πρόεδρος της Βουλής των Αντιπροσώπων</option>
+                                                    <option value="Υπουργοί" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Υπουργοί') ? 'selected' : ''; ?>>Υπουργός</option>
+                                                    <option value="Βουλευτές" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Βουλευτές') ? 'selected' : ''; ?>>Βουλευτής</option>
+                                                    <option value="Ευρωβουλευτές" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Ευρωβουλευτές') ? 'selected' : ''; ?>>Ευρωβουλευτής</option>
+                                                    <option value="Υφυπουργοί" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Υφυπουργοί') ? 'selected' : ''; ?>>Υφυπουργός</option>
+                                                    <option value="Τέως Πρόεδρος της Δημοκρατίας" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Πρόεδρος της Δημοκρατίας') ? 'selected' : ''; ?>>Τέως Πρόεδρος της Δημοκρατίας</option>
+                                                    <option value="Τέως Πρόεδρος της Βουλής των Αντιπροσώπων" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Πρόεδρος της Βουλής των Αντιπροσώπων') ? 'selected' : ''; ?>>Τέως Πρόεδρος της Βουλής των Αντιπροσώπων</option>
+                                                    <option value="Τέως Υπουργοί" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Υπουργοί') ? 'selected' : ''; ?>>Τέως Υπουργός</option>
+                                                    <option value="Τέως Βουλευτές" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Βουλευτές') ? 'selected' : ''; ?>>Τέως Βουλευτής</option>
+                                                    <option value="Τέως Ευρωβουλευτές" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Ευρωβουλευτές') ? 'selected' : ''; ?>>Τέως Ευρωβουλευτής</option>
+                                                    <option value="Τέως Υφυπουργοί" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Υφυπουργοί') ? 'selected' : ''; ?>>Τέως Υφυπουργός</option>
                                                 </select>
                                                 <div class="invalid-feedback">
                                                     Παρακαλώ επιλέξτε ιδιοτήτα/αξίωμα
@@ -397,32 +396,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                             </div>
                                             <div class="col-md-12">
                                                 <label class="form-label">Διεύθυνση </label>
-                                                <textarea name="address" class="form-control" rows="3"></textarea>
+                                                <textarea name="address" class="form-control" rows="3"><?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?></textarea>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Ημερομηνία Γέννησης *</label>
-                                                <input type="date" name="dob" class="form-control" required 
-                                                       min="1900-01-01" max="<?php echo date('Y-m-d'); ?>"
-                                                       oninvalid="this.setCustomValidity('Παρακαλώ εισάγετε έγκυρη ημερομηνία γέννησης')"
-                                                       oninput="this.setCustomValidity('')">
+                                                <input type="date" name="dob" class="form-control <?php echo isset($field_errors['dob']) ? 'is-invalid' : ''; ?>" 
+                                                       value="<?php echo isset($_POST['dob']) ? htmlspecialchars($_POST['dob']) : ''; ?>"
+                                                       min="1900-01-01" max="<?php echo date('Y-m-d'); ?>" required>
                                                 <div class="invalid-feedback">
                                                     Παρακαλώ εισάγετε έγκυρη ημερομηνία γέννησης
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Αριθμος ταυτότητας</label>
-                                                <input type="text" name="id_number" class="form-control">
+                                                <input type="text" name="id_number" class="form-control" 
+                                                       value="<?php echo isset($_POST['id_number']) ? htmlspecialchars($_POST['id_number']) : ''; ?>">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Οικογενειακή Κατάσταση *</label>
-                                                <select name="marital_status" class="form-select" required
-                                                        oninvalid="this.setCustomValidity('Παρακαλώ επιλέξτε οικογενειακή κατάσταση')"
-                                                        oninput="this.setCustomValidity('')">
+                                                <select name="marital_status" class="form-select <?php echo isset($field_errors['marital_status']) ? 'is-invalid' : ''; ?>" required>
                                                     <option value="">Επιλέξτε Κατάσταση</option>
-                                                    <option value="Άγαμος/η">Άγαμος/η</option>
-                                                    <option value="Έγγαμος/η">Έγγαμος/η</option>
-                                                    <option value="Διαζευγμένος/η">Διαζευγμένος/η</option>
-                                                    <option value="Άλλο">Άλλο</option>
+                                                    <option value="Άγαμος/η" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Άγαμος/η') ? 'selected' : ''; ?>>Άγαμος/η</option>
+                                                    <option value="Έγγαμος/η" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Έγγαμος/η') ? 'selected' : ''; ?>>Έγγαμος/η</option>
+                                                    <option value="Διαζευγμένος/η" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Διαζευγμένος/η') ? 'selected' : ''; ?>>Διαζευγμένος/η</option>
+                                                    <option value="Άλλο" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Άλλο') ? 'selected' : ''; ?>>Άλλο</option>
                                                 </select>
                                                 <div class="invalid-feedback">
                                                     Παρακαλώ επιλέξτε οικογενειακή κατάσταση
@@ -430,9 +427,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Αριθμος ανηλίκων τεκνών *</label>
-                                                <input type="number" name="dependants" class="form-control" min="0" required
-                                                       oninvalid="this.setCustomValidity('Παρακαλώ εισάγετε αριθμό ανηλίκων τεκνών')"
-                                                       oninput="this.setCustomValidity('')">
+                                                <input type="number" name="dependants" class="form-control <?php echo isset($field_errors['dependants']) ? 'is-invalid' : ''; ?>" 
+                                                       value="<?php echo isset($_POST['dependants']) ? htmlspecialchars($_POST['dependants']) : ''; ?>"
+                                                       min="0" required>
                                                 <div class="invalid-feedback">
                                                     Παρακαλώ εισάγετε αριθμό ανηλίκων τεκνών
                                                 </div>
