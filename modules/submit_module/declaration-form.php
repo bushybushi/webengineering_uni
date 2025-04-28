@@ -395,21 +395,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                         <h4 class="mb-4">1. Προσωπικά Στοιχεία</h4>
                                         <div class="row border rounded p-3 mb-3">
                                             <div class="col-md-6">
-                                                <label class="form-label">Περίοδος Υποβολής *</label>
-                                                <select name="submission_period_id" class="form-select <?php echo isset($field_errors['submission_period_id']) ? 'is-invalid' : ''; ?>" required>
-                                                    <option value="">Επιλέξτε Περίοδο</option>
-                                                    <?php foreach ($submission_periods as $period): ?>
-                                                        <option value="<?php echo htmlspecialchars($period['id']); ?>" 
-                                                            <?php echo (isset($_POST['submission_period_id']) && $_POST['submission_period_id'] == $period['id']) ? 'selected' : ''; ?>>
-                                                            <?php echo htmlspecialchars($period['year']); ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                                <div class="invalid-feedback">
-                                                    Παρακαλώ επιλέξτε περίοδο υποβολής
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
                                                 <label class="form-label">Ονοματεπώνυμο *</label>
                                                 <input type="text" name="full_name" class="form-control <?php echo isset($field_errors['full_name']) ? 'is-invalid' : ''; ?>" 
                                                        value="<?php echo isset($_POST['full_name']) ? htmlspecialchars($_POST['full_name']) : ''; ?>" required>
@@ -744,20 +729,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                         </div>
                                     </div>
 
-                                    <!-- Declaration -->
+                                    <!-- Submission Period -->
                                     <div class="mb-5">
-                                        <h4 class="mb-4">11. Δήλωση</h4>
-                                        <div class="form-check mb-3">
-                                            <input class="form-check-input" type="checkbox" >
-                                            <label class="form-check-label">
-                                                Θέλω να δηλώσω ότι όλα τα παραπάνω περιουσιακά στοιχεία είναι αληθινά και ακριβή.
-                                            </label>
-                                        </div>
-                                        <div class="form-check mb-3">
-                                            <input class="form-check-input" type="checkbox" >
-                                            <label class="form-check-label">
-                                                Ενημερώνομαι ότι η παράδοση ψευδών πληροφοριών μπορεί να οδηγήσει σε νομικές συνέπειες.
-                                            </label>
+                                        <h4 class="mb-4">11. Περίοδος Υποβολής *</h4>
+                                        <div class="row border rounded p-3 mb-3">
+                                            <div class="col-md-6">
+                                                <select name="submission_period_id" class="form-select <?php echo isset($field_errors['submission_period_id']) ? 'is-invalid' : ''; ?>" required>
+                                                    <option value="">Επιλέξτε Περίοδο</option>
+                                                    <?php foreach ($submission_periods as $period): ?>
+                                                        <option value="<?php echo htmlspecialchars($period['id']); ?>" 
+                                                            <?php echo (isset($_POST['submission_period_id']) && $_POST['submission_period_id'] == $period['id']) ? 'selected' : ''; ?>>
+                                                            <?php echo htmlspecialchars($period['year']); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    Παρακαλώ επιλέξτε περίοδο υποβολής
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
