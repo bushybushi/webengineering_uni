@@ -1,10 +1,19 @@
 <?php
 // Database connection
-require_once '../../config/db_connection.php';
+require_once '../../config/db_connection_local.php';
 
 // Initialize variables
 $success_message = '';
 $error_message = '';
+
+// Fetch parties for dropdown
+$parties = [];
+try {
+    $stmt = $pdo->query("SELECT id, name FROM parties ORDER BY name");
+    $parties = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $error_message = "Error fetching parties: " . $e->getMessage();
+}
 
 // Ensure database connection is established
 if (!isset($pdo)) {
@@ -16,19 +25,25 @@ if (!isset($pdo)) {
     }
 }
 
-// Fetch parties for dropdown
-$parties = [];
-try {
-    $stmt = $pdo->query("SELECT id, name FROM parties ORDER BY id");
-    $parties = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    $error_message = "Error fetching parties: " . $e->getMessage();
-}
-
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     try {
         $pdo->beginTransaction();
+
+        // Validate required fields
+        $required_fields = [
+            'full_name' => 'Ονοματεπώνυμο',
+            'office' => 'Ιδιοτήτα/Αξίωμα',
+            'marital_status' => 'Οικογενειακή Κατάσταση',
+            'dependants' => 'Αριθμός ανηλίκων τεκνών',
+            'dob' => 'Ημερομηνία Γέννησης'
+        ];
+
+        foreach ($required_fields as $field => $label) {
+            if (empty($_POST[$field])) {
+                throw new Exception("Το πεδίο '$label' είναι υποχρεωτικό");
+            }
+        }
 
         // Insert declaration (empty for now as per requirements)
         $stmt = $pdo->prepare("INSERT INTO declarations (submission_date, title) VALUES (CURDATE(), :title)");
@@ -37,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
         ]);
         $declaration_id = $pdo->lastInsertId();
 
-       // Insert personal data
+        // Insert personal data
         $stmt = $pdo->prepare("INSERT INTO personal_data (declaration_id, full_name, office, address, dob, id_number, marital_status, dependants, party_id) 
                               VALUES (:declaration_id, :full_name, :office, :address, :dob, :id_number, :marital_status, :dependants, :party_id)");
         
@@ -46,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
             ':full_name' => $_POST['full_name'],
             ':office' => $_POST['office'],
             ':address' => $_POST['address'],
-            ':dob' => $_POST['dob'],
+            ':dob' => $_POST['dob'] ?: null,
             ':id_number' => $_POST['id_number'],
             ':marital_status' => $_POST['marital_status'],
             ':dependants' => $_POST['dependants'],
@@ -339,12 +354,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                         <h4 class="mb-4">1. Προσωπικά Στοιχεία</h4>
                                         <div class="row border rounded p-3 mb-3">
                                             <div class="col-md-6">
-                                                <label class="form-label">Ονοματεπώνυμο</label>
-                                                <input type="text" name="full_name" class="form-control" required>
+                                                <label class="form-label">Ονοματεπώνυμο *</label>
+                                                <input type="text" name="full_name" class="form-control" required
+                                                       oninvalid="this.setCustomValidity('Παρακαλώ εισάγετε το ονοματεπώνυμο')"
+                                                       oninput="this.setCustomValidity('')">
+                                                <div class="invalid-feedback">
+                                                    Παρακαλώ εισάγετε το ονοματεπώνυμο
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Ιδιοτήτα/Αξίωμα</label>
-                                                <select name="office" class="form-select" required>
+                                                <label class="form-label">Ιδιοτήτα/Αξίωμα *</label>
+                                                <select name="office" class="form-select" required
+                                                        oninvalid="this.setCustomValidity('Παρακαλώ επιλέξτε ιδιοτήτα/αξίωμα')"
+                                                        oninput="this.setCustomValidity('')">
                                                     <option value="">Επιλέξτε Ιδιοτήτα/Αξίωμα</option>
                                                     <option value="Πρόεδρος της Δημοκρατίας">Πρόεδρος της Δημοκρατίας</option>
                                                     <option value="Πρόεδρος της Βουλής των Αντιπροσώπων">Πρόεδρος της Βουλής των Αντιπροσώπων</option>
@@ -359,32 +381,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                     <option value="Τέως Ευρωβουλευτές">Τέως Ευρωβουλευτής</option>
                                                     <option value="Τέως Υφυπουργοί">Τέως Υφυπουργός</option>
                                                 </select>
+                                                <div class="invalid-feedback">
+                                                    Παρακαλώ επιλέξτε ιδιοτήτα/αξίωμα
+                                                </div>
                                             </div>
                                             <div class="col-md-12">
-                                                <label class="form-label">Διεύθυνση</label>
-                                                <textarea name="address" class="form-control" rows="3" required></textarea>
+                                                <label class="form-label">Διεύθυνση </label>
+                                                <textarea name="address" class="form-control" rows="3"></textarea>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Ημερομηνία Γέννησης</label>
-                                                <input type="date" name="dob" class="form-control" required>
+                                                <label class="form-label">Ημερομηνία Γέννησης *</label>
+                                                <input type="date" name="dob" class="form-control" required 
+                                                       min="1900-01-01" max="<?php echo date('Y-m-d'); ?>"
+                                                       oninvalid="this.setCustomValidity('Παρακαλώ εισάγετε έγκυρη ημερομηνία γέννησης')"
+                                                       oninput="this.setCustomValidity('')">
+                                                <div class="invalid-feedback">
+                                                    Παρακαλώ εισάγετε έγκυρη ημερομηνία γέννησης
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Αριθμος ταυτότητας</label>
-                                                <input type="text" name="id_number" class="form-control" required>
+                                                <input type="text" name="id_number" class="form-control">
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Οικογενειακή Κατάσταση</label>
-                                               <select name="marital_status" class="form-select" required>
+                                                <label class="form-label">Οικογενειακή Κατάσταση *</label>
+                                                <select name="marital_status" class="form-select" required
+                                                        oninvalid="this.setCustomValidity('Παρακαλώ επιλέξτε οικογενειακή κατάσταση')"
+                                                        oninput="this.setCustomValidity('')">
                                                     <option value="">Επιλέξτε Κατάσταση</option>
                                                     <option value="Άγαμος/η">Άγαμος/η</option>
                                                     <option value="Έγγαμος/η">Έγγαμος/η</option>
                                                     <option value="Διαζευγμένος/η">Διαζευγμένος/η</option>
                                                     <option value="Άλλο">Άλλο</option>
                                                 </select>
+                                                <div class="invalid-feedback">
+                                                    Παρακαλώ επιλέξτε οικογενειακή κατάσταση
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label">Αριθμος ανηλίκων τεκνών</label>
-                                                <input type="number" name="dependants" class="form-control" min="0" required>
+                                                <label class="form-label">Αριθμος ανηλίκων τεκνών *</label>
+                                                <input type="number" name="dependants" class="form-control" min="0" required
+                                                       oninvalid="this.setCustomValidity('Παρακαλώ εισάγετε αριθμό ανηλίκων τεκνών')"
+                                                       oninput="this.setCustomValidity('')">
+                                                <div class="invalid-feedback">
+                                                    Παρακαλώ εισάγετε αριθμό ανηλίκων τεκνών
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Πολιτικό Κόμμα/Παράταξη</label>
@@ -438,7 +479,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Χρόνος απόκτησης</label>
-                                                     <input type="date" name="properties[0][acquisition_date]" class="form-control" required>
+                                                        <select name="properties[0][acquisition_date]" class="form-select" required>
+                                                            <option value="">Επιλέξτε Χρόνο</option>
+                                                            <?php
+                                                            $currentYear = date('Y');
+                                                            for ($year = $currentYear; $year >= 1900; $year--) {
+                                                                echo "<option value='$year'>$year</option>";
+                                                            }
+                                                            ?>
+                                                        </select>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Αξία απόκτησης (€)</label>
@@ -698,6 +747,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script>
+        // Function to handle property type selection
+        function handlePropertyTypeChange(selectElement) {
+            // This function is no longer needed as we removed the "Άλλο" option
+        }
+
+        // Add event listeners to existing property type selects
+        document.addEventListener('DOMContentLoaded', function() {
+            // This event listener is no longer needed as we removed the "Άλλο" option
+        });
+
         // Modify addPropertyEntry function to include the event listener
         function addPropertyEntry() {
             const container = document.getElementById('properties-container');
@@ -716,13 +775,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Είδος</label>
-                           <select name="properties[0][type]" class="form-select property-type" required>
-                                                            <option value="">Επιλέξτε</option>
-                                                            <option value="Σπίτι">Σπίτι</option>
-                                                            <option value="Διαμέρισμα">Διαμέρισμα</option>
-                                                            <option value="Οικόπεδο">Οικόπεδο</option>
-                                                            <option value="Χωράφι">Χωράφι</option>
-                                                        </select>
+                            <select name="properties[${index}][type]" class="form-select property-type" required>
+                                <option value="">Επιλέξτε</option>
+                                <option value="Σπίτι">Σπίτι</option>
+                                <option value="Διαμέρισμα">Διαμέρισμα</option>
+                                <option value="Οικόπεδο">Οικόπεδο</option>
+                                <option value="Χωράφι">Χωράφι</option>
+                            </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Τοποθεσία</label>
@@ -746,7 +805,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Χρόνος απόκτησης</label>
-                             <input type="date" name="properties[0][acquisition_date]" class="form-control" required>
+                            <select name="properties[${index}][acquisition_date]" class="form-select" required>
+                                ${yearOptions}
+                            </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Αξία απόκτησης (€)</label>
