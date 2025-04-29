@@ -477,6 +477,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                             <option value="Διαμέρισμα">Διαμέρισμα</option>
                                                             <option value="Οικόπεδο">Οικόπεδο</option>
                                                             <option value="Χωράφι">Χωράφι</option>
+                                                            <option value="Κατάστημα">Κατάστημα</option>
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">
@@ -814,6 +815,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                 <option value="Διαμέρισμα">Διαμέρισμα</option>
                                 <option value="Οικόπεδο">Οικόπεδο</option>
                                 <option value="Χωράφι">Χωράφι</option>
+                                <option value="Κατάστημα">Κατάστημα</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -870,13 +872,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 <div class="vehicle-entry entry-container border rounded p-3 mb-3">
                     <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
                         <i class="bi bi-x"></i>
-                    </button>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Μάρκα</label>
-                            <input type="text" name="vehicles[${index}][brand]" class="form-control">
-                        </div>
-                        <div class="col-md-6">
+                    </button><div class="col-md-6">
                             <label class="form-label">Τύπος</label>
                             <select name="vehicles[${index}][type]" class="form-select">
                                 <option value="">Επιλέξτε Τύπο</option>
@@ -885,6 +881,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                 <option value="Σκάφος">Σκάφος</option>
                                 <option value="Άλλο">Άλλο</option>
                             </select>
+                        </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Μάρκα</label>
+                            <input type="text" name="vehicles[${index}][brand]" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Χρονολογία παραγωγής</label>
