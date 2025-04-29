@@ -278,9 +278,6 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                         </td>
                                         <td>
                                             <strong><?php echo $declaration['submission_year']; ?></strong>
-                                            <div class="small text-muted">
-                                                Submitted: <?php echo date('d/m/Y', strtotime($declaration['submission_date'])); ?>
-                                            </div>
                                         </td>
                                         <td>
                                             <span class="badge bg-warning text-dark political-badge" data-party="<?php echo htmlspecialchars($declaration['party_name']); ?>"><?php echo htmlspecialchars($declaration['party_name']); ?></span>
