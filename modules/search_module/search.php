@@ -133,7 +133,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="../../index.html">
+            <a class="navbar-brand d-flex align-items-center" href="../../index.php">
                 <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
                 <span class="fw-bold">ΠΟΘΕΝ ΕΣΧΕΣ</span>
             </a>
@@ -147,7 +147,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="../../index.html">Home</a>
+                        <a class="nav-link" href="../../index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="./search.php">Search</a>
