@@ -319,7 +319,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0">2025 Πόθεν Εσχες © all rights reserved.</p>
+                    <p class="mb-0">&copy; 2025 Πόθεν Εσχες © all rights reserved.</p>
                 </div>
                 <div class="col-12 col-md-6 text-center text-md-end">
                     <div class="d-flex justify-content-center justify-content-md-end gap-3">
