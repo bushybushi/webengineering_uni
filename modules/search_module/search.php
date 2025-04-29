@@ -267,7 +267,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                                         <img src="<?php echo htmlspecialchars($declaration['image_url']); ?>" 
                                                              alt="<?php echo htmlspecialchars($declaration['full_name']); ?>" 
                                                              class="avatar-circle"
-                                                             style="width: 40px; height: 40px; object-fit: cover;">
+                                                             style="width: 45px; height: 45px; object-fit: cover;">
                                                     <?php else: ?>
                                                         <div class="avatar-circle"><?php echo substr($declaration['full_name'], 0, 1); ?></div>
                                                     <?php endif; ?>
