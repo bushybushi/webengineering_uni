@@ -133,7 +133,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="../../index.html">
+            <a class="navbar-brand d-flex align-items-center" href="../../index.php">
                 <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
                 <span class="fw-bold">ΠΟΘΕΝ ΕΣΧΕΣ</span>
             </a>
@@ -147,7 +147,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="../../index.html">Αρχική</a>
+                        <a class="nav-link" href="../../index.php">Αρχική</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="./search.php">Αναζήτηση</a>
@@ -319,11 +319,11 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0">&copy; 2025 Σύστημα Δηλώσεων Περιουσίας. Με επιφύλαξη παντός δικαιώματος.</p>
+                    <p class="mb-0">2025 Πόθεν Εσχες © all rights reserved.</p>
                 </div>
                 <div class="col-12 col-md-6 text-center text-md-end">
                     <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.php" class="text-decoration-none">Σχετικά</a>
+                        <a href="about.php" class="text-decoration-none">Ποιοι είμαστε</a>
                         <a href="contact.php" class="text-decoration-none">Επικοινωνία</a>
                         <a href="privacy.php" class="text-decoration-none">Πολιτική Απορρήτου</a>
                     </div>
