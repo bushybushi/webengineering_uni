@@ -262,8 +262,15 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="flex-shrink-0">
-                                                    <div class="avatar-circle"><?php echo substr($declaration['full_name'], 0, 1); ?></div>
+                                                  <div class="flex-shrink-0">
+                                                    <?php if (!empty($declaration['image_url'])): ?>
+                                                        <img src="<?php echo htmlspecialchars($declaration['image_url']); ?>" 
+                                                             alt="<?php echo htmlspecialchars($declaration['full_name']); ?>" 
+                                                             class="avatar-circle"
+                                                             style="width: 40px; height: 40px; object-fit: cover;">
+                                                    <?php else: ?>
+                                                        <div class="avatar-circle"><?php echo substr($declaration['full_name'], 0, 1); ?></div>
+                                                    <?php endif; ?>
                                                 </div>
                                                 <div class="ms-3">
                                                     <h6 class="mb-1"><?php echo htmlspecialchars($declaration['full_name']); ?></h6>
