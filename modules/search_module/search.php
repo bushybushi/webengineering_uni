@@ -10,10 +10,11 @@ $year = isset($_GET['year']) ? htmlspecialchars($_GET['year']) : '';
 $position = isset($_GET['position']) ? htmlspecialchars($_GET['position']) : '';
 
 // Base query
-$query = "SELECT d.*, pd.full_name, pd.office, p.name as party_name 
+$query = "SELECT d.*, pd.full_name, pd.office, p.name as party_name, sp.year as submission_year 
           FROM declarations d 
           LEFT JOIN personal_data pd ON d.id = pd.declaration_id 
           LEFT JOIN parties p ON pd.party_id = p.id 
+          LEFT JOIN submission_periods sp ON d.submission_period_id = sp.id 
           WHERE 1=1";
 $params = array();
 
@@ -27,7 +28,7 @@ if (!empty($search)) {
 }
 
 if (!empty($year)) {
-    $query .= " AND YEAR(d.submission_date) = ?";
+    $query .= " AND sp.year = ?";
     $params[] = $year;
 }
 
@@ -43,7 +44,7 @@ $declarations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $totalResults = count($declarations);
 
 // Get unique years for dropdown
-$yearQuery = "SELECT DISTINCT YEAR(submission_date) as year FROM declarations WHERE submission_date IS NOT NULL ORDER BY year DESC";
+$yearQuery = "SELECT DISTINCT year FROM submission_periods WHERE is_active = 1 ORDER BY year DESC";
 $yearStmt = $conn->query($yearQuery);
 $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
 
@@ -276,7 +277,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                             <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['title']); ?></span>
                                         </td>
                                         <td>
-                                            <strong><?php echo date('Y', strtotime($declaration['submission_date'])); ?></strong>
+                                            <strong><?php echo $declaration['submission_year']; ?></strong>
                                             <div class="small text-muted">
                                                 Submitted: <?php echo date('d/m/Y', strtotime($declaration['submission_date'])); ?>
                                             </div>
