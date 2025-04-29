@@ -10,12 +10,16 @@ $year = isset($_GET['year']) ? htmlspecialchars($_GET['year']) : '';
 $position = isset($_GET['position']) ? htmlspecialchars($_GET['position']) : '';
 
 // Base query
-$query = "SELECT * FROM people WHERE 1=1";
+$query = "SELECT d.*, pd.full_name, pd.office, p.name as party_name 
+          FROM declarations d 
+          LEFT JOIN personal_data pd ON d.id = pd.declaration_id 
+          LEFT JOIN parties p ON pd.party_id = p.id 
+          WHERE 1=1";
 $params = array();
 
 // Add search conditions
 if (!empty($search)) {
-    $query .= " AND (name LIKE ? OR office LIKE ? OR title LIKE ?)";
+    $query .= " AND (pd.full_name LIKE ? OR pd.office LIKE ? OR d.title LIKE ?)";
     $searchParam = "%$search%";
     $params[] = $searchParam;
     $params[] = $searchParam;
@@ -23,12 +27,12 @@ if (!empty($search)) {
 }
 
 if (!empty($year)) {
-    $query .= " AND YEAR(date_of_submission) = ?";
+    $query .= " AND YEAR(d.submission_date) = ?";
     $params[] = $year;
 }
 
 if (!empty($position)) {
-    $query .= " AND office = ?";
+    $query .= " AND pd.office = ?";
     $params[] = $position;
 }
 
@@ -39,12 +43,12 @@ $declarations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $totalResults = count($declarations);
 
 // Get unique years for dropdown
-$yearQuery = "SELECT DISTINCT YEAR(date_of_submission) as year FROM people WHERE date_of_submission IS NOT NULL ORDER BY year DESC";
+$yearQuery = "SELECT DISTINCT YEAR(submission_date) as year FROM declarations WHERE submission_date IS NOT NULL ORDER BY year DESC";
 $yearStmt = $conn->query($yearQuery);
 $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
 
 // Get unique positions for dropdown
-$positionQuery = "SELECT DISTINCT office FROM people WHERE office IS NOT NULL ORDER BY office";
+$positionQuery = "SELECT DISTINCT office FROM personal_data WHERE office IS NOT NULL ORDER BY office";
 $positionStmt = $conn->query($positionQuery);
 $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
 ?>
@@ -258,10 +262,10 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="flex-shrink-0">
-                                                    <div class="avatar-circle"><?php echo substr($declaration['name'], 0, 1); ?></div>
+                                                    <div class="avatar-circle"><?php echo substr($declaration['full_name'], 0, 1); ?></div>
                                                 </div>
                                                 <div class="ms-3">
-                                                    <h6 class="mb-1"><?php echo htmlspecialchars($declaration['name']); ?></h6>
+                                                    <h6 class="mb-1"><?php echo htmlspecialchars($declaration['full_name']); ?></h6>
                                                     <small class="text-muted">
                                                         <i class="bi bi-building"></i> <?php echo htmlspecialchars($declaration['office']); ?>
                                                     </small>
@@ -272,13 +276,13 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                             <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['title']); ?></span>
                                         </td>
                                         <td>
-                                            <strong><?php echo date('Y', strtotime($declaration['date_of_submission'])); ?></strong>
+                                            <strong><?php echo date('Y', strtotime($declaration['submission_date'])); ?></strong>
                                             <div class="small text-muted">
-                                                Submitted: <?php echo date('d/m/Y', strtotime($declaration['date_of_submission'])); ?>
+                                                Submitted: <?php echo date('d/m/Y', strtotime($declaration['submission_date'])); ?>
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge bg-warning text-dark political-badge" data-party="<?php echo htmlspecialchars($declaration['political_affiliation']); ?>"><?php echo htmlspecialchars($declaration['political_affiliation']); ?></span>
+                                            <span class="badge bg-warning text-dark political-badge" data-party="<?php echo htmlspecialchars($declaration['party_name']); ?>"><?php echo htmlspecialchars($declaration['party_name']); ?></span>
                                         </td>
                                         <td>
                                             <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="View Declaration Details">
