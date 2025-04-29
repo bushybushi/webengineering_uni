@@ -10,7 +10,7 @@ $year = isset($_GET['year']) ? htmlspecialchars($_GET['year']) : '';
 $position = isset($_GET['position']) ? htmlspecialchars($_GET['position']) : '';
 
 // Base query
-$query = "SELECT d.*, pd.full_name, pd.office, p.name as party_name, sp.year as submission_year 
+$query = "SELECT d.*, pd.full_name, pd.office, p.name as party_name, sp.year as submission_year, d.image_url 
           FROM declarations d 
           LEFT JOIN personal_data pd ON d.id = pd.declaration_id 
           LEFT JOIN parties p ON pd.party_id = p.id 
@@ -133,7 +133,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="../../index.php">
+            <a class="navbar-brand d-flex align-items-center" href="../../index.html">
                 <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
                 <span class="fw-bold">ΠΟΘΕΝ ΕΣΧΕΣ</span>
             </a>
@@ -147,16 +147,16 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="../../index.php">Home</a>
+                        <a class="nav-link" href="../../index.html">Αρχική</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="./search.php">Search</a>
+                        <a class="nav-link active" href="./search.php">Αναζήτηση</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./statistics.php">Statistics</a>
+                        <a class="nav-link" href="./statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../submit_module/declaration-form.php">Submit</a>
+                        <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -175,8 +175,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                 <i class="bi bi-person-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="../login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
-                                <li><a class="dropdown-item" href="../login_module/register.php"><i class="bi bi-person-plus"></i> Register</a></li>
+                                <li><a class="dropdown-item" href="../login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Σύνδεση</a></li>
+                                <li><a class="dropdown-item" href="../login_module/register.php"><i class="bi bi-person-plus"></i> Εγγραφή</a></li>
                             </ul>
                         </div>
                     </li>
@@ -195,9 +195,9 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
         <!-- Main Content -->
         <main class="container my-5">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Search Asset Declarations</h1>
+                <h1>Αναζήτηση Δηλώσεων Περιουσίας</h1>
                 <div class="text-muted">
-                    Found <?php echo $totalResults; ?> declaration(s)
+                    Βρέθηκαν <?php echo $totalResults; ?> δήλωση/εις
                 </div>
             </div>
 
@@ -206,13 +206,13 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                 <div class="card-body">
                     <form class="row g-3" method="GET">
                         <div class="col-md-6">
-                            <label class="form-label">Search</label>
-                            <input type="text" name="search" class="form-control" placeholder="Search by name" value="<?php echo $search; ?>">
+                            <label class="form-label">Αναζήτηση</label>
+                            <input type="text" name="search" class="form-control" placeholder="Αναζήτηση με όνομα" value="<?php echo $search; ?>">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Year</label>
+                            <label class="form-label">Έτος</label>
                             <select name="year" class="form-select">
-                                <option value="">All Years</option>
+                                <option value="">Όλα τα Έτη</option>
                                 <?php foreach ($years as $yearOption): ?>
                                     <option value="<?php echo $yearOption; ?>" <?php echo $year == $yearOption ? 'selected' : ''; ?>>
                                         <?php echo $yearOption; ?>
@@ -221,9 +221,9 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Position</label>
+                            <label class="form-label">Θέση</label>
                             <select name="position" class="form-select">
-                                <option value="">All Positions</option>
+                                <option value="">Όλες οι Θέσεις</option>
                                 <?php foreach ($positions as $positionOption): ?>
                                     <option value="<?php echo $positionOption; ?>" <?php echo $position == $positionOption ? 'selected' : ''; ?>>
                                         <?php echo $positionOption; ?>
@@ -233,10 +233,10 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                         </div>
                         <div class="col-12">
                             <button type="submit" class="btn btn-warning text-dark">
-                                <i class="bi bi-search"></i> Search
+                                <i class="bi bi-search"></i> Αναζήτηση
                             </button>
                             <a href="search.php" class="btn btn-outline-secondary">
-                                <i class="bi bi-x-circle"></i> Clear Filters
+                                <i class="bi bi-x-circle"></i> Καθαρισμός Φίλτρων
                             </a>
                         </div>
                     </form>
@@ -250,11 +250,11 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 40%">Person Details</th>
-                                    <th style="width: 20%">Title</th>
-                                    <th style="width: 15%">Submission Date</th>
-                                    <th style="width: 15%">Political Affiliation</th>
-                                    <th style="width: 10%">Actions</th>
+                                    <th style="width: 40%">Στοιχεία Προσώπου</th>
+                                    <th style="width: 20%">Τίτλος</th>
+                                    <th style="width: 15%">Έτος Υποβολής</th>
+                                    <th style="width: 15%">Κομματική ένταξη</th>
+                                    <th style="width: 10%">Ενέργειες</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -262,7 +262,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                  <div class="flex-shrink-0">
+                                                <div class="flex-shrink-0">
                                                     <?php if (!empty($declaration['image_url'])): ?>
                                                         <img src="<?php echo htmlspecialchars($declaration['image_url']); ?>" 
                                                              alt="<?php echo htmlspecialchars($declaration['full_name']); ?>" 
@@ -290,8 +290,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                             <span class="badge bg-warning text-dark political-badge" data-party="<?php echo htmlspecialchars($declaration['party_name']); ?>"><?php echo htmlspecialchars($declaration['party_name']); ?></span>
                                         </td>
                                         <td>
-                                            <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="View Declaration Details">
-                                                <i class="bi bi-eye"></i> View
+                                            <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="Προβολή Λεπτομερειών Δήλωσης">
+                                                <i class="bi bi-eye"></i> Προβολή
                                             </a>
                                         </td>
                                     </tr>
@@ -301,7 +301,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                         <td colspan="5" class="text-center py-4">
                                             <div class="text-muted">
                                                 <i class="bi bi-search"></i>
-                                                <p class="mb-0">No declarations found matching your search criteria.</p>
+                                                <p class="mb-0">Δεν βρέθηκαν δηλώσεις που να ταιριάζουν με τα κριτήρια αναζήτησής σας.</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -319,13 +319,13 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0">&copy; 2025 Asset Declaration System. All rights reserved.</p>
+                    <p class="mb-0">&copy; 2025 Σύστημα Δηλώσεων Περιουσίας. Με επιφύλαξη παντός δικαιώματος.</p>
                 </div>
                 <div class="col-12 col-md-6 text-center text-md-end">
                     <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.php" class="text-decoration-none">About</a>
-                        <a href="contact.php" class="text-decoration-none">Contact</a>
-                        <a href="privacy.php" class="text-decoration-none">Privacy Policy</a>
+                        <a href="about.php" class="text-decoration-none">Σχετικά</a>
+                        <a href="contact.php" class="text-decoration-none">Επικοινωνία</a>
+                        <a href="privacy.php" class="text-decoration-none">Πολιτική Απορρήτου</a>
                     </div>
                 </div>
             </div>
