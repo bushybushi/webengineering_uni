@@ -19,78 +19,63 @@ if (empty($ids)) {
 try {
     $result = [];
     
-    // Get basic info and financial data for each politician
     foreach ($ids as $id) {
+        error_log("Processing ID: " . $id);
+        
         // Get person's name
-        $stmt = $conn->prepare("SELECT name FROM people WHERE id = ?");
+        $stmt = $conn->prepare("
+            SELECT d.id, pd.full_name as name 
+            FROM declarations d 
+            INNER JOIN personal_data pd ON d.id = pd.declaration_id 
+            WHERE d.id = ?
+        ");
         $stmt->execute([$id]);
         $person = $stmt->fetch(PDO::FETCH_ASSOC);
         
+        error_log("Person data: " . print_r($person, true));
+        
         if ($person) {
-            // Initialize values
-            $realEstate = 0;
-            $stocks = 0;
-            $deposits = 0;
+            // Get real estate value
+            $stmt = $conn->prepare("
+                SELECT SUM(
+                    CASE 
+                        WHEN current_value IS NULL OR current_value = '' THEN 0
+                        WHEN current_value REGEXP '^[0-9]+(\\.[0-9]+)?$' THEN CAST(current_value AS DECIMAL(10,2))
+                        ELSE 0
+                    END
+                ) as total
+                FROM properties 
+                WHERE declaration_id = ?
+            ");
+            $stmt->execute([$id]);
+            $realEstate = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+            error_log("Real estate query result: " . print_r($realEstate, true));
 
-            // Check if real_estate table exists
-            $stmt = $conn->query("SHOW TABLES LIKE 'real_estate'");
-            if ($stmt->rowCount() > 0) {
-                // Get real estate value
-                $stmt = $conn->prepare("
-                    SELECT value 
-                    FROM real_estate 
-                    WHERE person_id = ?
-                ");
-                $stmt->execute([$id]);
-                $realEstateValues = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
-                foreach ($realEstateValues as $value) {
-                    $cleanValue = str_replace(['€', ','], '', $value['value']);
-                    $realEstate += floatval($cleanValue);
-                }
-                error_log("Real estate values for ID {$id}: " . print_r($realEstateValues, true));
-                error_log("Total real estate: {$realEstate}");
-            }
+            // Get stocks value
+            $stmt = $conn->prepare("
+                SELECT SUM(
+                    CASE 
+                        WHEN amount IS NULL OR amount = '' THEN 0
+                        WHEN amount REGEXP '^[0-9]+(\\.[0-9]+)?$' THEN CAST(amount AS DECIMAL(10,2))
+                        ELSE 0
+                    END
+                ) as total
+                FROM liquid_assets 
+                WHERE declaration_id = ? AND type = 'Μετοχές'
+            ");
+            $stmt->execute([$id]);
+            $stocks = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+            error_log("Stocks query result: " . print_r($stocks, true));
 
-            // Check if stocks table exists
-            $stmt = $conn->query("SHOW TABLES LIKE 'stocks'");
-            if ($stmt->rowCount() > 0) {
-                // Get stocks value
-                $stmt = $conn->prepare("
-                    SELECT value 
-                    FROM stocks 
-                    WHERE person_id = ?
-                ");
-                $stmt->execute([$id]);
-                $stocksValues = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
-                foreach ($stocksValues as $value) {
-                    $cleanValue = str_replace(['€', ','], '', $value['value']);
-                    $stocks += floatval($cleanValue);
-                }
-                error_log("Stocks values for ID {$id}: " . print_r($stocksValues, true));
-                error_log("Total stocks: {$stocks}");
-            }
-
-            // Check if deposits table exists
-            $stmt = $conn->query("SHOW TABLES LIKE 'deposits'");
-            if ($stmt->rowCount() > 0) {
-                // Get deposits value
-                $stmt = $conn->prepare("
-                    SELECT amount 
-                    FROM deposits 
-                    WHERE person_id = ?
-                ");
-                $stmt->execute([$id]);
-                $depositsValues = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
-                foreach ($depositsValues as $value) {
-                    $cleanValue = str_replace(['€', ','], '', $value['amount']);
-                    $deposits += floatval($cleanValue);
-                }
-                error_log("Deposits values for ID {$id}: " . print_r($depositsValues, true));
-                error_log("Total deposits: {$deposits}");
-            }
+            // Get deposits value
+            $stmt = $conn->prepare("
+                SELECT COALESCE(SUM(amount), 0) as total
+                FROM deposits 
+                WHERE declaration_id = ?
+            ");
+            $stmt->execute([$id]);
+            $deposits = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+            error_log("Deposits query result: " . print_r($deposits, true));
 
             $result[] = [
                 'name' => $person['name'],
@@ -98,16 +83,21 @@ try {
                 'stocks' => round($stocks, 2),
                 'deposits' => round($deposits, 2)
             ];
+            
+            error_log("Added to result: " . print_r(end($result), true));
+        } else {
+            error_log("No person found for ID: " . $id);
         }
     }
 
-    // Debug log
-    error_log('Final result: ' . print_r($result, true));
+    error_log('Final result array: ' . print_r($result, true));
     
     header('Content-Type: application/json');
     echo json_encode($result);
+    
 } catch(PDOException $e) {
     error_log('Database error: ' . $e->getMessage());
+    error_log('Error trace: ' . $e->getTraceAsString());
     http_response_code(500);
     header('Content-Type: application/json');
     echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);

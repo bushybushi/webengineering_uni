@@ -7,15 +7,23 @@ $conn = require '../../config/db_connection.php';
 // Calculate statistics
 try {
     // Total declarations (active officials)
-    $stmt = $conn->query("SELECT COUNT(*) as total FROM people");
+    $stmt = $conn->query("SELECT COUNT(*) as total FROM declarations");
     $totalDeclarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Total unique political affiliations
-    $stmt = $conn->query("SELECT COUNT(DISTINCT political_affiliation) as total FROM people WHERE political_affiliation IS NOT NULL");
+    $stmt = $conn->query("SELECT COUNT(DISTINCT p.name) as total FROM parties p 
+                         INNER JOIN personal_data pd ON pd.party_id = p.id 
+                         WHERE p.name IS NOT NULL");
     $totalParties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Declarations by political party
-    $stmt = $conn->query("SELECT political_affiliation, COUNT(*) as count FROM people WHERE political_affiliation IS NOT NULL GROUP BY political_affiliation ORDER BY count DESC");
+    $stmt = $conn->query("SELECT p.name as political_affiliation, COUNT(*) as count 
+                         FROM declarations d 
+                         INNER JOIN personal_data pd ON d.id = pd.declaration_id 
+                         INNER JOIN parties p ON pd.party_id = p.id 
+                         WHERE p.name IS NOT NULL 
+                         GROUP BY p.name 
+                         ORDER BY count DESC");
     $partyData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Format party data for chart
@@ -28,10 +36,10 @@ try {
     // Asset Value Distribution
     $stmt = $conn->query("SELECT 
         CASE 
-            WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 10000 THEN 'Under €10,000'
+            WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 10000 THEN 'Λιγότερο από €10,000'
             WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 50000 THEN '€10,000 - €50,000'
             WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 100000 THEN '€50,000 - €100,000'
-            ELSE 'Over €100,000'
+            ELSE 'Περισσότερο από €100,000'
         END as value_range,
         COUNT(*) as count
         FROM liquid_assets 
@@ -195,6 +203,79 @@ try {
         .selected-politician button:hover {
             color: #f8f9fa;
         }
+
+        .comparison-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .comparison-row {
+            display: flex;
+            gap: 1rem;
+            min-height: 100px;
+        }
+        
+        .comparison-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* Important for proper overflow handling */
+        }
+        
+        .comparison-section {
+            height: 100%;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .comparison-section .card {
+            height: 100%;
+            margin: 0;
+        }
+        
+        .comparison-section .card-body {
+            height: 100%;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+
+        /* Style the scrollbar for better appearance */
+        .comparison-section .card-body::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .comparison-section .card-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .comparison-section .card-body::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .comparison-section .card-body::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Ensure tables don't break the layout */
+        .comparison-section table {
+            min-width: 100%;
+            margin-bottom: 0;
+        }
+
+        /* Ensure content is properly contained */
+        .comparison-section .table-responsive {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Add some padding to the scrollable content */
+        .comparison-section .card-body > * {
+            padding-right: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -215,16 +296,16 @@ try {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="../../index.php">Home</a>
+                        <a class="nav-link" href="../../index.php">Αρχική</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./search.php">Search</a>
+                        <a class="nav-link" href="./search.php">Αναζήτηση</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="./statistics.php">Statistics</a>
+                        <a class="nav-link active" href="./statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../submit_module/declaration-form.php">Submit</a>
+                        <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -243,8 +324,8 @@ try {
                                 <i class="bi bi-person-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="../login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
-                                <li><a class="dropdown-item" href="../login_module/register.php"><i class="bi bi-person-plus"></i> Register</a></li>
+                                <li><a class="dropdown-item" href="../login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Σύνδεση</a></li>
+                                <li><a class="dropdown-item" href="../login_module/register.php"><i class="bi bi-person-plus"></i> Εγγραφή</a></li>
                             </ul>
                         </div>
                     </li>
@@ -318,7 +399,7 @@ try {
         <!-- Main Content -->
         <main class="container my-5">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Statistics & Analysis</h1>
+                <h1>Στατιστικά & Ανάλυση</h1>
             </div>
 
             <!-- Summary Stats -->
@@ -327,25 +408,25 @@ try {
                     <div class="col-md-3">
                         <div class="stat-item">
                             <div class="stat-value"><?php echo $submissionRate; ?>%</div>
-                            <div class="stat-label">Submission Rate</div>
+                            <div class="stat-label">Ποσοστό Υποβολής</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-item">
                             <div class="stat-value"><?php echo $totalDeclarations; ?></div>
-                            <div class="stat-label">Total Declarations</div>
+                            <div class="stat-label">Σύνολο Δηλώσεων</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-item">
                             <div class="stat-value"><?php echo $totalDeclarations; ?></div>
-                            <div class="stat-label">Active Officials</div>
+                            <div class="stat-label">Ενεργοί</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-item">
                             <div class="stat-value"><?php echo $totalParties; ?></div>
-                            <div class="stat-label">Political Parties</div>
+                            <div class="stat-label">Πολιτικά Κόμματα</div>
                         </div>
                     </div>
                 </div>
@@ -357,7 +438,7 @@ try {
                 <div class="col-lg-6">
                     <div class="card feature-card">
                         <div class="card-body">
-                            <h5 class="card-title mb-4">Declarations by Political Party</h5>
+                            <h5 class="card-title mb-4">Δηλώσεις ανά Πολιτικό Κόμμα</h5>
                             <div class="chart-container">
                                 <canvas id="partyChart"></canvas>
                             </div>
@@ -368,7 +449,7 @@ try {
                 <div class="col-lg-6">
                     <div class="card feature-card">
                         <div class="card-body">
-                            <h5 class="card-title mb-4">Asset Value Distribution</h5>
+                            <h5 class="card-title mb-4">Κατανομή Αξίας Περιουσίας</h5>
                             <div class="chart-container">
                                 <canvas id="valueDistributionChart"></canvas>
                             </div>
@@ -380,54 +461,63 @@ try {
 
         <!-- Comparison Section -->
         <div class="container mb-5">
-            <h2 class="mb-4">Compare Declarations</h2>
+            <h2 class="mb-4">Σύγκριση Δηλώσεων</h2>
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">First Person</h5>
+                            <h5 class="card-title">Πρώτο Πρόσωπο</h5>
                             <select class="form-select mb-3" id="person1">
-                                <option value="">Select person...</option>
+                                <option value="">Επιλέξτε πρόσωπο...</option>
                                 <?php
-                                $stmt = $conn->query("SELECT id, name FROM people ORDER BY name");
+                                $stmt = $conn->query("SELECT d.id, pd.full_name as name FROM declarations d 
+                                                     INNER JOIN personal_data pd ON d.id = pd.declaration_id 
+                                                     ORDER BY pd.full_name");
                                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                     echo "<option value='{$row['id']}'>{$row['name']}</option>";
                                 }
                                 ?>
                             </select>
-                            <div id="declaration1"></div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Second Person</h5>
+                            <h5 class="card-title">Δεύτερο Πρόσωπο</h5>
                             <select class="form-select mb-3" id="person2">
-                                <option value="">Select person...</option>
+                                <option value="">Επιλέξτε πρόσωπο...</option>
                                 <?php
-                                $stmt = $conn->query("SELECT id, name FROM people ORDER BY name");
+                                $stmt = $conn->query("SELECT d.id, pd.full_name as name FROM declarations d 
+                                                     INNER JOIN personal_data pd ON d.id = pd.declaration_id 
+                                                     ORDER BY pd.full_name");
                                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                     echo "<option value='{$row['id']}'>{$row['name']}</option>";
                                 }
                                 ?>
                             </select>
-                            <div id="declaration2"></div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row mt-3">
                 <div class="col-12 text-center">
-                    <button id="compareBtn" class="btn btn-compare me-2" disabled>Compare Declarations</button>
-                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                    <button id="compareBtn" class="btn btn-compare me-2" disabled>Σύγκριση Δηλώσεων</button>
+                    <button id="clearBtn" class="btn btn-secondary">Καθαρισμός</button>
+                </div>
+            </div>
+
+            <!-- Comparison Results -->
+            <div id="comparisonResults" class="mt-4" style="display: none;">
+                <div class="comparison-container">
+                    <!-- Content will be dynamically inserted here -->
                 </div>
             </div>
         </div>
 
         <!-- Financial Comparison Chart Section -->
         <div class="container mb-5">
-            <h2 class="mb-4">Financial Comparison</h2>
+            <h2 class="mb-4">Οικονομική Σύγκριση</h2>
             
             <!-- Search and Selection Area -->
             <div class="card mb-4">
@@ -435,7 +525,7 @@ try {
                     <div class="row">
                         <div class="col-md-8">
                             <div class="search-container">
-                                <input type="text" class="form-control" id="politicianSearch" placeholder="Search politicians...">
+                                <input type="text" class="form-control" id="politicianSearch" placeholder="Αναζήτηση πολιτικών...">
                                 <div id="searchResults" class="search-results"></div>
                             </div>
                             <div id="selectedPoliticians" class="selected-politicians mt-3">
@@ -443,7 +533,7 @@ try {
                             </div>
                         </div>
                         <div class="col-md-4 text-end">
-                            <button id="clearSelection" class="btn btn-secondary">Clear All</button>
+                            <button id="clearSelection" class="btn btn-secondary">Καθαρισμός Όλων</button>
                         </div>
                     </div>
                 </div>
@@ -463,13 +553,13 @@ try {
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0">&copy; 2025 Asset Declaration System. All rights reserved.</p>
+                    <p class="mb-0">&copy; 2025 Πόθεν Εσχες © all rights reserved.</p>
                 </div>
                 <div class="col-12 col-md-6 text-center text-md-end">
                     <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.php" class="text-decoration-none">About</a>
-                        <a href="contact.php" class="text-decoration-none">Contact</a>
-                        <a href="privacy.php" class="text-decoration-none">Privacy Policy</a>
+                        <a href="about.php" class="text-decoration-none">Ποιοι είμαστε</a>
+                        <a href="contact.php" class="text-decoration-none">Επικοινωνία</a>
+                        <a href="privacy.php" class="text-decoration-none">Πολιτική Απορρήτου</a>
                     </div>
                 </div>
             </div>
@@ -488,7 +578,7 @@ try {
             data: {
                 labels: <?php echo json_encode($partyLabels); ?>,
                 datasets: [{
-                    label: 'Number of Declarations',
+                    label: 'Αριθμός Δηλώσεων',
                     data: <?php echo json_encode($partyCounts); ?>,
                     backgroundColor: [
                         '#ED9635',
@@ -503,7 +593,35 @@ try {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Δηλώσεις ανά Πολιτικό Κόμμα'
+                    },
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Αριθμός Δηλώσεων'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Πολιτικά Κόμματα'
+                        }
+                    }
+                }
             }
         });
 
@@ -514,7 +632,7 @@ try {
             data: {
                 labels: <?php echo json_encode($valueLabels); ?>,
                 datasets: [{
-                    label: 'Number of Assets',
+                    label: 'Αριθμός Περιουσιακών Στοιχείων',
                     data: <?php echo json_encode($valueCounts); ?>,
                     backgroundColor: '#ED9635'
                 }]
@@ -523,8 +641,27 @@ try {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
+                    title: {
+                        display: true,
+                        text: 'Κατανομή Αξίας Περιουσίας'
+                    },
                     legend: {
                         display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Αριθμός Περιουσιακών Στοιχείων'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Εύρος Αξίας'
+                        }
                     }
                 }
             }
@@ -544,36 +681,93 @@ try {
         person1Select.addEventListener('change', checkSelections);
         person2Select.addEventListener('change', checkSelections);
 
-        // Add click event to compare button
+        // Function to create comparison layout
+        function createComparisonLayout(html1, html2) {
+            const container = document.querySelector('.comparison-container');
+            container.innerHTML = '';
+
+            // Create temporary divs to parse the HTML
+            const temp1 = document.createElement('div');
+            const temp2 = document.createElement('div');
+            temp1.innerHTML = html1;
+            temp2.innerHTML = html2;
+
+            // Get all sections from both declarations
+            const sections1 = temp1.querySelectorAll('.card.feature-card');
+            const sections2 = temp2.querySelectorAll('.card.feature-card');
+
+            // Create rows for each section pair
+            sections1.forEach((section1, index) => {
+                const section2 = sections2[index];
+                if (section1 || section2) {
+                    const row = document.createElement('div');
+                    row.className = 'comparison-row';
+
+                    // First column
+                    const col1 = document.createElement('div');
+                    col1.className = 'comparison-column';
+                    if (section1) {
+                        // Remove header and footer
+                        const headerDiv = section1.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
+                        if (headerDiv) headerDiv.remove();
+                        const footer = section1.querySelector('footer');
+                        if (footer) footer.remove();
+                        
+                        col1.innerHTML = section1.outerHTML;
+                    }
+
+                    // Second column
+                    const col2 = document.createElement('div');
+                    col2.className = 'comparison-column';
+                    if (section2) {
+                        // Remove header and footer
+                        const headerDiv = section2.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
+                        if (headerDiv) headerDiv.remove();
+                        const footer = section2.querySelector('footer');
+                        if (footer) footer.remove();
+                        
+                        col2.innerHTML = section2.outerHTML;
+                    }
+
+                    row.appendChild(col1);
+                    row.appendChild(col2);
+                    container.appendChild(row);
+                }
+            });
+
+            // Show the comparison results
+            document.getElementById('comparisonResults').style.display = 'block';
+        }
+
+        // Update the compare button click handler
         compareBtn.addEventListener('click', function() {
             if (person1Select.value && person2Select.value) {
                 // Load first declaration
                 fetch(`../submit_module/view-declaration.php?id=${person1Select.value}`)
                     .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('declaration1').innerHTML = html;
-                    });
-
-                // Load second declaration
-                fetch(`../submit_module/view-declaration.php?id=${person2Select.value}`)
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('declaration2').innerHTML = html;
-                        // Hide compare button after loading declarations
-                        compareBtn.style.display = 'none';
+                    .then(html1 => {
+                        // Load second declaration
+                        fetch(`../submit_module/view-declaration.php?id=${person2Select.value}`)
+                            .then(response => response.text())
+                            .then(html2 => {
+                                // Create comparison layout
+                                createComparisonLayout(html1, html2);
+                                // Hide compare button
+                                compareBtn.style.display = 'none';
+                            });
                     });
             }
         });
 
-        // Add click event to clear button
+        // Update clear button click handler
         clearBtn.addEventListener('click', function() {
             // Reset selects
             person1Select.value = '';
             person2Select.value = '';
             
-            // Clear declarations
-            document.getElementById('declaration1').innerHTML = '';
-            document.getElementById('declaration2').innerHTML = '';
+            // Clear comparison results
+            document.getElementById('comparisonResults').style.display = 'none';
+            document.querySelector('.comparison-container').innerHTML = '';
             
             // Show compare button again
             compareBtn.style.display = 'inline-block';
@@ -583,7 +777,7 @@ try {
         // Financial Chart Code
         const ctx = document.getElementById('financialChart').getContext('2d');
         let financialChart = null;
-        let selectedPoliticians = new Map(); // Store selected politicians
+        let selectedPoliticians = new Map();
 
         // Function to fetch financial data
         async function fetchFinancialData(politicianIds) {
@@ -597,30 +791,29 @@ try {
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`Σφάλμα HTTP! κατάσταση: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('Fetched data:', data); // Debug log
+                console.log('Ληφθέντα δεδομένα:', data);
                 
                 if (data.error) {
-                    console.error('Server error:', data.error);
+                    console.error('Σφάλμα διακομιστή:', data.error);
                     return null;
                 }
                 
                 return data;
             } catch (error) {
-                console.error('Error fetching financial data:', error);
+                console.error('Σφάλμα κατά την ανάκτηση οικονομικών δεδομένων:', error);
                 return null;
             }
         }
 
         // Function to update chart
         function updateChart(data) {
-            console.log('Updating chart with data:', data); // Debug log
+            console.log('Ενημέρωση γραφήματος με δεδομένα:', data);
             
             if (!data || data.length === 0) {
-                // Show empty chart with axes
                 if (financialChart) {
                     financialChart.destroy();
                 }
@@ -631,21 +824,21 @@ try {
                         labels: [],
                         datasets: [
                             {
-                                label: 'Real Estate Value (€)',
+                                label: 'Αξία Ακινήτων (€)',
                                 data: [],
                                 backgroundColor: 'rgba(237, 150, 53, 0.8)',
                                 borderColor: 'rgba(237, 150, 53, 1)',
                                 borderWidth: 1
                             },
                             {
-                                label: 'Stocks Value (€)',
+                                label: 'Αξία Μετοχών (€)',
                                 data: [],
                                 backgroundColor: 'rgba(214, 123, 31, 0.8)',
                                 borderColor: 'rgba(214, 123, 31, 1)',
                                 borderWidth: 1
                             },
                             {
-                                label: 'Deposits Value (€)',
+                                label: 'Αξία Καταθέσεων (€)',
                                 data: [],
                                 backgroundColor: 'rgba(240, 168, 90, 0.8)',
                                 borderColor: 'rgba(240, 168, 90, 1)',
@@ -660,14 +853,14 @@ try {
                                 stacked: false,
                                 title: {
                                     display: true,
-                                    text: 'Politicians'
+                                    text: 'Πολιτικοί'
                                 }
                             },
                             y: {
                                 stacked: false,
                                 title: {
                                     display: true,
-                                    text: 'Value (€)'
+                                    text: 'Αξία (€)'
                                 },
                                 beginAtZero: true
                             }
@@ -675,7 +868,7 @@ try {
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Financial Comparison'
+                                text: 'Οικονομική Σύγκριση'
                             }
                         }
                     }
@@ -698,21 +891,21 @@ try {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Real Estate Value (€)',
+                            label: 'Αξία Ακινήτων (€)',
                             data: realEstateData,
                             backgroundColor: 'rgba(237, 150, 53, 0.8)',
                             borderColor: 'rgba(237, 150, 53, 1)',
                             borderWidth: 1
                         },
                         {
-                            label: 'Stocks Value (€)',
+                            label: 'Αξία Μετοχών (€)',
                             data: stocksData,
                             backgroundColor: 'rgba(214, 123, 31, 0.8)',
                             borderColor: 'rgba(214, 123, 31, 1)',
                             borderWidth: 1
                         },
                         {
-                            label: 'Deposits Value (€)',
+                            label: 'Αξία Καταθέσεων (€)',
                             data: depositsData,
                             backgroundColor: 'rgba(240, 168, 90, 0.8)',
                             borderColor: 'rgba(240, 168, 90, 1)',
@@ -727,14 +920,14 @@ try {
                             stacked: false,
                             title: {
                                 display: true,
-                                text: 'Politicians'
+                                text: 'Πολιτικοί'
                             }
                         },
                         y: {
                             stacked: false,
                             title: {
                                 display: true,
-                                text: 'Value (€)'
+                                text: 'Αξία (€)'
                             },
                             beginAtZero: true
                         }
@@ -742,7 +935,7 @@ try {
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Financial Comparison'
+                            text: 'Οικονομική Σύγκριση'
                         }
                     }
                 }
