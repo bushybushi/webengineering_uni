@@ -610,14 +610,34 @@ try {
                 fetch(`../submit_module/view-declaration.php?id=${person1Select.value}`)
                     .then(response => response.text())
                     .then(html => {
-                        document.getElementById('declaration1').innerHTML = html;
+                        // Create a temporary div to parse the HTML
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = html;
+                        
+                        // Remove navigation buttons and header
+                        const headerDiv = tempDiv.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
+                        if (headerDiv) {
+                            headerDiv.remove();
+                        }
+                        
+                        document.getElementById('declaration1').innerHTML = tempDiv.innerHTML;
                     });
 
                 // Load second declaration
                 fetch(`../submit_module/view-declaration.php?id=${person2Select.value}`)
                     .then(response => response.text())
                     .then(html => {
-                        document.getElementById('declaration2').innerHTML = html;
+                        // Create a temporary div to parse the HTML
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = html;
+                        
+                        // Remove navigation buttons and header
+                        const headerDiv = tempDiv.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
+                        if (headerDiv) {
+                            headerDiv.remove();
+                        }
+                        
+                        document.getElementById('declaration2').innerHTML = tempDiv.innerHTML;
                         // Hide compare button after loading declarations
                         compareBtn.style.display = 'none';
                     });
