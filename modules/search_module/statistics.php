@@ -36,10 +36,10 @@ try {
     // Asset Value Distribution
     $stmt = $conn->query("SELECT 
         CASE 
-            WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 10000 THEN 'Under €10,000'
+            WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 10000 THEN 'Λιγότερο από €10,000'
             WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 50000 THEN '€10,000 - €50,000'
             WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 100000 THEN '€50,000 - €100,000'
-            ELSE 'Over €100,000'
+            ELSE 'Περισσότερο από €100,000'
         END as value_range,
         COUNT(*) as count
         FROM liquid_assets 
@@ -376,7 +376,7 @@ try {
                 <div class="col-lg-6">
                     <div class="card feature-card">
                         <div class="card-body">
-                            <h5 class="card-title mb-4">Κατανομή Αξίας Περιουσίας</h5>
+                            <h5 class="card-title mb-4">Κατανομή ανά Αξίας Περιουσίας</h5>
                             <div class="chart-container">
                                 <canvas id="valueDistributionChart"></canvas>
                             </div>
