@@ -61,7 +61,7 @@ try {
                     END
                 ) as total
                 FROM liquid_assets 
-                WHERE declaration_id = ? AND type = 'stocks'
+                WHERE declaration_id = ? AND type = 'Μετοχές'
             ");
             $stmt->execute([$id]);
             $stocks = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
