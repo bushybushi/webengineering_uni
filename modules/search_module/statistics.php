@@ -203,6 +203,79 @@ try {
         .selected-politician button:hover {
             color: #f8f9fa;
         }
+
+        .comparison-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .comparison-row {
+            display: flex;
+            gap: 1rem;
+            min-height: 100px;
+        }
+        
+        .comparison-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* Important for proper overflow handling */
+        }
+        
+        .comparison-section {
+            height: 100%;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .comparison-section .card {
+            height: 100%;
+            margin: 0;
+        }
+        
+        .comparison-section .card-body {
+            height: 100%;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+
+        /* Style the scrollbar for better appearance */
+        .comparison-section .card-body::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .comparison-section .card-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .comparison-section .card-body::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .comparison-section .card-body::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Ensure tables don't break the layout */
+        .comparison-section table {
+            min-width: 100%;
+            margin-bottom: 0;
+        }
+
+        /* Ensure content is properly contained */
+        .comparison-section .table-responsive {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Add some padding to the scrollable content */
+        .comparison-section .card-body > * {
+            padding-right: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -405,7 +478,6 @@ try {
                                 }
                                 ?>
                             </select>
-                            <div id="declaration1"></div>
                         </div>
                     </div>
                 </div>
@@ -424,7 +496,6 @@ try {
                                 }
                                 ?>
                             </select>
-                            <div id="declaration2"></div>
                         </div>
                     </div>
                 </div>
@@ -433,6 +504,13 @@ try {
                 <div class="col-12 text-center">
                     <button id="compareBtn" class="btn btn-compare me-2" disabled>Σύγκριση Δηλώσεων</button>
                     <button id="clearBtn" class="btn btn-secondary">Καθαρισμός</button>
+                </div>
+            </div>
+
+            <!-- Comparison Results -->
+            <div id="comparisonResults" class="mt-4" style="display: none;">
+                <div class="comparison-container">
+                    <!-- Content will be dynamically inserted here -->
                 </div>
             </div>
         </div>
@@ -603,68 +681,93 @@ try {
         person1Select.addEventListener('change', checkSelections);
         person2Select.addEventListener('change', checkSelections);
 
-        // Add click event to compare button
+        // Function to create comparison layout
+        function createComparisonLayout(html1, html2) {
+            const container = document.querySelector('.comparison-container');
+            container.innerHTML = '';
+
+            // Create temporary divs to parse the HTML
+            const temp1 = document.createElement('div');
+            const temp2 = document.createElement('div');
+            temp1.innerHTML = html1;
+            temp2.innerHTML = html2;
+
+            // Get all sections from both declarations
+            const sections1 = temp1.querySelectorAll('.card.feature-card');
+            const sections2 = temp2.querySelectorAll('.card.feature-card');
+
+            // Create rows for each section pair
+            sections1.forEach((section1, index) => {
+                const section2 = sections2[index];
+                if (section1 || section2) {
+                    const row = document.createElement('div');
+                    row.className = 'comparison-row';
+
+                    // First column
+                    const col1 = document.createElement('div');
+                    col1.className = 'comparison-column';
+                    if (section1) {
+                        // Remove header and footer
+                        const headerDiv = section1.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
+                        if (headerDiv) headerDiv.remove();
+                        const footer = section1.querySelector('footer');
+                        if (footer) footer.remove();
+                        
+                        col1.innerHTML = section1.outerHTML;
+                    }
+
+                    // Second column
+                    const col2 = document.createElement('div');
+                    col2.className = 'comparison-column';
+                    if (section2) {
+                        // Remove header and footer
+                        const headerDiv = section2.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
+                        if (headerDiv) headerDiv.remove();
+                        const footer = section2.querySelector('footer');
+                        if (footer) footer.remove();
+                        
+                        col2.innerHTML = section2.outerHTML;
+                    }
+
+                    row.appendChild(col1);
+                    row.appendChild(col2);
+                    container.appendChild(row);
+                }
+            });
+
+            // Show the comparison results
+            document.getElementById('comparisonResults').style.display = 'block';
+        }
+
+        // Update the compare button click handler
         compareBtn.addEventListener('click', function() {
             if (person1Select.value && person2Select.value) {
                 // Load first declaration
                 fetch(`../submit_module/view-declaration.php?id=${person1Select.value}`)
                     .then(response => response.text())
-                    .then(html => {
-                        // Create a temporary div to parse the HTML
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = html;
-                        
-                        // Remove navigation buttons and header
-                        const headerDiv = tempDiv.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
-                        if (headerDiv) {
-                            headerDiv.remove();
-                        }
-
-                        // Remove footer
-                        const footer = tempDiv.querySelector('footer');
-                        if (footer) {
-                            footer.remove();
-                        }
-                        
-                        document.getElementById('declaration1').innerHTML = tempDiv.innerHTML;
-                    });
-
-                // Load second declaration
-                fetch(`../submit_module/view-declaration.php?id=${person2Select.value}`)
-                    .then(response => response.text())
-                    .then(html => {
-                        // Create a temporary div to parse the HTML
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = html;
-                        
-                        // Remove navigation buttons and header
-                        const headerDiv = tempDiv.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
-                        if (headerDiv) {
-                            headerDiv.remove();
-                        }
-
-                        // Remove footer
-                        const footer = tempDiv.querySelector('footer');
-                        if (footer) {
-                            footer.remove();
-                        }
-                        
-                        document.getElementById('declaration2').innerHTML = tempDiv.innerHTML;
-                        // Hide compare button after loading declarations
-                        compareBtn.style.display = 'none';
+                    .then(html1 => {
+                        // Load second declaration
+                        fetch(`../submit_module/view-declaration.php?id=${person2Select.value}`)
+                            .then(response => response.text())
+                            .then(html2 => {
+                                // Create comparison layout
+                                createComparisonLayout(html1, html2);
+                                // Hide compare button
+                                compareBtn.style.display = 'none';
+                            });
                     });
             }
         });
 
-        // Add click event to clear button
+        // Update clear button click handler
         clearBtn.addEventListener('click', function() {
             // Reset selects
             person1Select.value = '';
             person2Select.value = '';
             
-            // Clear declarations
-            document.getElementById('declaration1').innerHTML = '';
-            document.getElementById('declaration2').innerHTML = '';
+            // Clear comparison results
+            document.getElementById('comparisonResults').style.display = 'none';
+            document.querySelector('.comparison-container').innerHTML = '';
             
             // Show compare button again
             compareBtn.style.display = 'inline-block';
