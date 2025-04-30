@@ -7,15 +7,23 @@ $conn = require '../../config/db_connection.php';
 // Calculate statistics
 try {
     // Total declarations (active officials)
-    $stmt = $conn->query("SELECT COUNT(*) as total FROM people");
+    $stmt = $conn->query("SELECT COUNT(*) as total FROM declarations");
     $totalDeclarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Total unique political affiliations
-    $stmt = $conn->query("SELECT COUNT(DISTINCT political_affiliation) as total FROM people WHERE political_affiliation IS NOT NULL");
+    $stmt = $conn->query("SELECT COUNT(DISTINCT p.name) as total FROM parties p 
+                         INNER JOIN personal_data pd ON pd.party_id = p.id 
+                         WHERE p.name IS NOT NULL");
     $totalParties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Declarations by political party
-    $stmt = $conn->query("SELECT political_affiliation, COUNT(*) as count FROM people WHERE political_affiliation IS NOT NULL GROUP BY political_affiliation ORDER BY count DESC");
+    $stmt = $conn->query("SELECT p.name as political_affiliation, COUNT(*) as count 
+                         FROM declarations d 
+                         INNER JOIN personal_data pd ON d.id = pd.declaration_id 
+                         INNER JOIN parties p ON pd.party_id = p.id 
+                         WHERE p.name IS NOT NULL 
+                         GROUP BY p.name 
+                         ORDER BY count DESC");
     $partyData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Format party data for chart
@@ -389,8 +397,10 @@ try {
                             <select class="form-select mb-3" id="person1">
                                 <option value="">Select person...</option>
                                 <?php
-                                $stmt = $conn->query("SELECT id, name FROM people ORDER BY name");
-                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                $stmt = $conn->query("SELECT d.id, pd.full_name as name FROM declarations d 
+                                                     INNER JOIN personal_data pd ON d.id = pd.declaration_id 
+                                                     ORDER BY pd.full_name");                                
+                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                     echo "<option value='{$row['id']}'>{$row['name']}</option>";
                                 }
                                 ?>
@@ -406,8 +416,10 @@ try {
                             <select class="form-select mb-3" id="person2">
                                 <option value="">Select person...</option>
                                 <?php
-                                $stmt = $conn->query("SELECT id, name FROM people ORDER BY name");
-                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                $stmt = $conn->query("SELECT d.id, pd.full_name as name FROM declarations d 
+                                                     INNER JOIN personal_data pd ON d.id = pd.declaration_id 
+                                                     ORDER BY pd.full_name");
+                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                     echo "<option value='{$row['id']}'>{$row['name']}</option>";
                                 }
                                 ?>
