@@ -619,6 +619,12 @@ try {
                         if (headerDiv) {
                             headerDiv.remove();
                         }
+
+                        // Remove footer
+                        const footer = tempDiv.querySelector('footer');
+                        if (footer) {
+                            footer.remove();
+                        }
                         
                         document.getElementById('declaration1').innerHTML = tempDiv.innerHTML;
                     });
@@ -635,6 +641,12 @@ try {
                         const headerDiv = tempDiv.querySelector('.d-flex.justify-content-between.align-items-center.mb-4');
                         if (headerDiv) {
                             headerDiv.remove();
+                        }
+
+                        // Remove footer
+                        const footer = tempDiv.querySelector('footer');
+                        if (footer) {
+                            footer.remove();
                         }
                         
                         document.getElementById('declaration2').innerHTML = tempDiv.innerHTML;
