@@ -223,16 +223,16 @@ try {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="../../index.php">Home</a>
+                        <a class="nav-link" href="../../index.php">Αρχική</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./search.php">Search</a>
+                        <a class="nav-link" href="./search.php">Αναζήτηση</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="./statistics.php">Statistics</a>
+                        <a class="nav-link active" href="./statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../submit_module/declaration-form.php">Submit</a>
+                        <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -251,8 +251,8 @@ try {
                                 <i class="bi bi-person-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="../login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
-                                <li><a class="dropdown-item" href="../login_module/register.php"><i class="bi bi-person-plus"></i> Register</a></li>
+                                <li><a class="dropdown-item" href="../login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Σύνδεση</a></li>
+                                <li><a class="dropdown-item" href="../login_module/register.php"><i class="bi bi-person-plus"></i> Εγγραφή</a></li>
                             </ul>
                         </div>
                     </li>
@@ -326,7 +326,7 @@ try {
         <!-- Main Content -->
         <main class="container my-5">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Statistics & Analysis</h1>
+                <h1>Στατιστικά & Ανάλυση</h1>
             </div>
 
             <!-- Summary Stats -->
@@ -335,25 +335,25 @@ try {
                     <div class="col-md-3">
                         <div class="stat-item">
                             <div class="stat-value"><?php echo $submissionRate; ?>%</div>
-                            <div class="stat-label">Submission Rate</div>
+                            <div class="stat-label">Ποσοστό Υποβολής</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-item">
                             <div class="stat-value"><?php echo $totalDeclarations; ?></div>
-                            <div class="stat-label">Total Declarations</div>
+                            <div class="stat-label">Σύνολο Δηλώσεων</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-item">
                             <div class="stat-value"><?php echo $totalDeclarations; ?></div>
-                            <div class="stat-label">Active Officials</div>
+                            <div class="stat-label">Ενεργοί</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-item">
                             <div class="stat-value"><?php echo $totalParties; ?></div>
-                            <div class="stat-label">Political Parties</div>
+                            <div class="stat-label">Πολιτικά Κόμματα</div>
                         </div>
                     </div>
                 </div>
@@ -365,7 +365,7 @@ try {
                 <div class="col-lg-6">
                     <div class="card feature-card">
                         <div class="card-body">
-                            <h5 class="card-title mb-4">Declarations by Political Party</h5>
+                            <h5 class="card-title mb-4">Δηλώσεις ανά Πολιτικό Κόμμα</h5>
                             <div class="chart-container">
                                 <canvas id="partyChart"></canvas>
                             </div>
@@ -376,7 +376,7 @@ try {
                 <div class="col-lg-6">
                     <div class="card feature-card">
                         <div class="card-body">
-                            <h5 class="card-title mb-4">Asset Value Distribution</h5>
+                            <h5 class="card-title mb-4">Κατανομή Αξίας Περιουσίας</h5>
                             <div class="chart-container">
                                 <canvas id="valueDistributionChart"></canvas>
                             </div>
@@ -388,19 +388,19 @@ try {
 
         <!-- Comparison Section -->
         <div class="container mb-5">
-            <h2 class="mb-4">Compare Declarations</h2>
+            <h2 class="mb-4">Σύγκριση Δηλώσεων</h2>
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">First Person</h5>
+                            <h5 class="card-title">Πρώτο Πρόσωπο</h5>
                             <select class="form-select mb-3" id="person1">
-                                <option value="">Select person...</option>
+                                <option value="">Επιλέξτε πρόσωπο...</option>
                                 <?php
                                 $stmt = $conn->query("SELECT d.id, pd.full_name as name FROM declarations d 
                                                      INNER JOIN personal_data pd ON d.id = pd.declaration_id 
-                                                     ORDER BY pd.full_name");                                
-                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                     ORDER BY pd.full_name");
+                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                     echo "<option value='{$row['id']}'>{$row['name']}</option>";
                                 }
                                 ?>
@@ -412,14 +412,14 @@ try {
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Second Person</h5>
+                            <h5 class="card-title">Δεύτερο Πρόσωπο</h5>
                             <select class="form-select mb-3" id="person2">
-                                <option value="">Select person...</option>
+                                <option value="">Επιλέξτε πρόσωπο...</option>
                                 <?php
                                 $stmt = $conn->query("SELECT d.id, pd.full_name as name FROM declarations d 
                                                      INNER JOIN personal_data pd ON d.id = pd.declaration_id 
                                                      ORDER BY pd.full_name");
-                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                     echo "<option value='{$row['id']}'>{$row['name']}</option>";
                                 }
                                 ?>
@@ -431,15 +431,15 @@ try {
             </div>
             <div class="row mt-3">
                 <div class="col-12 text-center">
-                    <button id="compareBtn" class="btn btn-compare me-2" disabled>Compare Declarations</button>
-                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                    <button id="compareBtn" class="btn btn-compare me-2" disabled>Σύγκριση Δηλώσεων</button>
+                    <button id="clearBtn" class="btn btn-secondary">Καθαρισμός</button>
                 </div>
             </div>
         </div>
 
         <!-- Financial Comparison Chart Section -->
         <div class="container mb-5">
-            <h2 class="mb-4">Financial Comparison</h2>
+            <h2 class="mb-4">Οικονομική Σύγκριση</h2>
             
             <!-- Search and Selection Area -->
             <div class="card mb-4">
@@ -447,7 +447,7 @@ try {
                     <div class="row">
                         <div class="col-md-8">
                             <div class="search-container">
-                                <input type="text" class="form-control" id="politicianSearch" placeholder="Search politicians...">
+                                <input type="text" class="form-control" id="politicianSearch" placeholder="Αναζήτηση πολιτικών...">
                                 <div id="searchResults" class="search-results"></div>
                             </div>
                             <div id="selectedPoliticians" class="selected-politicians mt-3">
@@ -455,7 +455,7 @@ try {
                             </div>
                         </div>
                         <div class="col-md-4 text-end">
-                            <button id="clearSelection" class="btn btn-secondary">Clear All</button>
+                            <button id="clearSelection" class="btn btn-secondary">Καθαρισμός Όλων</button>
                         </div>
                     </div>
                 </div>
@@ -475,13 +475,13 @@ try {
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0">&copy; 2025 Asset Declaration System. All rights reserved.</p>
+                    <p class="mb-0">&copy; 2025 Πόθεν Εσχες © all rights reserved.</p>
                 </div>
                 <div class="col-12 col-md-6 text-center text-md-end">
                     <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.php" class="text-decoration-none">About</a>
-                        <a href="contact.php" class="text-decoration-none">Contact</a>
-                        <a href="privacy.php" class="text-decoration-none">Privacy Policy</a>
+                        <a href="about.php" class="text-decoration-none">Ποιοι είμαστε</a>
+                        <a href="contact.php" class="text-decoration-none">Επικοινωνία</a>
+                        <a href="privacy.php" class="text-decoration-none">Πολιτική Απορρήτου</a>
                     </div>
                 </div>
             </div>
