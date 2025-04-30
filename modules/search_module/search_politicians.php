@@ -15,10 +15,11 @@ if (empty($query)) {
 try {
     // Search for politicians
     $stmt = $conn->prepare("
-        SELECT id, name 
-        FROM people 
-        WHERE name LIKE ? 
-        ORDER BY name 
+        SELECT d.id, pd.full_name as name 
+        FROM declarations d 
+        INNER JOIN personal_data pd ON d.id = pd.declaration_id 
+        WHERE pd.full_name LIKE ? 
+        ORDER BY pd.full_name 
         LIMIT 10
     ");
     $stmt->execute(['%' . $query . '%']);
