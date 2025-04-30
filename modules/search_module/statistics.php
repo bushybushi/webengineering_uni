@@ -376,7 +376,7 @@ try {
                 <div class="col-lg-6">
                     <div class="card feature-card">
                         <div class="card-body">
-                            <h5 class="card-title mb-4">Κατανομή ανά Αξίας Περιουσίας</h5>
+                            <h5 class="card-title mb-4">Κατανομή Αξίας Περιουσίας</h5>
                             <div class="chart-container">
                                 <canvas id="valueDistributionChart"></canvas>
                             </div>
@@ -500,7 +500,7 @@ try {
             data: {
                 labels: <?php echo json_encode($partyLabels); ?>,
                 datasets: [{
-                    label: 'Number of Declarations',
+                    label: 'Αριθμός Δηλώσεων',
                     data: <?php echo json_encode($partyCounts); ?>,
                     backgroundColor: [
                         '#ED9635',
@@ -515,7 +515,35 @@ try {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Δηλώσεις ανά Πολιτικό Κόμμα'
+                    },
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Αριθμός Δηλώσεων'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Πολιτικά Κόμματα'
+                        }
+                    }
+                }
             }
         });
 
@@ -526,7 +554,7 @@ try {
             data: {
                 labels: <?php echo json_encode($valueLabels); ?>,
                 datasets: [{
-                    label: 'Number of Assets',
+                    label: 'Αριθμός Περιουσιακών Στοιχείων',
                     data: <?php echo json_encode($valueCounts); ?>,
                     backgroundColor: '#ED9635'
                 }]
@@ -535,8 +563,27 @@ try {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
+                    title: {
+                        display: true,
+                        text: 'Κατανομή Αξίας Περιουσίας'
+                    },
                     legend: {
                         display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Αριθμός Περιουσιακών Στοιχείων'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Εύρος Αξίας'
+                        }
                     }
                 }
             }
@@ -595,7 +642,7 @@ try {
         // Financial Chart Code
         const ctx = document.getElementById('financialChart').getContext('2d');
         let financialChart = null;
-        let selectedPoliticians = new Map(); // Store selected politicians
+        let selectedPoliticians = new Map();
 
         // Function to fetch financial data
         async function fetchFinancialData(politicianIds) {
@@ -609,30 +656,29 @@ try {
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`Σφάλμα HTTP! κατάσταση: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('Fetched data:', data); // Debug log
+                console.log('Ληφθέντα δεδομένα:', data);
                 
                 if (data.error) {
-                    console.error('Server error:', data.error);
+                    console.error('Σφάλμα διακομιστή:', data.error);
                     return null;
                 }
                 
                 return data;
             } catch (error) {
-                console.error('Error fetching financial data:', error);
+                console.error('Σφάλμα κατά την ανάκτηση οικονομικών δεδομένων:', error);
                 return null;
             }
         }
 
         // Function to update chart
         function updateChart(data) {
-            console.log('Updating chart with data:', data); // Debug log
+            console.log('Ενημέρωση γραφήματος με δεδομένα:', data);
             
             if (!data || data.length === 0) {
-                // Show empty chart with axes
                 if (financialChart) {
                     financialChart.destroy();
                 }
@@ -643,21 +689,21 @@ try {
                         labels: [],
                         datasets: [
                             {
-                                label: 'Real Estate Value (€)',
+                                label: 'Αξία Ακινήτων (€)',
                                 data: [],
                                 backgroundColor: 'rgba(237, 150, 53, 0.8)',
                                 borderColor: 'rgba(237, 150, 53, 1)',
                                 borderWidth: 1
                             },
                             {
-                                label: 'Stocks Value (€)',
+                                label: 'Αξία Μετοχών (€)',
                                 data: [],
                                 backgroundColor: 'rgba(214, 123, 31, 0.8)',
                                 borderColor: 'rgba(214, 123, 31, 1)',
                                 borderWidth: 1
                             },
                             {
-                                label: 'Deposits Value (€)',
+                                label: 'Αξία Καταθέσεων (€)',
                                 data: [],
                                 backgroundColor: 'rgba(240, 168, 90, 0.8)',
                                 borderColor: 'rgba(240, 168, 90, 1)',
@@ -672,14 +718,14 @@ try {
                                 stacked: false,
                                 title: {
                                     display: true,
-                                    text: 'Politicians'
+                                    text: 'Πολιτικοί'
                                 }
                             },
                             y: {
                                 stacked: false,
                                 title: {
                                     display: true,
-                                    text: 'Value (€)'
+                                    text: 'Αξία (€)'
                                 },
                                 beginAtZero: true
                             }
@@ -687,7 +733,7 @@ try {
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Financial Comparison'
+                                text: 'Οικονομική Σύγκριση'
                             }
                         }
                     }
@@ -710,21 +756,21 @@ try {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Real Estate Value (€)',
+                            label: 'Αξία Ακινήτων (€)',
                             data: realEstateData,
                             backgroundColor: 'rgba(237, 150, 53, 0.8)',
                             borderColor: 'rgba(237, 150, 53, 1)',
                             borderWidth: 1
                         },
                         {
-                            label: 'Stocks Value (€)',
+                            label: 'Αξία Μετοχών (€)',
                             data: stocksData,
                             backgroundColor: 'rgba(214, 123, 31, 0.8)',
                             borderColor: 'rgba(214, 123, 31, 1)',
                             borderWidth: 1
                         },
                         {
-                            label: 'Deposits Value (€)',
+                            label: 'Αξία Καταθέσεων (€)',
                             data: depositsData,
                             backgroundColor: 'rgba(240, 168, 90, 0.8)',
                             borderColor: 'rgba(240, 168, 90, 1)',
@@ -739,14 +785,14 @@ try {
                             stacked: false,
                             title: {
                                 display: true,
-                                text: 'Politicians'
+                                text: 'Πολιτικοί'
                             }
                         },
                         y: {
                             stacked: false,
                             title: {
                                 display: true,
-                                text: 'Value (€)'
+                                text: 'Αξία (€)'
                             },
                             beginAtZero: true
                         }
@@ -754,7 +800,7 @@ try {
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Financial Comparison'
+                            text: 'Οικονομική Σύγκριση'
                         }
                     }
                 }
