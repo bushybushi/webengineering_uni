@@ -16,19 +16,10 @@ session_start();
 
 // Debug queries
 try {
-    // Fetch statistics
+    // Fetch total declarations
     $stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations");
     $total_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     echo "Total declarations: " . $total_declarations . "<br>";
-
-    $stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations WHERE status = 'Approved'");
-    $approved_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-
-    $stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations WHERE status = 'Rejected'");
-    $rejected_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-
-    $stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations WHERE status = 'Pending'");
-    $pending_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Fetch declarations by year
     $declarations_by_year = $conn->query("
@@ -119,7 +110,7 @@ ini_set('display_errors', 1);
         
         <!-- Quick Stats -->
         <div class="row g-4 mb-5">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body text-center">
                         <i class="bi bi-file-text feature-icon mb-3" style="font-size: 2rem; color: #ED9635;"></i>
@@ -128,30 +119,21 @@ ini_set('display_errors', 1);
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body text-center">
-                        <i class="bi bi-check-circle feature-icon mb-3" style="font-size: 2rem; color: #28a745;"></i>
-                        <h5 class="card-title">Εγκεκριμένες</h5>
-                        <h2 class="mb-0"><?= $approved_declarations ?></h2>
+                        <i class="bi bi-calendar-check feature-icon mb-3" style="font-size: 2rem; color: #28a745;"></i>
+                        <h5 class="card-title">Ενεργές Περιόδους</h5>
+                        <h2 class="mb-0"><?= count($declarations_by_year) ?></h2>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body text-center">
-                        <i class="bi bi-x-circle feature-icon mb-3" style="font-size: 2rem; color: #dc3545;"></i>
-                        <h5 class="card-title">Απορριφθείσες</h5>
-                        <h2 class="mb-0"><?= $rejected_declarations ?></h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-clock feature-icon mb-3" style="font-size: 2rem; color: #ffc107;"></i>
-                        <h5 class="card-title">Σε Εκκρεμότητα</h5>
-                        <h2 class="mb-0"><?= $pending_declarations ?></h2>
+                        <i class="bi bi-building feature-icon mb-3" style="font-size: 2rem; color: #dc3545;"></i>
+                        <h5 class="card-title">Κόμματα με Δηλώσεις</h5>
+                        <h2 class="mb-0"><?= count($declarations_by_party) ?></h2>
                     </div>
                 </div>
             </div>
