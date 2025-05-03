@@ -23,7 +23,7 @@ $declarations_by_year = $conn->query("
     JOIN submission_periods sp ON d.submission_period_id = sp.id 
     GROUP BY sp.year 
     ORDER BY sp.year DESC
-");
+")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch declarations by party
 $declarations_by_party = $conn->query("
@@ -33,7 +33,7 @@ $declarations_by_party = $conn->query("
     JOIN parties p ON pd.party_id = p.id 
     GROUP BY p.name 
     ORDER BY count DESC
-");
+")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch people without declarations
 $people_without_declarations = $conn->query("
@@ -42,7 +42,7 @@ $people_without_declarations = $conn->query("
     JOIN parties p ON pd.party_id = p.id
     LEFT JOIN declarations d ON pd.declaration_id = d.id
     WHERE d.id IS NULL
-");
+")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -165,7 +165,7 @@ $people_without_declarations = $conn->query("
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($person = $people_without_declarations->fetch(PDO::FETCH_ASSOC)) { ?>
+                            <?php foreach ($people_without_declarations as $person) { ?>
                                 <tr>
                                     <td><?= $person['full_name'] ?></td>
                                     <td><?= $person['party_name'] ?></td>
@@ -207,15 +207,14 @@ $people_without_declarations = $conn->query("
             type: 'bar',
             data: {
                 labels: [<?php 
-                    while ($row = $declarations_by_year->fetch(PDO::FETCH_ASSOC)) {
+                    foreach ($declarations_by_year as $row) {
                         echo "'" . $row['year'] . "',";
                     }
                 ?>],
                 datasets: [{
                     label: 'Δηλώσεις',
                     data: [<?php 
-                        $declarations_by_year->execute();
-                        while ($row = $declarations_by_year->fetch(PDO::FETCH_ASSOC)) {
+                        foreach ($declarations_by_year as $row) {
                             echo $row['count'] . ",";
                         }
                     ?>],
@@ -238,14 +237,13 @@ $people_without_declarations = $conn->query("
             type: 'pie',
             data: {
                 labels: [<?php 
-                    while ($row = $declarations_by_party->fetch(PDO::FETCH_ASSOC)) {
+                    foreach ($declarations_by_party as $row) {
                         echo "'" . $row['party_name'] . "',";
                     }
                 ?>],
                 datasets: [{
                     data: [<?php 
-                        $declarations_by_party->execute();
-                        while ($row = $declarations_by_party->fetch(PDO::FETCH_ASSOC)) {
+                        foreach ($declarations_by_party as $row) {
                             echo $row['count'] . ",";
                         }
                     ?>],
