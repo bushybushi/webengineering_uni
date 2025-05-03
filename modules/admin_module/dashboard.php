@@ -1,12 +1,8 @@
 <!-- filepath: c:\xampp\htdocs\webengineering_uni\webengineering_uni\modules\admin_module\dashboard.php -->
 <?php
-// Include necessary files and authentication checks
+// Include necessary files
 include '../../config/db_connection.php';
 session_start();
-if (!isset($_SESSION['admin_logged_in'])) {
-    header('Location: ../login_module/login.php');
-    exit();
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">

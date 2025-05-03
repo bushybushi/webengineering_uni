@@ -2,10 +2,6 @@
 <?php
 include '../../config/db_connection.php';
 session_start();
-if (!isset($_SESSION['admin_logged_in'])) {
-    header('Location: ../login_module/login.php');
-    exit();
-}
 
 // Fetch submissions from the database
 $query = "SELECT s.id, s.date_of_submission, s.status, p.name AS person_name 

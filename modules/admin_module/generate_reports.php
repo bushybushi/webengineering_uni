@@ -2,10 +2,6 @@
 <?php
 include '../../config/db_connection.php';
 session_start();
-if (!isset($_SESSION['admin_logged_in'])) {
-    header('Location: ../login_module/login.php');
-    exit();
-}
 
 // Fetch statistics
 $total_submissions = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM submissions"))['total'];
