@@ -1,27 +1,27 @@
 <!-- filepath: c:\xampp\htdocs\webengineering_uni\webengineering_uni\modules\admin_module\manage_submissions.php -->
 <?php
-include '../../config/db_connection.php';
+$conn = include '../../config/db_connection.php';
 session_start();
 
-// Fetch submissions from the database
-$query = "SELECT s.id, s.date_of_submission, s.status, p.name AS person_name 
-          FROM submissions s 
-          JOIN people p ON s.person_id = p.id";
-$result = mysqli_query($conn, $query);
-
-// Handle submission actions (approve/reject)
+// Handle submission actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $submission_id = $_POST['submission_id'];
-    if (isset($_POST['approve'])) {
-        $update_query = "UPDATE submissions SET status = 'Approved' WHERE id = $submission_id";
-        mysqli_query($conn, $update_query);
-    } elseif (isset($_POST['reject'])) {
-        $update_query = "UPDATE submissions SET status = 'Rejected' WHERE id = $submission_id";
-        mysqli_query($conn, $update_query);
+    if (isset($_POST['update_status'])) {
+        $submission_id = $_POST['submission_id'];
+        $status = $_POST['status'];
+        $stmt = $conn->prepare("UPDATE submissions SET status = ? WHERE id = ?");
+        $stmt->execute([$status, $submission_id]);
     }
-    header('Location: manage_submissions.php');
-    exit();
 }
+
+// Fetch all submissions with related data
+$submissions = $conn->query("
+    SELECT s.*, p.name as person_name, pp.name as party_name, pos.name as position_name 
+    FROM submissions s 
+    JOIN people p ON s.person_id = p.id 
+    JOIN political_parties pp ON p.party_id = pp.id 
+    JOIN positions pos ON p.position_id = pos.id 
+    ORDER BY s.date_of_submission DESC
+");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                            <?php while ($row = mysqli_fetch_assoc($submissions)) { ?>
                                 <tr>
                                     <td><?= $row['id'] ?></td>
                                     <td><?= $row['person_name'] ?></td>
@@ -97,13 +97,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <td>
                                         <form method="POST" class="d-inline me-2">
                                             <input type="hidden" name="submission_id" value="<?= $row['id'] ?>">
-                                            <button type="submit" name="approve" class="btn btn-success btn-sm">
+                                            <input type="hidden" name="status" value="Approved">
+                                            <button type="submit" name="update_status" class="btn btn-success btn-sm">
                                                 <i class="bi bi-check-circle"></i> Έγκριση
                                             </button>
                                         </form>
                                         <form method="POST" class="d-inline">
                                             <input type="hidden" name="submission_id" value="<?= $row['id'] ?>">
-                                            <button type="submit" name="reject" class="btn btn-danger btn-sm">
+                                            <input type="hidden" name="status" value="Rejected">
+                                            <button type="submit" name="update_status" class="btn btn-danger btn-sm">
                                                 <i class="bi bi-x-circle"></i> Απόρριψη
                                             </button>
                                         </form>

@@ -1,16 +1,23 @@
 <!-- filepath: c:\xampp\htdocs\webengineering_uni\webengineering_uni\modules\admin_module\generate_reports.php -->
 <?php
-include '../../config/db_connection.php';
+$conn = include '../../config/db_connection.php';
 session_start();
 
 // Fetch statistics
-$total_submissions = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM submissions"))['total'];
-$approved_submissions = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM submissions WHERE status = 'Approved'"))['total'];
-$rejected_submissions = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM submissions WHERE status = 'Rejected'"))['total'];
-$pending_submissions = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM submissions WHERE status = 'Pending'"))['total'];
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM submissions");
+$total_submissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM submissions WHERE status = 'Approved'");
+$approved_submissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM submissions WHERE status = 'Rejected'");
+$rejected_submissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM submissions WHERE status = 'Pending'");
+$pending_submissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
 // Fetch submissions by year
-$submissions_by_year = mysqli_query($conn, "
+$submissions_by_year = $conn->query("
     SELECT YEAR(date_of_submission) as year, COUNT(*) as count 
     FROM submissions 
     GROUP BY YEAR(date_of_submission) 
@@ -18,7 +25,7 @@ $submissions_by_year = mysqli_query($conn, "
 ");
 
 // Fetch submissions by party
-$submissions_by_party = mysqli_query($conn, "
+$submissions_by_party = $conn->query("
     SELECT pp.name as party_name, COUNT(s.id) as count 
     FROM submissions s 
     JOIN people p ON s.person_id = p.id 
@@ -28,7 +35,7 @@ $submissions_by_party = mysqli_query($conn, "
 ");
 
 // Fetch people without submissions
-$people_without_submissions = mysqli_query($conn, "
+$people_without_submissions = $conn->query("
     SELECT p.name, pp.name as party_name, pos.name as position_name 
     FROM people p 
     JOIN political_parties pp ON p.party_id = pp.id 

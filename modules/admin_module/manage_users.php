@@ -1,26 +1,19 @@
 <!-- filepath: c:\xampp\htdocs\webengineering_uni\webengineering_uni\modules\admin_module\manage_users.php -->
 <?php
-include '../../config/db_connection.php';
+$conn = include '../../config/db_connection.php';
 session_start();
 
-// Fetch users
-$query = "SELECT * FROM users";
-$result = mysqli_query($conn, $query);
-
-// Handle user actions (add, update, delete)
+// Handle user actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['add_user'])) {
-        $name = $_POST['name'];
-        $email = $_POST['email'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $query = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
-        mysqli_query($conn, $query);
-    } elseif (isset($_POST['delete_user'])) {
+    if (isset($_POST['delete_user'])) {
         $user_id = $_POST['user_id'];
-        $query = "DELETE FROM users WHERE id = $user_id";
-        mysqli_query($conn, $query);
+        $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
     }
 }
+
+// Fetch all users
+$users = $conn->query("SELECT * FROM users ORDER BY created_at DESC");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -82,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                            <?php while ($row = mysqli_fetch_assoc($users)) { ?>
                                 <tr>
                                     <td><?= $row['id'] ?></td>
                                     <td><?= $row['name'] ?></td>

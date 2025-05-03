@@ -1,13 +1,18 @@
 <!-- filepath: c:\xampp\htdocs\webengineering_uni\webengineering_uni\modules\admin_module\dashboard.php -->
 <?php
 // Include necessary files
-include '../../config/db_connection.php';
+$conn = include '../../config/db_connection.php';
 session_start();
 
 // Fetch some basic statistics for the dashboard
-$total_users = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM users"))['total'];
-$total_submissions = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM submissions"))['total'];
-$total_parties = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM political_parties"))['total'];
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM users");
+$total_users = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM submissions");
+$total_submissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM political_parties");
+$total_parties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 ?>
 <!DOCTYPE html>
 <html lang="en">

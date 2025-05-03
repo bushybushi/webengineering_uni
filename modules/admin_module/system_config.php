@@ -1,34 +1,34 @@
 <!-- filepath: c:\xampp\htdocs\webengineering_uni\webengineering_uni\modules\admin_module\system_config.php -->
 <?php
-include '../../config/db_connection.php';
+$conn = include '../../config/db_connection.php';
 session_start();
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_party'])) {
         $party = $_POST['party'];
-        $query = "INSERT INTO political_parties (name) VALUES ('$party')";
-        mysqli_query($conn, $query);
+        $stmt = $conn->prepare("INSERT INTO political_parties (name) VALUES (?)");
+        $stmt->execute([$party]);
     } elseif (isset($_POST['add_position'])) {
         $position = $_POST['position'];
-        $query = "INSERT INTO positions (name) VALUES ('$position')";
-        mysqli_query($conn, $query);
+        $stmt = $conn->prepare("INSERT INTO positions (name) VALUES (?)");
+        $stmt->execute([$position]);
     } elseif (isset($_POST['add_person'])) {
         $name = $_POST['name'];
         $party_id = $_POST['party_id'];
         $position_id = $_POST['position_id'];
-        $query = "INSERT INTO people (name, party_id, position_id) VALUES ('$name', $party_id, $position_id)";
-        mysqli_query($conn, $query);
+        $stmt = $conn->prepare("INSERT INTO people (name, party_id, position_id) VALUES (?, ?, ?)");
+        $stmt->execute([$name, $party_id, $position_id]);
     }
 }
 
 // Fetch existing data
-$parties = mysqli_query($conn, "SELECT * FROM political_parties");
-$positions = mysqli_query($conn, "SELECT * FROM positions");
-$people = mysqli_query($conn, "SELECT p.*, pp.name as party_name, pos.name as position_name 
-                             FROM people p 
-                             JOIN political_parties pp ON p.party_id = pp.id 
-                             JOIN positions pos ON p.position_id = pos.id");
+$parties = $conn->query("SELECT * FROM political_parties");
+$positions = $conn->query("SELECT * FROM positions");
+$people = $conn->query("SELECT p.*, pp.name as party_name, pos.name as position_name 
+                       FROM people p 
+                       JOIN political_parties pp ON p.party_id = pp.id 
+                       JOIN positions pos ON p.position_id = pos.id");
 ?>
 <!DOCTYPE html>
 <html lang="en">
