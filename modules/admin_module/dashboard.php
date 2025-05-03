@@ -3,6 +3,11 @@
 // Include necessary files
 include '../../config/db_connection.php';
 session_start();
+
+// Fetch some basic statistics for the dashboard
+$total_users = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM users"))['total'];
+$total_submissions = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM submissions"))['total'];
+$total_parties = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM political_parties"))['total'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,52 +53,99 @@ session_start();
 
     <!-- Main Content -->
     <main class="container mt-5 pt-5">
+        <h1 class="text-center mb-4">Admin Dashboard</h1>
+        
+        <!-- Quick Stats -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people feature-icon mb-3" style="font-size: 2rem; color: #ED9635;"></i>
+                        <h5 class="card-title">Χρήστες</h5>
+                        <h2 class="mb-0"><?= $total_users ?></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-file-text feature-icon mb-3" style="font-size: 2rem; color: #28a745;"></i>
+                        <h5 class="card-title">Υποβολές</h5>
+                        <h2 class="mb-0"><?= $total_submissions ?></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-building feature-icon mb-3" style="font-size: 2rem; color: #dc3545;"></i>
+                        <h5 class="card-title">Κόμματα</h5>
+                        <h2 class="mb-0"><?= $total_parties ?></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-graph-up feature-icon mb-3" style="font-size: 2rem; color: #ffc107;"></i>
+                        <h5 class="card-title">Αναφορές</h5>
+                        <h2 class="mb-0">4</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Actions -->
         <div class="row g-4">
             <div class="col-md-3">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-people feature-icon"></i>
-                        <h5 class="card-title">Διαχείριση Χρηστών</h5>
-                        <p class="card-text">Διαχειριστείτε τους χρήστες του συστήματος</p>
-                        <a href="manage_users.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Διαχείριση</a>
+                <a href="manage_users.php" class="text-decoration-none">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-people feature-icon mb-3" style="font-size: 3rem; color: #ED9635;"></i>
+                            <h5 class="card-title">Διαχείριση Χρηστών</h5>
+                            <p class="card-text">Διαχειριστείτε τους χρήστες του συστήματος</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-3">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-file-earmark-text feature-icon"></i>
-                        <h5 class="card-title">Διαχείριση Υποβολών</h5>
-                        <p class="card-text">Διαχειριστείτε τις υποβολές δηλώσεων</p>
-                        <a href="manage_submissions.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Διαχείριση</a>
+                <a href="manage_submissions.php" class="text-decoration-none">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-file-text feature-icon mb-3" style="font-size: 3rem; color: #28a745;"></i>
+                            <h5 class="card-title">Διαχείριση Υποβολών</h5>
+                            <p class="card-text">Διαχειριστείτε τις υποβολές δηλώσεων</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-3">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-gear feature-icon"></i>
-                        <h5 class="card-title">Ρυθμίσεις Συστήματος</h5>
-                        <p class="card-text">Ρυθμίστε τις παραμέτρους του συστήματος</p>
-                        <a href="system_config.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Ρυθμίσεις</a>
+                <a href="system_config.php" class="text-decoration-none">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-gear feature-icon mb-3" style="font-size: 3rem; color: #dc3545;"></i>
+                            <h5 class="card-title">Ρυθμίσεις Συστήματος</h5>
+                            <p class="card-text">Ρυθμίστε τις παραμέτρους του συστήματος</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-3">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-graph-up feature-icon"></i>
-                        <h5 class="card-title">Αναφορές</h5>
-                        <p class="card-text">Δείτε αναφορές και στατιστικά στοιχεία</p>
-                        <a href="generate_reports.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Αναφορές</a>
+                <a href="generate_reports.php" class="text-decoration-none">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-graph-up feature-icon mb-3" style="font-size: 3rem; color: #ffc107;"></i>
+                            <h5 class="card-title">Αναφορές</h5>
+                            <p class="card-text">Δείτε αναφορές και στατιστικά στοιχεία</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-light py-4 mt-auto">
+    <footer class="bg-light py-4 mt-5">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
