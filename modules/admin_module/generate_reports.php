@@ -1,64 +1,39 @@
 <!-- filepath: c:\xampp\htdocs\webengineering_uni\webengineering_uni\modules\admin_module\generate_reports.php -->
 <?php
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-// Debug connection
-try {
-    $conn = include '../../config/db_connection.php';
-    echo "Database connection successful<br>";
-} catch (Exception $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
-
+$conn = include '../../config/db_connection.php';
 session_start();
 
-// Debug queries
-try {
-    // Fetch total declarations
-    $stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations");
-    $total_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-    echo "Total declarations: " . $total_declarations . "<br>";
+// Fetch total declarations
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations");
+$total_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-    // Fetch declarations by year
-    $declarations_by_year = $conn->query("
-        SELECT sp.year, COUNT(d.id) as count 
-        FROM declarations d 
-        JOIN submission_periods sp ON d.submission_period_id = sp.id 
-        GROUP BY sp.year 
-        ORDER BY sp.year DESC
-    ")->fetchAll(PDO::FETCH_ASSOC);
-    echo "Declarations by year query successful<br>";
+// Fetch declarations by year
+$declarations_by_year = $conn->query("
+    SELECT sp.year, COUNT(d.id) as count 
+    FROM declarations d 
+    JOIN submission_periods sp ON d.submission_period_id = sp.id 
+    GROUP BY sp.year 
+    ORDER BY sp.year DESC
+")->fetchAll(PDO::FETCH_ASSOC);
 
-    // Fetch declarations by party
-    $declarations_by_party = $conn->query("
-        SELECT p.name as party_name, COUNT(d.id) as count 
-        FROM declarations d 
-        JOIN personal_data pd ON d.id = pd.declaration_id
-        JOIN parties p ON pd.party_id = p.id 
-        GROUP BY p.name 
-        ORDER BY count DESC
-    ")->fetchAll(PDO::FETCH_ASSOC);
-    echo "Declarations by party query successful<br>";
+// Fetch declarations by party
+$declarations_by_party = $conn->query("
+    SELECT p.name as party_name, COUNT(d.id) as count 
+    FROM declarations d 
+    JOIN personal_data pd ON d.id = pd.declaration_id
+    JOIN parties p ON pd.party_id = p.id 
+    GROUP BY p.name 
+    ORDER BY count DESC
+")->fetchAll(PDO::FETCH_ASSOC);
 
-    // Fetch people without declarations
-    $people_without_declarations = $conn->query("
-        SELECT pd.full_name, p.name as party_name
-        FROM personal_data pd
-        JOIN parties p ON pd.party_id = p.id
-        LEFT JOIN declarations d ON pd.declaration_id = d.id
-        WHERE d.id IS NULL
-    ")->fetchAll(PDO::FETCH_ASSOC);
-    echo "People without declarations query successful<br>";
-
-} catch (Exception $e) {
-    die("Query failed: " . $e->getMessage());
-}
-
-// Debug information
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Fetch people without declarations
+$people_without_declarations = $conn->query("
+    SELECT pd.full_name, p.name as party_name
+    FROM personal_data pd
+    JOIN parties p ON pd.party_id = p.id
+    LEFT JOIN declarations d ON pd.declaration_id = d.id
+    WHERE d.id IS NULL
+")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="el">
