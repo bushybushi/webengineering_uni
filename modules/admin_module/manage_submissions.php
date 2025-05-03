@@ -3,24 +3,27 @@
 $conn = include '../../config/db_connection.php';
 session_start();
 
-// Handle submission actions
+// Handle declaration actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_status'])) {
-        $submission_id = $_POST['submission_id'];
+        $declaration_id = $_POST['declaration_id'];
         $status = $_POST['status'];
-        $stmt = $conn->prepare("UPDATE submissions SET status = ? WHERE id = ?");
-        $stmt->execute([$status, $submission_id]);
+        $stmt = $conn->prepare("UPDATE declarations SET status = ? WHERE id = ?");
+        $stmt->execute([$status, $declaration_id]);
     }
 }
 
-// Fetch all submissions with related data
-$submissions = $conn->query("
-    SELECT s.*, p.name as person_name, pp.name as party_name, pos.name as position_name 
-    FROM submissions s 
-    JOIN people p ON s.person_id = p.id 
-    JOIN political_parties pp ON p.party_id = pp.id 
-    JOIN positions pos ON p.position_id = pos.id 
-    ORDER BY s.date_of_submission DESC
+// Fetch all declarations with related data
+$declarations = $conn->query("
+    SELECT d.*, 
+           pd.full_name as person_name, 
+           p.name as party_name,
+           sp.year as submission_year
+    FROM declarations d 
+    LEFT JOIN personal_data pd ON d.id = pd.declaration_id
+    LEFT JOIN parties p ON pd.party_id = p.id
+    LEFT JOIN submission_periods sp ON d.submission_period_id = sp.id
+    ORDER BY d.submission_date DESC
 ");
 ?>
 <!DOCTYPE html>
@@ -28,7 +31,7 @@ $submissions = $conn->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Διαχείριση Υποβολών - ΠΟΘΕΝ ΕΣΧΕΣ</title>
+    <title>Διαχείριση Δηλώσεων - ΠΟΘΕΝ ΕΣΧΕΣ</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="../../assets/images/iconlogo.png">
     <!-- Bootstrap CSS -->
@@ -67,9 +70,9 @@ $submissions = $conn->query("
 
     <!-- Main Content -->
     <main class="container mt-5 pt-5">
-        <h1 class="text-center mb-4">Διαχείριση Υποβολών</h1>
+        <h1 class="text-center mb-4">Διαχείριση Δηλώσεων</h1>
         
-        <!-- Submissions Table -->
+        <!-- Declarations Table -->
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="table-responsive">
@@ -78,32 +81,33 @@ $submissions = $conn->query("
                             <tr>
                                 <th>ID</th>
                                 <th>Όνομα</th>
+                                <th>Κόμμα</th>
+                                <th>Έτος</th>
                                 <th>Ημερομηνία Υποβολής</th>
-                                <th>Κατάσταση</th>
                                 <th>Ενέργειες</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($row = mysqli_fetch_assoc($submissions)) { ?>
+                            <?php while ($row = $declarations->fetch(PDO::FETCH_ASSOC)) { ?>
                                 <tr>
                                     <td><?= $row['id'] ?></td>
                                     <td><?= $row['person_name'] ?></td>
-                                    <td><?= $row['date_of_submission'] ?></td>
+                                    <td><?= $row['party_name'] ?></td>
+                                    <td><?= $row['submission_year'] ?></td>
+                                    <td><?= $row['submission_date'] ?></td>
                                     <td>
-                                        <span class="badge <?= $row['status'] === 'Approved' ? 'bg-success' : ($row['status'] === 'Rejected' ? 'bg-danger' : 'bg-warning') ?>">
-                                            <?= $row['status'] ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <form method="POST" class="d-inline me-2">
-                                            <input type="hidden" name="submission_id" value="<?= $row['id'] ?>">
+                                        <a href="view_declaration.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-eye"></i> Προβολή
+                                        </a>
+                                        <form method="POST" class="d-inline">
+                                            <input type="hidden" name="declaration_id" value="<?= $row['id'] ?>">
                                             <input type="hidden" name="status" value="Approved">
                                             <button type="submit" name="update_status" class="btn btn-success btn-sm">
                                                 <i class="bi bi-check-circle"></i> Έγκριση
                                             </button>
                                         </form>
                                         <form method="POST" class="d-inline">
-                                            <input type="hidden" name="submission_id" value="<?= $row['id'] ?>">
+                                            <input type="hidden" name="declaration_id" value="<?= $row['id'] ?>">
                                             <input type="hidden" name="status" value="Rejected">
                                             <button type="submit" name="update_status" class="btn btn-danger btn-sm">
                                                 <i class="bi bi-x-circle"></i> Απόρριψη

@@ -8,11 +8,14 @@ session_start();
 $stmt = $conn->query("SELECT COUNT(*) AS total FROM users");
 $total_users = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-$stmt = $conn->query("SELECT COUNT(*) AS total FROM submissions");
-$total_submissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations");
+$total_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-$stmt = $conn->query("SELECT COUNT(*) AS total FROM political_parties");
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM parties");
 $total_parties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM submission_periods WHERE is_active = 1");
+$active_periods = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -75,8 +78,8 @@ $total_parties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body text-center">
                         <i class="bi bi-file-text feature-icon mb-3" style="font-size: 2rem; color: #28a745;"></i>
-                        <h5 class="card-title">Υποβολές</h5>
-                        <h2 class="mb-0"><?= $total_submissions ?></h2>
+                        <h5 class="card-title">Δηλώσεις</h5>
+                        <h2 class="mb-0"><?= $total_declarations ?></h2>
                     </div>
                 </div>
             </div>
@@ -92,9 +95,9 @@ $total_parties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
             <div class="col-md-3">
                 <div class="card shadow-sm h-100">
                     <div class="card-body text-center">
-                        <i class="bi bi-graph-up feature-icon mb-3" style="font-size: 2rem; color: #ffc107;"></i>
-                        <h5 class="card-title">Αναφορές</h5>
-                        <h2 class="mb-0">4</h2>
+                        <i class="bi bi-calendar-check feature-icon mb-3" style="font-size: 2rem; color: #ffc107;"></i>
+                        <h5 class="card-title">Ενεργές Περιόδους</h5>
+                        <h2 class="mb-0"><?= $active_periods ?></h2>
                     </div>
                 </div>
             </div>
@@ -118,7 +121,7 @@ $total_parties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
                     <div class="card shadow-sm h-100">
                         <div class="card-body text-center">
                             <i class="bi bi-file-text feature-icon mb-3" style="font-size: 3rem; color: #28a745;"></i>
-                            <h5 class="card-title">Διαχείριση Υποβολών</h5>
+                            <h5 class="card-title">Διαχείριση Δηλώσεων</h5>
                             <p class="card-text">Διαχειριστείτε τις υποβολές δηλώσεων</p>
                         </div>
                     </div>
