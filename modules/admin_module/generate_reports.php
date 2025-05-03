@@ -43,6 +43,10 @@ $people_without_declarations = $conn->query("
     LEFT JOIN declarations d ON pd.declaration_id = d.id
     WHERE d.id IS NULL
 ")->fetchAll(PDO::FETCH_ASSOC);
+
+// Debug information
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -167,8 +171,8 @@ $people_without_declarations = $conn->query("
                         <tbody>
                             <?php foreach ($people_without_declarations as $person) { ?>
                                 <tr>
-                                    <td><?= $person['full_name'] ?></td>
-                                    <td><?= $person['party_name'] ?></td>
+                                    <td><?= htmlspecialchars($person['full_name']) ?></td>
+                                    <td><?= htmlspecialchars($person['party_name']) ?></td>
                                 </tr>
                             <?php } ?>
                         </tbody>
@@ -238,7 +242,7 @@ $people_without_declarations = $conn->query("
             data: {
                 labels: [<?php 
                     foreach ($declarations_by_party as $row) {
-                        echo "'" . $row['party_name'] . "',";
+                        echo "'" . addslashes($row['party_name']) . "',";
                     }
                 ?>],
                 datasets: [{
