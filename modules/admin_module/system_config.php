@@ -7,28 +7,22 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_party'])) {
         $party = $_POST['party'];
-        $stmt = $conn->prepare("INSERT INTO political_parties (name) VALUES (?)");
+        $stmt = $conn->prepare("INSERT INTO parties (name) VALUES (?)");
         $stmt->execute([$party]);
-    } elseif (isset($_POST['add_position'])) {
-        $position = $_POST['position'];
-        $stmt = $conn->prepare("INSERT INTO positions (name) VALUES (?)");
-        $stmt->execute([$position]);
-    } elseif (isset($_POST['add_person'])) {
-        $name = $_POST['name'];
-        $party_id = $_POST['party_id'];
-        $position_id = $_POST['position_id'];
-        $stmt = $conn->prepare("INSERT INTO people (name, party_id, position_id) VALUES (?, ?, ?)");
-        $stmt->execute([$name, $party_id, $position_id]);
+    } elseif (isset($_POST['add_period'])) {
+        $year = $_POST['year'];
+        $start_date = $_POST['start_date'];
+        $end_date = $_POST['end_date'];
+        $is_active = isset($_POST['is_active']) ? 1 : 0;
+        
+        $stmt = $conn->prepare("INSERT INTO submission_periods (year, start_date, end_date, is_active) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$year, $start_date, $end_date, $is_active]);
     }
 }
 
 // Fetch existing data
-$parties = $conn->query("SELECT * FROM political_parties");
-$positions = $conn->query("SELECT * FROM positions");
-$people = $conn->query("SELECT p.*, pp.name as party_name, pos.name as position_name 
-                       FROM people p 
-                       JOIN political_parties pp ON p.party_id = pp.id 
-                       JOIN positions pos ON p.position_id = pos.id");
+$parties = $conn->query("SELECT * FROM parties ORDER BY name");
+$periods = $conn->query("SELECT * FROM submission_periods ORDER BY year DESC");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,7 +93,7 @@ $people = $conn->query("SELECT p.*, pp.name as party_name, pos.name as position_
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($party = mysqli_fetch_assoc($parties)) { ?>
+                            <?php while ($party = $parties->fetch(PDO::FETCH_ASSOC)) { ?>
                                 <tr>
                                     <td><?= $party['id'] ?></td>
                                     <td><?= $party['name'] ?></td>
@@ -111,68 +105,43 @@ $people = $conn->query("SELECT p.*, pp.name as party_name, pos.name as position_
             </div>
         </div>
         
-        <!-- Positions Section -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h2 class="card-title mb-4">Θέσεις</h2>
-                <form method="POST" class="mb-4">
-                    <div class="mb-3">
-                        <label for="position" class="form-label">Όνομα Θέσης</label>
-                        <input type="text" class="form-control" id="position" name="position" required>
-                    </div>
-                    <button type="submit" name="add_position" class="btn btn-primary" style="background-color: #ED9635; border-color: #ED9635;">
-                        <i class="bi bi-plus-circle"></i> Προσθήκη Θέσης
-                    </button>
-                </form>
-                
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Όνομα</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($position = mysqli_fetch_assoc($positions)) { ?>
-                                <tr>
-                                    <td><?= $position['id'] ?></td>
-                                    <td><?= $position['name'] ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- People Section -->
+        <!-- Submission Periods Section -->
         <div class="card shadow-sm">
             <div class="card-body">
-                <h2 class="card-title mb-4">Άτομα</h2>
+                <h2 class="card-title mb-4">Περίοδοι Υποβολής</h2>
                 <form method="POST" class="mb-4">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Όνομα</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="year" class="form-label">Έτος</label>
+                                <input type="number" class="form-control" id="year" name="year" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="start_date" class="form-label">Ημερομηνία Έναρξης</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="end_date" class="form-label">Ημερομηνία Λήξης</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active">
+                                    <label class="form-check-label" for="is_active">
+                                        Ενεργή Περίοδος
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="party_id" class="form-label">Κόμμα</label>
-                        <select class="form-select" id="party_id" name="party_id" required>
-                            <?php mysqli_data_seek($parties, 0); while ($party = mysqli_fetch_assoc($parties)) { ?>
-                                <option value="<?= $party['id'] ?>"><?= $party['name'] ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="position_id" class="form-label">Θέση</label>
-                        <select class="form-select" id="position_id" name="position_id" required>
-                            <?php mysqli_data_seek($positions, 0); while ($position = mysqli_fetch_assoc($positions)) { ?>
-                                <option value="<?= $position['id'] ?>"><?= $position['name'] ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                    <button type="submit" name="add_person" class="btn btn-primary" style="background-color: #ED9635; border-color: #ED9635;">
-                        <i class="bi bi-plus-circle"></i> Προσθήκη Ατόμου
+                    <button type="submit" name="add_period" class="btn btn-primary" style="background-color: #ED9635; border-color: #ED9635;">
+                        <i class="bi bi-plus-circle"></i> Προσθήκη Περιόδου
                     </button>
                 </form>
                 
@@ -181,18 +150,24 @@ $people = $conn->query("SELECT p.*, pp.name as party_name, pos.name as position_
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Όνομα</th>
-                                <th>Κόμμα</th>
-                                <th>Θέση</th>
+                                <th>Έτος</th>
+                                <th>Έναρξη</th>
+                                <th>Λήξη</th>
+                                <th>Κατάσταση</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($person = mysqli_fetch_assoc($people)) { ?>
+                            <?php while ($period = $periods->fetch(PDO::FETCH_ASSOC)) { ?>
                                 <tr>
-                                    <td><?= $person['id'] ?></td>
-                                    <td><?= $person['name'] ?></td>
-                                    <td><?= $person['party_name'] ?></td>
-                                    <td><?= $person['position_name'] ?></td>
+                                    <td><?= $period['id'] ?></td>
+                                    <td><?= $period['year'] ?></td>
+                                    <td><?= $period['start_date'] ?></td>
+                                    <td><?= $period['end_date'] ?></td>
+                                    <td>
+                                        <span class="badge <?= $period['is_active'] ? 'bg-success' : 'bg-secondary' ?>">
+                                            <?= $period['is_active'] ? 'Ενεργή' : 'Ανενεργή' ?>
+                                        </span>
+                                    </td>
                                 </tr>
                             <?php } ?>
                         </tbody>

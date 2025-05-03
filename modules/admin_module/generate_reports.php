@@ -4,44 +4,44 @@ $conn = include '../../config/db_connection.php';
 session_start();
 
 // Fetch statistics
-$stmt = $conn->query("SELECT COUNT(*) AS total FROM submissions");
-$total_submissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations");
+$total_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-$stmt = $conn->query("SELECT COUNT(*) AS total FROM submissions WHERE status = 'Approved'");
-$approved_submissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations WHERE status = 'Approved'");
+$approved_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-$stmt = $conn->query("SELECT COUNT(*) AS total FROM submissions WHERE status = 'Rejected'");
-$rejected_submissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations WHERE status = 'Rejected'");
+$rejected_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-$stmt = $conn->query("SELECT COUNT(*) AS total FROM submissions WHERE status = 'Pending'");
-$pending_submissions = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations WHERE status = 'Pending'");
+$pending_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-// Fetch submissions by year
-$submissions_by_year = $conn->query("
-    SELECT YEAR(date_of_submission) as year, COUNT(*) as count 
-    FROM submissions 
-    GROUP BY YEAR(date_of_submission) 
-    ORDER BY year DESC
+// Fetch declarations by year
+$declarations_by_year = $conn->query("
+    SELECT sp.year, COUNT(d.id) as count 
+    FROM declarations d 
+    JOIN submission_periods sp ON d.submission_period_id = sp.id 
+    GROUP BY sp.year 
+    ORDER BY sp.year DESC
 ");
 
-// Fetch submissions by party
-$submissions_by_party = $conn->query("
-    SELECT pp.name as party_name, COUNT(s.id) as count 
-    FROM submissions s 
-    JOIN people p ON s.person_id = p.id 
-    JOIN political_parties pp ON p.party_id = pp.id 
-    GROUP BY pp.name 
+// Fetch declarations by party
+$declarations_by_party = $conn->query("
+    SELECT p.name as party_name, COUNT(d.id) as count 
+    FROM declarations d 
+    JOIN personal_data pd ON d.id = pd.declaration_id
+    JOIN parties p ON pd.party_id = p.id 
+    GROUP BY p.name 
     ORDER BY count DESC
 ");
 
-// Fetch people without submissions
-$people_without_submissions = $conn->query("
-    SELECT p.name, pp.name as party_name, pos.name as position_name 
-    FROM people p 
-    JOIN political_parties pp ON p.party_id = pp.id 
-    JOIN positions pos ON p.position_id = pos.id 
-    LEFT JOIN submissions s ON p.id = s.person_id 
-    WHERE s.id IS NULL
+// Fetch people without declarations
+$people_without_declarations = $conn->query("
+    SELECT pd.full_name, p.name as party_name
+    FROM personal_data pd
+    JOIN parties p ON pd.party_id = p.id
+    LEFT JOIN declarations d ON pd.declaration_id = d.id
+    WHERE d.id IS NULL
 ");
 ?>
 <!DOCTYPE html>
@@ -98,8 +98,8 @@ $people_without_submissions = $conn->query("
                 <div class="card shadow-sm h-100">
                     <div class="card-body text-center">
                         <i class="bi bi-file-text feature-icon mb-3" style="font-size: 2rem; color: #ED9635;"></i>
-                        <h5 class="card-title">Συνολικές Υποβολές</h5>
-                        <h2 class="mb-0"><?= $total_submissions ?></h2>
+                        <h5 class="card-title">Συνολικές Δηλώσεις</h5>
+                        <h2 class="mb-0"><?= $total_declarations ?></h2>
                     </div>
                 </div>
             </div>
@@ -108,7 +108,7 @@ $people_without_submissions = $conn->query("
                     <div class="card-body text-center">
                         <i class="bi bi-check-circle feature-icon mb-3" style="font-size: 2rem; color: #28a745;"></i>
                         <h5 class="card-title">Εγκεκριμένες</h5>
-                        <h2 class="mb-0"><?= $approved_submissions ?></h2>
+                        <h2 class="mb-0"><?= $approved_declarations ?></h2>
                     </div>
                 </div>
             </div>
@@ -117,7 +117,7 @@ $people_without_submissions = $conn->query("
                     <div class="card-body text-center">
                         <i class="bi bi-x-circle feature-icon mb-3" style="font-size: 2rem; color: #dc3545;"></i>
                         <h5 class="card-title">Απορριφθείσες</h5>
-                        <h2 class="mb-0"><?= $rejected_submissions ?></h2>
+                        <h2 class="mb-0"><?= $rejected_declarations ?></h2>
                     </div>
                 </div>
             </div>
@@ -126,7 +126,7 @@ $people_without_submissions = $conn->query("
                     <div class="card-body text-center">
                         <i class="bi bi-clock feature-icon mb-3" style="font-size: 2rem; color: #ffc107;"></i>
                         <h5 class="card-title">Σε Εκκρεμότητα</h5>
-                        <h2 class="mb-0"><?= $pending_submissions ?></h2>
+                        <h2 class="mb-0"><?= $pending_declarations ?></h2>
                     </div>
                 </div>
             </div>
@@ -137,40 +137,38 @@ $people_without_submissions = $conn->query("
             <div class="col-md-6">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Υποβολές ανά Έτος</h5>
-                        <canvas id="submissionsByYearChart"></canvas>
+                        <h5 class="card-title">Δηλώσεις ανά Έτος</h5>
+                        <canvas id="declarationsByYearChart"></canvas>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Υποβολές ανά Κόμμα</h5>
-                        <canvas id="submissionsByPartyChart"></canvas>
+                        <h5 class="card-title">Δηλώσεις ανά Κόμμα</h5>
+                        <canvas id="declarationsByPartyChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- People Without Submissions -->
+        <!-- People Without Declarations -->
         <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">Άτομα χωρίς Υποβολές</h5>
+                <h5 class="card-title">Άτομα χωρίς Δηλώσεις</h5>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
                                 <th>Όνομα</th>
                                 <th>Κόμμα</th>
-                                <th>Θέση</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($person = mysqli_fetch_assoc($people_without_submissions)) { ?>
+                            <?php while ($person = $people_without_declarations->fetch(PDO::FETCH_ASSOC)) { ?>
                                 <tr>
-                                    <td><?= $person['name'] ?></td>
+                                    <td><?= $person['full_name'] ?></td>
                                     <td><?= $person['party_name'] ?></td>
-                                    <td><?= $person['position_name'] ?></td>
                                 </tr>
                             <?php } ?>
                         </tbody>
@@ -203,22 +201,21 @@ $people_without_submissions = $conn->query("
     
     <!-- Charts -->
     <script>
-        // Submissions by Year Chart
-        const submissionsByYearCtx = document.getElementById('submissionsByYearChart').getContext('2d');
-        new Chart(submissionsByYearCtx, {
+        // Declarations by Year Chart
+        const declarationsByYearCtx = document.getElementById('declarationsByYearChart').getContext('2d');
+        new Chart(declarationsByYearCtx, {
             type: 'bar',
             data: {
                 labels: [<?php 
-                    mysqli_data_seek($submissions_by_year, 0);
-                    while ($row = mysqli_fetch_assoc($submissions_by_year)) {
+                    while ($row = $declarations_by_year->fetch(PDO::FETCH_ASSOC)) {
                         echo "'" . $row['year'] . "',";
                     }
                 ?>],
                 datasets: [{
-                    label: 'Υποβολές',
+                    label: 'Δηλώσεις',
                     data: [<?php 
-                        mysqli_data_seek($submissions_by_year, 0);
-                        while ($row = mysqli_fetch_assoc($submissions_by_year)) {
+                        $declarations_by_year->execute();
+                        while ($row = $declarations_by_year->fetch(PDO::FETCH_ASSOC)) {
                             echo $row['count'] . ",";
                         }
                     ?>],
@@ -235,21 +232,20 @@ $people_without_submissions = $conn->query("
             }
         });
 
-        // Submissions by Party Chart
-        const submissionsByPartyCtx = document.getElementById('submissionsByPartyChart').getContext('2d');
-        new Chart(submissionsByPartyCtx, {
+        // Declarations by Party Chart
+        const declarationsByPartyCtx = document.getElementById('declarationsByPartyChart').getContext('2d');
+        new Chart(declarationsByPartyCtx, {
             type: 'pie',
             data: {
                 labels: [<?php 
-                    mysqli_data_seek($submissions_by_party, 0);
-                    while ($row = mysqli_fetch_assoc($submissions_by_party)) {
+                    while ($row = $declarations_by_party->fetch(PDO::FETCH_ASSOC)) {
                         echo "'" . $row['party_name'] . "',";
                     }
                 ?>],
                 datasets: [{
                     data: [<?php 
-                        mysqli_data_seek($submissions_by_party, 0);
-                        while ($row = mysqli_fetch_assoc($submissions_by_party)) {
+                        $declarations_by_party->execute();
+                        while ($row = $declarations_by_party->fetch(PDO::FETCH_ASSOC)) {
                             echo $row['count'] . ",";
                         }
                     ?>],
