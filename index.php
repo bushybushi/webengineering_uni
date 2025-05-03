@@ -89,6 +89,7 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="./modules/login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Σύνδεση</a></li>
                                 <li><a class="dropdown-item" href="./modules/login_module/register.php"><i class="bi bi-person-plus"></i> Εγγραφή</a></li>
+                                <li><a class="dropdown-item" href="./modules/admin_module/dashboard.php"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
                             </ul>
                         </div>
                     </li>
