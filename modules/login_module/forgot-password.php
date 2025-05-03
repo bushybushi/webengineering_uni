@@ -1,7 +1,5 @@
 <?php
 // Include config file
-<?php
-// Include config file
 $pdo = require_once "../../config/db_connection.php";
 
 // Include Composer's autoloader if it exists
