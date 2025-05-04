@@ -317,17 +317,19 @@ require_once 'config/db_connection.php';
                                     $formatted_date = date('d/m/Y', strtotime($declaration['submission_date']));
                                     ?>
                                     <div class="declaration-item">
-                                        <div class="d-flex align-items-center">
-                                            <div class="ms-3">
-                                                <h6 class="mb-1"><?php echo htmlspecialchars($declaration['title']); ?></h6>
-                                                <small class="text-muted">
-                                                    <?php 
-                                                    echo htmlspecialchars($declaration['office'] ?? 'Μέλος του Κοινοβουλίου');
-                                                    echo ' - ' . $formatted_date;
-                                                    ?>
-                                                </small>
+                                        <a href="./modules/submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="text-decoration-none text-dark">
+                                            <div class="d-flex align-items-center">
+                                                <div class="ms-3">
+                                                    <h6 class="mb-1"><?php echo htmlspecialchars($declaration['title']); ?></h6>
+                                                    <small class="text-muted">
+                                                        <?php 
+                                                        echo htmlspecialchars($declaration['office'] ?? 'Μέλος του Κοινοβουλίου');
+                                                        echo ' - ' . $formatted_date;
+                                                        ?>
+                                                    </small>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </a>
                                     </div>
                                     <?php
                                 }
