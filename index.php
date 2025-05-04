@@ -1,3 +1,8 @@
+<?php
+session_start();
+require_once 'config/db_connection.php';
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -87,9 +92,34 @@
                                 <i class="bi bi-person-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="./modules/login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Σύνδεση</a></li>
-                                <li><a class="dropdown-item" href="./modules/login_module/register.php"><i class="bi bi-person-plus"></i> Εγγραφή</a></li>
-                                <li><a class="dropdown-item" href="./modules/admin_module/dashboard.php"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
+                                <?php if (isset($_SESSION['user_id'])): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="./modules/profile_module/profile.php">
+                                            <i class="bi bi-person"></i> Το προφίλ μου
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="./modules/favorites_module/favorites.php">
+                                            <i class="bi bi-heart"></i> Αγαπημένα
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="./modules/login_module/logout.php">
+                                            <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
+                                        </a>
+                                    </li>
+                                <?php else: ?>
+                                    <li>
+                                        <a class="dropdown-item" href="./modules/login_module/login.php">
+                                            <i class="bi bi-box-arrow-in-right"></i> Σύνδεση
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="./modules/login_module/register.php">
+                                            <i class="bi bi-person-plus"></i> Εγγραφή
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
                             </ul>
                         </div>
                     </li>
@@ -144,12 +174,21 @@
                                 <span class="fw-medium">Λογαριασμός</span>
                             </div>
                             <div class="d-flex flex-column gap-2">
-                                <a href="./modules/login_module/login.php" class="nav-link py-2">
-                                    <i class="bi bi-box-arrow-in-right me-2"></i> Σύνδεση
-                                </a>
-                                <a href="./modules/login_module/register.php" class="nav-link py-2">
-                                    <i class="bi bi-person-plus me-2"></i> Εγγραφή
-                                </a>
+                                <?php if (isset($_SESSION['user_id'])): ?>
+                                    <a href="./modules/profile_module/profile.php" class="nav-link py-2">
+                                        <i class="bi bi-person"></i> Το προφίλ μου
+                                    </a>
+                                    <a href="./modules/login_module/logout.php" class="nav-link py-2">
+                                        <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
+                                    </a>
+                                <?php else: ?>
+                                    <a href="./modules/login_module/login.php" class="nav-link py-2">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Σύνδεση
+                                    </a>
+                                    <a href="./modules/login_module/register.php" class="nav-link py-2">
+                                        <i class="bi bi-person-plus me-2"></i> Εγγραφή
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </li>
                     </ul>
@@ -168,9 +207,9 @@
                 <div class="col-lg-6 col-md-8">
                     <h1 class="hero-title">Παρακολούθησε τις Δηλώσεις Πόθεν Έσχες</h1>
                     <div class="search-box-container mb-4">
-                        <form id="searchForm" action="./modules/search_module/search.php" method="GET" class="d-flex gap-2">
-                            <input type="text" class="form-control form-control-lg" name="q" placeholder="Αναζήτηση Δηλώσεων . . ." aria-label="Αναζήτηση Δηλώσεων">
-                            <button type="submit" form="searchForm" class="btn btn-light btn-lg px-4"><i class="bi bi-search"></i></button>
+                        <form action="./modules/search_module/search.php" method="GET" class="d-flex gap-2">
+                            <input type="text" class="form-control form-control-lg" name="search" placeholder="Αναζήτηση Δηλώσεων . . ." aria-label="Αναζήτηση Δηλώσεων">
+                            <button type="submit" class="btn btn-light btn-lg px-4"><i class="bi bi-search"></i></button>
                         </form>
                     </div>
                     <div class="d-flex flex-column flex-sm-row gap-3">
@@ -185,22 +224,28 @@
     <main class="container mb-5">
         <!-- Stats Section -->
         <div class="row g-4 mb-5">
+            <?php
+            // Get counts from database
+            $declarations_count = $pdo->query("SELECT COUNT(*) FROM declarations")->fetchColumn();
+            $parties_count = $pdo->query("SELECT COUNT(*) FROM parties")->fetchColumn();
+            $users_count = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+            ?>
             <div class="col-md-4">
                 <div class="stats-card text-center h-100">
-                    <div class="stat-number">500+</div>
-                    <div class="stat-label">Δημοσίοι Αξιωματούχοι</div>
+                    <div class="stat-number"><?php echo number_format($declarations_count); ?></div>
+                    <div class="stat-label">Δηλώσεις</div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stats-card text-center h-100">
-                    <div class="stat-number">8</div>
+                    <div class="stat-number"><?php echo number_format($parties_count); ?></div>
                     <div class="stat-label">Πολιτικά Κόμματα</div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stats-card text-center h-100">
-                    <div class="stat-number">2025</div>
-                    <div class="stat-label">Τελευταίες Δηλώσεις</div>
+                    <div class="stat-number"><?php echo number_format($users_count); ?></div>
+                    <div class="stat-label">Χρήστες</div>
                 </div>
             </div>
         </div>
@@ -245,51 +290,46 @@
                 <div class="card feature-card h-100">
                     <div class="card-body">
                         <h5 class="card-title mb-4">Πρόσφατες Δηλώσεις</h5>
-                        <div class="declaration-item">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-circle">A</div>
-                                <div class="ms-3">
-                                    <h6 class="mb-1">Ανδρέας Αθανασιάδης</h6>
-                                    <small class="text-muted">Μελος του Κοινοβουλίου - 15/03/2024</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="declaration-item">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-circle">M</div>
-                                <div class="ms-3">
-                                    <h6 class="mb-1">Μαρία Μιχαηλίδου</h6>
-                                    <small class="text-muted">Υπουργός - 14/03/2024</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="declaration-item">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-circle">G</div>
-                                <div class="ms-3">
-                                    <h6 class="mb-1">Γεώργιος Γεωργίου</h6>
-                                    <small class="text-muted">Αναπληρωτής Υπουργός - 13/03/2024</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="declaration-item">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-circle">E</div>
-                                <div class="ms-3">
-                                    <h6 class="mb-1">Ελένη Παπαδοπούλου</h6>
-                                    <small class="text-muted">Μελος του Κοινοβουλίου - 12/03/2024</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="declaration-item">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-circle">N</div>
-                                <div class="ms-3">
-                                    <h6 class="mb-1">Νίκος Νικολαίου</h6>
-                                    <small class="text-muted">Υπουργός - 11/03/2024</small>
-                                </div>
-                            </div>
-                        </div>
+                        <?php
+                        // Get latest declarations
+                        $latest_query = "SELECT d.id, d.title, d.submission_date, pd.office
+                                        FROM declarations d
+                                        JOIN personal_data pd ON d.id = pd.declaration_id
+                                        ORDER BY d.submission_date DESC
+                                        LIMIT 5";
+
+                        try {
+                            $latest_stmt = $pdo->prepare($latest_query);
+                            $latest_stmt->execute();
+                            $latest_declarations = $latest_stmt->fetchAll(PDO::FETCH_ASSOC);
+                            
+                            if (count($latest_declarations) > 0) {
+                                foreach ($latest_declarations as $declaration) {
+                                    // Format date
+                                    $formatted_date = date('d/m/Y', strtotime($declaration['submission_date']));
+                                    ?>
+                                    <div class="declaration-item">
+                                        <div class="d-flex align-items-center">
+                                            <div class="ms-3">
+                                                <h6 class="mb-1"><?php echo htmlspecialchars($declaration['title']); ?></h6>
+                                                <small class="text-muted">
+                                                    <?php 
+                                                    echo htmlspecialchars($declaration['office'] ?? 'Μέλος του Κοινοβουλίου');
+                                                    echo ' - ' . $formatted_date;
+                                                    ?>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+                                }
+                            } else {
+                                echo '<div class="text-center text-muted">Δεν υπάρχουν πρόσφατες δηλώσεις</div>';
+                            }
+                        } catch (PDOException $e) {
+                            echo '<div class="alert alert-danger">Σφάλμα κατά την ανάκτηση των πρόσφατων δηλώσεων</div>';
+                        }
+                        ?>
                     </div>
                 </div>
             </div>
