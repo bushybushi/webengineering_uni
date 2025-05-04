@@ -172,9 +172,6 @@ if (!$personal_data) {
                     <a href="../search_module/search.php" class="btn btn-secondary">
                         <i class="bi bi-arrow-left"></i> Back to Declarations
                     </a>
-                    <a href="./edit-declaration.php?id=<?php echo $declaration_id; ?>" class="btn btn-warning text-dark">
-                        <i class="bi bi-pencil"></i> Edit Declaration
-                    </a>
                 </div>
             </div>
 
