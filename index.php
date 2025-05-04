@@ -216,7 +216,7 @@ require_once 'config/db_connection.php';
                     <h1 class="hero-title">Παρακολούθησε τις Δηλώσεις Πόθεν Έσχες</h1>
                     <div class="search-box-container mb-4">
                         <form action="./modules/search_module/search.php" method="GET" class="d-flex gap-2">
-                            <input type="text" class="form-control form-control-lg" name="search" placeholder="Αναζήτηση Δηλώσεων . . ." aria-label="Αναζήτηση Δηλώσεων">
+                            <input type="text" class="form-control form-control-lg" name="search" placeholder="Αναζήτηση Πολιτικών . . ." aria-label="Αναζήτηση Πολιτικών">
                             <button type="submit" class="btn btn-light btn-lg px-4"><i class="bi bi-search"></i></button>
                         </form>
                     </div>
