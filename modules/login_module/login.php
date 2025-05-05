@@ -9,7 +9,7 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
 }
 
 // Include config file
-$pdo = require_once "db_connection.php";
+$pdo = require_once "../../config/db_connection.php";
 
 // Define variables and initialize with empty values
 $email = $password = "";
