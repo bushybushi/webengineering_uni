@@ -2,6 +2,12 @@
 // Database connection
 require_once '../../config/db_connection.php';
 
+// Check if user is logged in and not Public
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public') {
+    header("Location: ../../index.php");
+    exit();
+}
+
 // Initialize variables
 $success_message = '';
 $error_message = '';
