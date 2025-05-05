@@ -73,7 +73,11 @@ require_once 'config/db_connection.php';
                         <a class="nav-link" href="./modules/search_module/statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./modules/submit_module/declaration-form.php">Υποβολή</a>
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
+                            <a class="nav-link" href="./index.php">Υποβολή</a>
+                        <?php else: ?>
+                            <a class="nav-link" href="./modules/submit_module/declaration-form.php">Υποβολή</a>
+                        <?php endif; ?>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -103,6 +107,13 @@ require_once 'config/db_connection.php';
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
                                     </li>
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="./modules/admin_module/dashboard.php">
+                                            <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
                                     <li>
                                         <a class="dropdown-item" href="./modules/login_module/logout.php">
                                             <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
@@ -119,11 +130,6 @@ require_once 'config/db_connection.php';
                                             <i class="bi bi-person-plus"></i> Εγγραφή
                                         </a>
                                     </li>
-                                <li>
-                                    <a class="dropdown-item" href="./modules/admin_module/dashboard.php">
-                                        <i class="bi bi-speedometer2"></i> Admin Dashboard
-                                    </a>
-                                </li>
                                 <?php endif; ?>
                             </ul>
                         </div>
@@ -155,9 +161,15 @@ require_once 'config/db_connection.php';
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-3" href="./modules/submit_module/declaration-form.php">
-                                <i class="bi bi-file-earmark-text"></i> Υποβολή
-                            </a>
+                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
+                                <a class="nav-link d-flex align-items-center gap-2 mb-3" href="./index.php">
+                                    <i class="bi bi-file-earmark-text"></i> Υποβολή
+                                </a>
+                            <?php else: ?>
+                                <a class="nav-link d-flex align-items-center gap-2 mb-3" href="./modules/submit_module/declaration-form.php">
+                                    <i class="bi bi-file-earmark-text"></i> Υποβολή
+                                </a>
+                            <?php endif; ?>
                         </li>
                         <li class="nav-item border-top pt-3">
                             <div class="d-flex align-items-center gap-2 mb-2">
@@ -183,6 +195,16 @@ require_once 'config/db_connection.php';
                                     <a href="./modules/profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
+
+                                        <a class="dropdown-item" href="./modules/favorites_module/favorites.php">
+                                            <i class="bi bi-heart"></i> Αγαπημένα
+                                        </a>
+                                   
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                                    <a href="./modules/admin_module/dashboard.php" class="nav-link py-2">
+                                        <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                    </a>
+                                    <?php endif; ?>
                                     <a href="./modules/login_module/logout.php" class="nav-link py-2">
                                         <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
                                     </a>
@@ -192,9 +214,6 @@ require_once 'config/db_connection.php';
                                     </a>
                                     <a href="./modules/login_module/register.php" class="nav-link py-2">
                                         <i class="bi bi-person-plus me-2"></i> Εγγραφή
-                                    </a>
-                                <a class="dropdown-item" href="./modules/admin_module/dashboard.php">
-                                        <i class="bi bi-speedometer2"></i> Admin Dashboard
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -216,7 +235,7 @@ require_once 'config/db_connection.php';
                     <h1 class="hero-title">Παρακολούθησε τις Δηλώσεις Πόθεν Έσχες</h1>
                     <div class="search-box-container mb-4">
                         <form action="./modules/search_module/search.php" method="GET" class="d-flex gap-2">
-                            <input type="text" class="form-control form-control-lg" name="search" placeholder="Αναζήτηση Πολιτικών . . ." aria-label="Αναζήτηση Πολιτικών">
+                            <input type="text" class="form-control form-control-lg" name="search" placeholder="Αναζήτηση Δηλώσεων . . ." aria-label="Αναζήτηση Δηλώσεων">
                             <button type="submit" class="btn btn-light btn-lg px-4"><i class="bi bi-search"></i></button>
                         </form>
                     </div>
