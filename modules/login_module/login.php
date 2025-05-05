@@ -9,7 +9,7 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
 }
 
 // Include config file
-$pdo = require_once "../../config/db_connection.php";
+$pdo = require_once "db_connection.php";
 
 // Define variables and initialize with empty values
 $email = $password = "";
@@ -35,7 +35,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validate credentials
     if(empty($email_err) && empty($password_err)){
         // Prepare a select statement
-        $sql = "SELECT id, email, password, first_name, last_name, role, person_id FROM users WHERE email = :email";
+        $sql = "SELECT id, email, password, first_name, last_name, role FROM users WHERE email = :email";
         
         if($stmt = $pdo->prepare($sql)){
             // Bind variables to the prepared statement as parameters
@@ -52,7 +52,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         $first_name = $row["first_name"];
                         $last_name = $row["last_name"];
                         $role = $row["role"];
-                        $person_id = $row["person_id"];
                         
                         if(password_verify($password, $hashed_password)){
                             // Password is correct, so start a new session
@@ -65,10 +64,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             $_SESSION["first_name"] = $first_name;
                             $_SESSION["last_name"] = $last_name;
                             $_SESSION["role"] = $role;
-                            $_SESSION["person_id"] = $person_id;
                             
-                            // Redirect user to welcome page
-                            header("location: ../../index.php");
+                            // Redirect user based on role
+                            if($role === "Admin") {
+                                header("location: admin/dashboard.php");
+                            } else {
+                                header("location: ../../index.php");
+                            }
+                            exit();
                         } else{
                             // Password is not valid, display a generic error message
                             $login_err = "Invalid email or password.";
