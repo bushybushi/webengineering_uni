@@ -92,7 +92,7 @@ require_once 'config/db_connection.php';
                                 <i class="bi bi-person-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <?php if (isset($_SESSION['user_id'])): ?>
+                                <?php if (isset($_SESSION['id'])): ?>
                                     <li>
                                         <a class="dropdown-item" href="./modules/profile_module/profile.php">
                                             <i class="bi bi-person"></i> Το προφίλ μου
@@ -179,7 +179,7 @@ require_once 'config/db_connection.php';
                                 <span class="fw-medium">Λογαριασμός</span>
                             </div>
                             <div class="d-flex flex-column gap-2">
-                                <?php if (isset($_SESSION['user_id'])): ?>
+                                <?php if (isset($_SESSION['id'])): ?>
                                     <a href="./modules/profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
