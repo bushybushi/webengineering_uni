@@ -87,36 +87,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty($first_name_err) && empty($last_name_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err) && empty($role_err)){
         
         try {
-            // Start transaction
-            $pdo->beginTransaction();
-            
-            // First, insert into people table
-            $sql = "INSERT INTO people (name, title, office, address, dob, id_number, marital_status, num_of_dependents, date_of_submission, political_affiliation) 
-                    VALUES (:name, :title, :office, :address, :dob, :id_number, :marital_status, :num_of_dependents, :date, :political_affiliation)";
-            
-            $stmt = $pdo->prepare($sql);
-            
-            // Set parameters
-            $param_name = $first_name . " " . $last_name;
-            $param_date = date("Y-m-d");
-            
-            $stmt->bindParam(":name", $param_name);
-            $stmt->bindParam(":title", $title);
-            $stmt->bindParam(":office", $office);
-            $stmt->bindParam(":address", $address);
-            $stmt->bindParam(":dob", $dob);
-            $stmt->bindParam(":id_number", $id_number);
-            $stmt->bindParam(":marital_status", $marital_status);
-            $stmt->bindParam(":num_of_dependents", $num_of_dependents);
-            $stmt->bindParam(":date", $param_date);
-            $stmt->bindParam(":political_affiliation", $political_affiliation);
-            
-            $stmt->execute();
-            $person_id = $pdo->lastInsertId();
-            
-            // Now insert into users table
-            $sql = "INSERT INTO users (first_name, last_name, email, password, role, person_id) 
-                    VALUES (:first_name, :last_name, :email, :password, :role, :person_id)";
+            // Insert into users table
+            $sql = "INSERT INTO users (first_name, last_name, email, password, role) 
+                    VALUES (:first_name, :last_name, :email, :password, :role)";
             
             $stmt = $pdo->prepare($sql);
             
@@ -128,20 +101,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $stmt->bindParam(":email", $email);
             $stmt->bindParam(":password", $param_password);
             $stmt->bindParam(":role", $role);
-            $stmt->bindParam(":person_id", $person_id);
             
             $stmt->execute();
             
-            // Commit transaction
-            $pdo->commit();
-            
             // Redirect to login page
-            header("location: ../../login.php");
+            header("location: login.php");
             exit();
             
         } catch(PDOException $e) {
-            // Rollback transaction on error
-            $pdo->rollBack();
             echo "Something went wrong. Please try again later.";
         }
     }
@@ -229,6 +196,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                             <option value="">Select position</option>
                                             <option value="Public" <?php echo ($role == "Public") ? 'selected' : ''; ?>>Public</option>
                                             <option value="Politician" <?php echo ($role == "Politician") ? 'selected' : ''; ?>>Politician</option>
+                                            <option value="Admin" <?php echo ($role == "Admin") ? 'selected' : ''; ?>>Admin</option>
                                         </select>
                                         <div class="invalid-feedback"><?php echo $role_err; ?></div>
                                     </div>
