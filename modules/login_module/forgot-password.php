@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Europe/Athens');
 // Include config file
 $pdo = require_once "../../config/db_connection.php";
 
@@ -90,9 +91,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                     }
                                     
                                     // Create email content
+                                    $reset_link = "http://" . $_SERVER['HTTP_HOST'] . "/myDomain/PothenEsxes/LoginWITHfunctionality/reset-password.php?token=" . $token;
                                     $email_content = "Hello " . $row["first_name"] . ",<br><br>" .
                                         "You have requested to reset your password. Click the link below to reset your password:<br><br>" .
-                                        "<a href='http://" . $_SERVER['HTTP_HOST'] . "/myDomain/PothenEsxes/LoginWITHfunctionality/reset-password.php?token=" . $token . "'>Reset Password</a><br><br>" .
+                                        "<a href=\"$reset_link\">Reset Password</a><br><br>" .
+                                        "Or copy and paste this URL into your browser:<br>" .
+                                        "<span style=\"word-break:break-all;\">$reset_link</span><br><br>" .
                                         "<strong>Important Security Information:</strong><br>" .
                                         "- This link will expire in 1 hour<br>" .
                                         "- This link can only be used once<br>" .
