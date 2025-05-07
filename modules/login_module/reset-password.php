@@ -1,6 +1,7 @@
 <?php
+date_default_timezone_set('Europe/Athens');
 // Include config file
-$pdo = require_once "db_connection.php";
+$pdo = require_once "../../config/db_connection.php";
 
 // Define variables and initialize with empty values
 $new_password = $confirm_password = "";
@@ -8,17 +9,28 @@ $new_password_err = $confirm_password_err = "";
 $token_err = "";
 
 // Check if token is provided
-if(!isset($_GET["token"]) || empty($_GET["token"])){
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $token = $_POST["token"] ?? '';
+    // re-validate the token
+    $sql = "SELECT id FROM users WHERE reset_token = :token AND reset_expires > NOW() AND reset_used = 0";
+    if($stmt = $pdo->prepare($sql)){
+        $stmt->bindParam(":token", $token, PDO::PARAM_STR);
+        if($stmt->execute()){
+            if($stmt->rowCount() == 0){
+                $token_err = "Invalid or expired password reset link.";
+            }
+        } else {
+            echo "Oops! Something went wrong. Please try again later.";
+        }
+    }
+} else if(!isset($_GET["token"]) || empty($_GET["token"])){
     $token_err = "Invalid password reset link.";
 } else {
     $token = $_GET["token"];
-    
     // Verify token exists and is not expired
     $sql = "SELECT id FROM users WHERE reset_token = :token AND reset_expires > NOW() AND reset_used = 0";
-    
     if($stmt = $pdo->prepare($sql)){
         $stmt->bindParam(":token", $token, PDO::PARAM_STR);
-        
         if($stmt->execute()){
             if($stmt->rowCount() == 0){
                 $token_err = "Invalid or expired password reset link.";
@@ -109,7 +121,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && empty($token_err)){
                                 <p class="mb-0"><a href="forgot-password.php" class="text-decoration-none">Request a new password reset link</a></p>
                             </div>
                         <?php else: ?>
-                            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?token=" . $token; ?>" method="post" class="needs-validation" novalidate>
+                            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="needs-validation" novalidate>
+                                <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
                                 <div class="mb-3">
                                     <label class="form-label">New Password</label>
                                     <div class="input-group">
