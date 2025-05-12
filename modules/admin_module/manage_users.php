@@ -10,6 +10,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
         $stmt->execute([$user_id]);
     }
+    
+    if (isset($_POST['add_user'])) {
+        // Validate input
+        $first_name = trim($_POST['first_name']);
+        $last_name = trim($_POST['last_name']);
+        $email = trim($_POST['email']);
+        $password = trim($_POST['password']);
+        $confirm_password = trim($_POST['confirm_password']);
+        $role = trim($_POST['role']);
+        
+        // Check if passwords match
+        if ($password === $confirm_password) {
+            // Check if email already exists
+            $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            
+            if ($stmt->rowCount() == 0) {
+                // Hash password
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                
+                // Insert new user
+                $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$first_name, $last_name, $email, $hashed_password, $role]);
+            }
+        }
+    }
 }
 
 // Fetch all users
@@ -103,21 +129,64 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="card shadow-sm">
             <div class="card-body">
                 <h2 class="card-title mb-4">Προσθήκη Νέου Χρήστη</h2>
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Όνομα</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" name="first_name" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" name="last_name" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                <input type="password" name="confirm_password" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Position/Role</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-briefcase"></i></span>
+                                <select name="role" class="form-select" required>
+                                    <option value="">Select position</option>
+                                    <option value="Public">Public</option>
+                                    <option value="Politician">Politician</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Κωδικός</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <button type="submit" name="add_user" class="btn btn-primary" style="background-color: #ED9635; border-color: #ED9635;">
-                        <i class="bi bi-person-plus"></i> Προσθήκη Χρήστη
+
+                    <button type="submit" name="add_user" class="btn btn-warning text-dark w-100 mt-4 mb-3">
+                        <i class="bi bi-person-plus"></i> Add User
                     </button>
                 </form>
             </div>
