@@ -17,23 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $last_name = trim($_POST['last_name']);
         $email = trim($_POST['email']);
         $password = trim($_POST['password']);
-        $confirm_password = trim($_POST['confirm_password']);
         $role = trim($_POST['role']);
         
-        // Check if passwords match
-        if ($password === $confirm_password) {
-            // Check if email already exists
-            $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-            $stmt->execute([$email]);
+        // Check if email already exists
+        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        
+        if ($stmt->rowCount() == 0) {
+            // Hash password
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
-            if ($stmt->rowCount() == 0) {
-                // Hash password
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                
-                // Insert new user
-                $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$first_name, $last_name, $email, $hashed_password, $role]);
-            }
+            // Insert new user
+            $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$first_name, $last_name, $email, $hashed_password, $role]);
         }
     }
 }
@@ -160,14 +156,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                 <input type="password" name="password" class="form-control" required>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Confirm Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                                <input type="password" name="confirm_password" class="form-control" required>
                             </div>
                         </div>
 
