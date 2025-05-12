@@ -13,7 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch all users
-$users = $conn->query("SELECT * FROM users ORDER BY created_at DESC");
+$stmt = $conn->query("SELECT * FROM users ORDER BY created_at DESC");
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -75,10 +76,10 @@ $users = $conn->query("SELECT * FROM users ORDER BY created_at DESC");
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($row = mysqli_fetch_assoc($users)) { ?>
+                            <?php foreach ($users as $row) { ?>
                                 <tr>
                                     <td><?= $row['id'] ?></td>
-                                    <td><?= $row['name'] ?></td>
+                                    <td><?= $row['first_name'] . ' ' . $row['last_name'] ?></td>
                                     <td><?= $row['email'] ?></td>
                                     <td>
                                         <form method="POST" class="d-inline">
