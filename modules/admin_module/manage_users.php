@@ -72,6 +72,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <th>ID</th>
                                 <th>Όνομα</th>
                                 <th>Email</th>
+                                <th>Ρόλος</th>
                                 <th>Ενέργειες</th>
                             </tr>
                         </thead>
@@ -81,6 +82,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= $row['id'] ?></td>
                                     <td><?= $row['first_name'] . ' ' . $row['last_name'] ?></td>
                                     <td><?= $row['email'] ?></td>
+                                    <td><?= $row['role'] ?></td>
                                     <td>
                                         <form method="POST" class="d-inline">
                                             <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
