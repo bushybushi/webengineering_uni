@@ -47,6 +47,13 @@ $periods = $conn->query("SELECT * FROM submission_periods ORDER BY year DESC");
                 <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
                 <span class="fw-bold">ΠΟΘΕΝ ΕΣΧΕΣ</span>
             </a>
+            
+            <!-- Mobile Toggle Button -->
+            <button class="navbar-toggler border-0 d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Desktop Menu -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
@@ -61,7 +68,113 @@ $periods = $conn->query("SELECT * FROM submission_periods ORDER BY year DESC");
                     <li class="nav-item">
                         <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
                     </li>
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <button class="lang-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-translate"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="?lang=en"><span class="fi fi-gb"></span> English</a></li>
+                                <li><a class="dropdown-item" href="?lang=el"><span class="fi fi-gr"></span> Ελληνικά</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <button class="profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="../profile_module/profile.php">
+                                        <i class="bi bi-person"></i> Το προφίλ μου
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="../favorites_module/favorites.php">
+                                        <i class="bi bi-heart"></i> Αγαπημένα
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="../admin_module/dashboard.php">
+                                        <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="../login_module/logout.php">
+                                        <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
                 </ul>
+            </div>
+
+            <!-- Mobile Menu (Offcanvas) -->
+            <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+                <div class="offcanvas-header border-bottom">
+                    <h5 class="offcanvas-title" id="mobileMenuLabel">Μενού</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../../index.php">
+                                <i class="bi bi-house"></i> Αρχική
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../search_module/search.php">
+                                <i class="bi bi-search"></i> Αναζήτηση
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../search_module/statistics.php">
+                                <i class="bi bi-graph-up"></i> Στατιστικά
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../submit_module/declaration-form.php">
+                                <i class="bi bi-file-earmark-text"></i> Υποβολή
+                            </a>
+                        </li>
+                        <li class="nav-item border-top pt-3">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-translate"></i>
+                                <span class="fw-medium">Γλώσσα</span>
+                            </div>
+                            <div class="d-flex flex-column gap-2">
+                                <a href="?lang=en" class="nav-link py-2">
+                                    <span class="fi fi-gb"></span> English
+                                </a>
+                                <a href="?lang=el" class="nav-link py-2">
+                                    <span class="fi fi-gr"></span> Ελληνικά
+                                </a>
+                            </div>
+                        </li>
+                        <li class="nav-item border-top pt-3">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-person-circle"></i>
+                                <span class="fw-medium">Λογαριασμός</span>
+                            </div>
+                            <div class="d-flex flex-column gap-2">
+                                <a href="../profile_module/profile.php" class="nav-link py-2">
+                                    <i class="bi bi-person"></i> Το προφίλ μου
+                                </a>
+                                <a href="../favorites_module/favorites.php" class="nav-link py-2">
+                                    <i class="bi bi-heart"></i> Αγαπημένα
+                                </a>
+                                <a href="../admin_module/dashboard.php" class="nav-link py-2">
+                                    <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                </a>
+                                <a href="../login_module/logout.php" class="nav-link py-2">
+                                    <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
