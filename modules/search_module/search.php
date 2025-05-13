@@ -130,8 +130,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 
 </style>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="../../index.php">
                 <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
@@ -150,24 +150,17 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                         <a class="nav-link" href="../../index.php">Αρχική</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="./search.php">Αναζήτηση</a>
+                        <a class="nav-link" href="../search_module/search.php">Αναζήτηση</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./statistics.php">Στατιστικά</a>
+                        <a class="nav-link" href="../search_module/statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
-                    </li>
-                    <li class="nav-item">
-                        <div class="dropdown">
-                            <button class="lang-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-translate"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="?lang=en"><span class="fi fi-gb"></span> English</a></li>
-                                <li><a class="dropdown-item" href="?lang=el"><span class="fi fi-gr"></span> Ελληνικά</a></li>
-                            </ul>
-                        </div>
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
+                            <a class="nav-link" href="../../index.php">Υποβολή</a>
+                        <?php else: ?>
+                            <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
+                        <?php endif; ?>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -175,8 +168,41 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                 <i class="bi bi-person-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="../login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Σύνδεση</a></li>
-                                <li><a class="dropdown-item" href="../login_module/register.php"><i class="bi bi-person-plus"></i> Εγγραφή</a></li>
+                                <?php if (isset($_SESSION['id'])): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../profile_module/profile.php">
+                                            <i class="bi bi-person"></i> Το προφίλ μου
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="../favorites_module/favorites.php">
+                                            <i class="bi bi-heart"></i> Αγαπημένα
+                                        </a>
+                                    </li>
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../admin_module/dashboard.php">
+                                            <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../login_module/logout.php">
+                                            <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
+                                        </a>
+                                    </li>
+                                <?php else: ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../login_module/login.php">
+                                            <i class="bi bi-box-arrow-in-right"></i> Σύνδεση
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="../login_module/register.php">
+                                            <i class="bi bi-person-plus"></i> Εγγραφή
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
                             </ul>
                         </div>
                     </li>
@@ -185,10 +211,77 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 
             <!-- Mobile Menu (Offcanvas) -->
             <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
-                <!-- ... existing mobile menu code ... -->
+                <div class="offcanvas-header border-bottom">
+                    <h5 class="offcanvas-title" id="mobileMenuLabel">Μενού</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../../index.php">
+                                <i class="bi bi-house"></i> Αρχική
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../search_module/search.php">
+                                <i class="bi bi-search"></i> Αναζήτηση
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../search_module/statistics.php">
+                                <i class="bi bi-graph-up"></i> Στατιστικά
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
+                                <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../../index.php">
+                                    <i class="bi bi-file-earmark-text"></i> Υποβολή
+                                </a>
+                            <?php else: ?>
+                                <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../submit_module/declaration-form.php">
+                                    <i class="bi bi-file-earmark-text"></i> Υποβολή
+                                </a>
+                            <?php endif; ?>
+                        </li>
+                        <li class="nav-item border-top pt-3">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-person-circle"></i>
+                                <span class="fw-medium">Λογαριασμός</span>
+                            </div>
+                            <div class="d-flex flex-column gap-2">
+                                <?php if (isset($_SESSION['id'])): ?>
+                                    <a href="../profile_module/profile.php" class="nav-link py-2">
+                                        <i class="bi bi-person"></i> Το προφίλ μου
+                                    </a>
+
+                                        <a class="dropdown-item" href="../submit_module/favorites.php">
+                                            <i class="bi bi-heart"></i> Αγαπημένα
+                                        </a>
+                                   
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                                    <a href="../admin_module/dashboard.php" class="nav-link py-2">
+                                        <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                    </a>
+                                    <?php endif; ?>
+                                    <a href="../login_module/logout.php" class="nav-link py-2">
+                                        <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
+                                    </a>
+                                <?php else: ?>
+                                    <a href="../login_module/login.php" class="nav-link py-2">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Σύνδεση
+                                    </a>
+                                    <a href="../login_module/register.php" class="nav-link py-2">
+                                        <i class="bi bi-person-plus me-2"></i> Εγγραφή
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
+
 
     <!-- Add padding-top to account for fixed navbar -->
     <div class="pt-5">
