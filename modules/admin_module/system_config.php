@@ -36,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get search parameters
 $party_search = isset($_GET['party_search']) ? $_GET['party_search'] : '';
-$period_search = isset($_GET['period_search']) ? $_GET['period_search'] : '';
 
 // Fetch existing data with search
 $party_query = "SELECT * FROM parties";
@@ -49,15 +48,15 @@ if (!empty($party_search)) {
 }
 $parties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$period_query = "SELECT * FROM submission_periods";
-if (!empty($period_search)) {
-    $period_query .= " WHERE year LIKE ?";
-    $stmt = $conn->prepare($period_query);
-    $stmt->execute(["%$period_search%"]);
-} else {
-    $stmt = $conn->query($period_query);
-}
-$periods = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch periods without search
+$periods = $conn->query("
+    SELECT sp.*, 
+           CASE WHEN COUNT(d.id) > 0 THEN 1 ELSE 0 END as is_used
+    FROM submission_periods sp
+    LEFT JOIN declarations d ON sp.id = d.submission_period_id
+    GROUP BY sp.id
+    ORDER BY sp.year DESC
+")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -285,21 +284,6 @@ $periods = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="card-body">
                 <h2 class="card-title mb-4">Περίοδοι Υποβολής</h2>
 
-                <!-- Period Search -->
-                <form method="GET" class="mb-4">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="period_search" placeholder="Αναζήτηση έτους..." value="<?= htmlspecialchars($period_search) ?>">
-                        <button type="submit" class="btn btn-warning">
-                            <i class="bi bi-search"></i> Αναζήτηση
-                        </button>
-                        <?php if (!empty($period_search)): ?>
-                            <a href="system_config.php" class="btn btn-secondary">
-                                <i class="bi bi-x-circle"></i> Καθαρισμός
-                            </a>
-                        <?php endif; ?>
-                    </div>
-                </form>
-
                 <!-- Add Period Form -->
                 <form method="POST" class="mb-4">
                     <div class="mb-3">
@@ -318,6 +302,7 @@ $periods = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <tr>
                                 <th>ID</th>
                                 <th>Έτος</th>
+                                <th>Κατάσταση</th>
                                 <th>Ενέργειες</th>
                             </tr>
                         </thead>
@@ -327,12 +312,25 @@ $periods = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= $period['id'] ?></td>
                                     <td><?= $period['year'] ?></td>
                                     <td>
+                                        <?php if ($period['is_used']): ?>
+                                            <span class="badge bg-success">Σε χρήση</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary">Δεν χρησιμοποιείται</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
                                         <button type="button" class="btn btn-sm btn-warning" onclick="editPeriod(<?= $period['id'] ?>, '<?= $period['year'] ?>')">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="deletePeriod(<?= $period['id'] ?>, '<?= $period['year'] ?>')">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                        <?php if (!$period['is_used']): ?>
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="deletePeriod(<?= $period['id'] ?>, '<?= $period['year'] ?>')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        <?php else: ?>
+                                            <button type="button" class="btn btn-sm btn-danger" disabled title="Δεν μπορείτε να διαγράψετε μια περίοδο που χρησιμοποιείται σε δηλώσεις">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
