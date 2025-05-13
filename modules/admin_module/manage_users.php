@@ -33,9 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $last_name = trim($_POST['last_name']);
         $email = trim($_POST['email']);
         $role = trim($_POST['role']);
+        $password = trim($_POST['password']);
+        $confirm_password = trim($_POST['confirm_password']);
         
-        $stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ?, role = ? WHERE id = ?");
-        $stmt->execute([$first_name, $last_name, $email, $role, $user_id]);
+        if (!empty($password)) {
+            if ($password === $confirm_password) {
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ?, role = ?, password = ? WHERE id = ?");
+                $stmt->execute([$first_name, $last_name, $email, $role, $hashed_password, $user_id]);
+            }
+        } else {
+            $stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ?, role = ? WHERE id = ?");
+            $stmt->execute([$first_name, $last_name, $email, $role, $user_id]);
+        }
     }
     
     if (isset($_POST['add_user'])) {
@@ -262,21 +272,21 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="d-flex gap-2 justify-content-md-end">
                             <div class="dropdown">
                                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    Sort by: <?= ucfirst($sort_by) ?> (<?= $sort_order ?>)
+                                    Ταξινόμηση κατά: <?= ucfirst($sort_by) ?> (<?= $sort_order ?>)
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="?sort=id&order=asc&search=<?= urlencode($search) ?>">ID (Ascending)</a></li>
-                                    <li><a class="dropdown-item" href="?sort=id&order=desc&search=<?= urlencode($search) ?>">ID (Descending)</a></li>
-                                    <li><a class="dropdown-item" href="?sort=role&order=asc&search=<?= urlencode($search) ?>">Role (Ascending)</a></li>
-                                    <li><a class="dropdown-item" href="?sort=role&order=desc&search=<?= urlencode($search) ?>">Role (Descending)</a></li>
-                                    <li><a class="dropdown-item" href="?sort=first_name&order=asc&search=<?= urlencode($search) ?>">Name (Ascending)</a></li>
-                                    <li><a class="dropdown-item" href="?sort=first_name&order=desc&search=<?= urlencode($search) ?>">Name (Descending)</a></li>
-                                    <li><a class="dropdown-item" href="?sort=is_suspended&order=asc&search=<?= urlencode($search) ?>">Status (Ascending)</a></li>
-                                    <li><a class="dropdown-item" href="?sort=is_suspended&order=desc&search=<?= urlencode($search) ?>">Status (Descending)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=id&order=asc&search=<?= urlencode($search) ?>">ID (Αύξουσα)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=id&order=desc&search=<?= urlencode($search) ?>">ID (Φθίνουσα)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=role&order=asc&search=<?= urlencode($search) ?>">Ρόλος (Αύξουσα)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=role&order=desc&search=<?= urlencode($search) ?>">Ρόλος (Φθίνουσα)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=first_name&order=asc&search=<?= urlencode($search) ?>">Όνομα (Αύξουσα)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=first_name&order=desc&search=<?= urlencode($search) ?>">Όνομα (Φθίνουσα)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=is_suspended&order=asc&search=<?= urlencode($search) ?>">Κατάσταση (Αύξουσα)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=is_suspended&order=desc&search=<?= urlencode($search) ?>">Κατάσταση (Φθίνουσα)</a></li>
                                 </ul>
                             </div>
                             <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                                <i class="bi bi-person-plus"></i> Add User
+                                <i class="bi bi-person-plus"></i> Προσθήκη Χρήστη
                             </button>
                         </div>
                     </div>
@@ -316,27 +326,27 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td>
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal<?= $row['id'] ?>">
-                                                <i class="bi bi-pencil"></i> Edit
+                                                <i class="bi bi-pencil"></i> Επεξεργασία
                                             </button>
                                             <?php if (isset($row['is_suspended']) && $row['is_suspended']) { ?>
                                                 <form method="POST" class="d-inline">
                                                     <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
                                                     <button type="submit" name="unsuspend_user" class="btn btn-success btn-sm">
-                                                        <i class="bi bi-unlock"></i> Unsuspend
+                                                        <i class="bi bi-unlock"></i> Επαναφορά
                                                     </button>
                                                 </form>
                                             <?php } else { ?>
                                                 <form method="POST" class="d-inline">
                                                     <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
                                                     <button type="submit" name="suspend_user" class="btn btn-warning btn-sm">
-                                                        <i class="bi bi-lock"></i> Suspend
+                                                        <i class="bi bi-lock"></i> Αναστολή
                                                     </button>
                                                 </form>
                                             <?php } ?>
                                             <form method="POST" class="d-inline">
                                                 <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
-                                                <button type="submit" name="delete_user" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">
-                                                    <i class="bi bi-trash"></i> Delete
+                                                <button type="submit" name="delete_user" class="btn btn-danger btn-sm" onclick="return confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτόν τον χρήστη;')">
+                                                    <i class="bi bi-trash"></i> Διαγραφή
                                                 </button>
                                             </form>
                                         </div>
@@ -348,18 +358,18 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title">Edit User</h5>
+                                                <h5 class="modal-title">Επεξεργασία Χρήστη</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <form method="POST">
                                                 <div class="modal-body">
                                                     <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
                                                     <div class="mb-3">
-                                                        <label class="form-label">First Name</label>
+                                                        <label class="form-label">Όνομα</label>
                                                         <input type="text" name="first_name" class="form-control" value="<?= $row['first_name'] ?>" required>
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label class="form-label">Last Name</label>
+                                                        <label class="form-label">Επώνυμο</label>
                                                         <input type="text" name="last_name" class="form-control" value="<?= $row['last_name'] ?>" required>
                                                     </div>
                                                     <div class="mb-3">
@@ -367,7 +377,15 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                         <input type="email" name="email" class="form-control" value="<?= $row['email'] ?>" required>
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label class="form-label">Role</label>
+                                                        <label class="form-label">Κωδικός</label>
+                                                        <input type="password" name="password" class="form-control" placeholder="Αφήστε κενό για να διατηρηθεί ο τρέχων κωδικός">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Επιβεβαίωση Κωδικού</label>
+                                                        <input type="password" name="confirm_password" class="form-control" placeholder="Αφήστε κενό για να διατηρηθεί ο τρέχων κωδικός">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Ρόλος</label>
                                                         <select name="role" class="form-select" required>
                                                             <option value="Public" <?= $row['role'] == 'Public' ? 'selected' : '' ?>>Public</option>
                                                             <option value="Politician" <?= $row['role'] == 'Politician' ? 'selected' : '' ?>>Politician</option>
@@ -376,8 +394,8 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    <button type="submit" name="edit_user" class="btn btn-primary">Save Changes</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
+                                                    <button type="submit" name="edit_user" class="btn btn-primary">Αποθήκευση</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -396,35 +414,35 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add New User</h5>
+                    <h5 class="modal-title">Προσθήκη Νέου Χρήστη</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="POST" class="needs-validation" novalidate>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">First Name</label>
+                            <label class="form-label">Όνομα</label>
                             <input type="text" name="first_name" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Last Name</label>
+                            <label class="form-label">Επώνυμο</label>
                             <input type="text" name="last_name" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Email Address</label>
+                            <label class="form-label">Email</label>
                             <input type="email" name="email" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Password</label>
+                            <label class="form-label">Κωδικός</label>
                             <input type="password" name="password" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Confirm Password</label>
+                            <label class="form-label">Επιβεβαίωση Κωδικού</label>
                             <input type="password" name="confirm_password" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Role</label>
+                            <label class="form-label">Ρόλος</label>
                             <select name="role" class="form-select" required>
-                                <option value="">Select position</option>
+                                <option value="">Επιλέξτε ρόλο</option>
                                 <option value="Public">Public</option>
                                 <option value="Politician">Politician</option>
                                 <option value="Admin">Admin</option>
@@ -432,8 +450,8 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" name="add_user" class="btn btn-warning">Add User</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
+                        <button type="submit" name="add_user" class="btn btn-warning">Προσθήκη</button>
                     </div>
                 </form>
             </div>
