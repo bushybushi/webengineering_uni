@@ -15,7 +15,7 @@ $query = "SELECT d.*, pd.full_name, pd.office, p.name as party_name, sp.year as 
           LEFT JOIN personal_data pd ON d.id = pd.declaration_id 
           LEFT JOIN parties p ON pd.party_id = p.id 
           LEFT JOIN submission_periods sp ON d.submission_period_id = sp.id 
-          WHERE 1=1";
+          WHERE d.status = 'Approved'";
 $params = array();
 
 // Add search conditions

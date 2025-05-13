@@ -4,7 +4,7 @@ $conn = include '../../config/db_connection.php';
 session_start();
 
 // Fetch total declarations
-$stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations");
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM declarations WHERE status = 'Approved'");
 $total_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
 // Fetch declarations by year
@@ -12,6 +12,7 @@ $declarations_by_year = $conn->query("
     SELECT sp.year, COUNT(d.id) as count 
     FROM declarations d 
     JOIN submission_periods sp ON d.submission_period_id = sp.id 
+    WHERE d.status = 'Approved'
     GROUP BY sp.year 
     ORDER BY sp.year DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
@@ -22,6 +23,7 @@ $declarations_by_party = $conn->query("
     FROM declarations d 
     JOIN personal_data pd ON d.id = pd.declaration_id
     JOIN parties p ON pd.party_id = p.id 
+    WHERE d.status = 'Approved'
     GROUP BY p.name 
     ORDER BY count DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
@@ -31,7 +33,7 @@ $people_without_declarations = $conn->query("
     SELECT pd.full_name, p.name as party_name
     FROM personal_data pd
     JOIN parties p ON pd.party_id = p.id
-    LEFT JOIN declarations d ON pd.declaration_id = d.id
+    LEFT JOIN declarations d ON pd.declaration_id = d.id AND d.status = 'Approved'
     WHERE d.id IS NULL
 ")->fetchAll(PDO::FETCH_ASSOC);
 ?>

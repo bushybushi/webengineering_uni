@@ -7,13 +7,14 @@ $conn = require '../../config/db_connection.php';
 // Calculate statistics
 try {
     // Total declarations (active officials)
-    $stmt = $conn->query("SELECT COUNT(*) as total FROM declarations");
+    $stmt = $conn->query("SELECT COUNT(*) as total FROM declarations WHERE status = 'Approved'");
     $totalDeclarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Total unique political affiliations
     $stmt = $conn->query("SELECT COUNT(DISTINCT p.name) as total FROM parties p 
                          INNER JOIN personal_data pd ON pd.party_id = p.id 
-                         WHERE p.name IS NOT NULL");
+                         INNER JOIN declarations d ON pd.declaration_id = d.id
+                         WHERE p.name IS NOT NULL AND d.status = 'Approved'");
     $totalParties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Declarations by political party
@@ -21,7 +22,7 @@ try {
                          FROM declarations d 
                          INNER JOIN personal_data pd ON d.id = pd.declaration_id 
                          INNER JOIN parties p ON pd.party_id = p.id 
-                         WHERE p.name IS NOT NULL 
+                         WHERE p.name IS NOT NULL AND d.status = 'Approved'
                          GROUP BY p.name 
                          ORDER BY count DESC");
     $partyData = $stmt->fetchAll(PDO::FETCH_ASSOC);
