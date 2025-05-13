@@ -1,8 +1,9 @@
 <?php
 require_once '../../config/db_connection.php';
+session_start();
 
 // Get database connection
-$conn = require '../../config/db_connection.php';
+$pdo = require '../../config/db_connection.php';
 
 // Get search parameters
 $search = isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '';
@@ -38,19 +39,19 @@ if (!empty($position)) {
 }
 
 // Prepare and execute query
-$stmt = $conn->prepare($query);
+$stmt = $pdo->prepare($query);
 $stmt->execute($params);
 $declarations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $totalResults = count($declarations);
 
 // Get unique years for dropdown
 $yearQuery = "SELECT DISTINCT year FROM submission_periods WHERE is_active = 1 ORDER BY year DESC";
-$yearStmt = $conn->query($yearQuery);
+$yearStmt = $pdo->query($yearQuery);
 $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
 
 // Get unique positions for dropdown
 $positionQuery = "SELECT DISTINCT office FROM personal_data WHERE office IS NOT NULL ORDER BY office";
-$positionStmt = $conn->query($positionQuery);
+$positionStmt = $pdo->query($positionQuery);
 $positions = $positionStmt->fetchAll(PDO::FETCH_COLUMN);
 ?>
 <!DOCTYPE html>
@@ -253,11 +254,9 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-
-                                        <a class="dropdown-item" href="../submit_module/favorites.php">
-                                            <i class="bi bi-heart"></i> Αγαπημένα
-                                        </a>
-                                   
+                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
+                                        <i class="bi bi-heart"></i> Αγαπημένα
+                                    </a>
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                                     <a href="../admin_module/dashboard.php" class="nav-link py-2">
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
@@ -268,10 +267,10 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     </a>
                                 <?php else: ?>
                                     <a href="../login_module/login.php" class="nav-link py-2">
-                                        <i class="bi bi-box-arrow-in-right me-2"></i> Σύνδεση
+                                        <i class="bi bi-box-arrow-in-right"></i> Σύνδεση
                                     </a>
                                     <a href="../login_module/register.php" class="nav-link py-2">
-                                        <i class="bi bi-person-plus me-2"></i> Εγγραφή
+                                        <i class="bi bi-person-plus"></i> Εγγραφή
                                     </a>
                                 <?php endif; ?>
                             </div>
