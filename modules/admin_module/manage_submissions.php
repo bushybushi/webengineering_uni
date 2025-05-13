@@ -287,7 +287,6 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                             <option value="">Επιλέξτε Ενέργεια</option>
                             <option value="approve">Έγκριση</option>
                             <option value="reject">Απόρριψη</option>
-                            <option value="delete">Διαγραφή</option>
                         </select>
                         <button type="submit" class="btn btn-warning text-dark" id="bulkActionBtn" disabled>
                             Εφαρμογή
@@ -342,7 +341,7 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                                                     <button type="button" class="btn btn-success btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'approve')">
                                                         <i class="bi bi-check-circle"></i> Έγκριση
                                                     </button>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'reject')">
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'delete')">
                                                         <i class="bi bi-x-circle"></i> Απόρριψη
                                                     </button>
                                                 <?php else: ?>
@@ -471,9 +470,6 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                 case 'approve':
                     actionText = 'έγκριση';
                     break;
-                case 'reject':
-                    actionText = 'απόρριψη';
-                    break;
                 case 'delete':
                     actionText = 'διαγραφή';
                     break;
@@ -481,7 +477,7 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
             
             message.textContent = `Είστε σίγουροι ότι θέλετε να προχωρήσετε στην ${actionText} αυτής της δήλωσης;`;
             document.getElementById('declarationId').value = id;
-            document.getElementById('actionStatus').value = action === 'delete' ? 'Rejected' : action === 'approve' ? 'Approved' : 'Rejected';
+            document.getElementById('actionStatus').value = action === 'delete' ? 'Rejected' : 'Approved';
             
             modal.show();
         }
