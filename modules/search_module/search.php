@@ -247,7 +247,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
             <div class="card feature-card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle" id="declarationsTable">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width: 40%">Στοιχεία Προσώπου</th>
@@ -258,52 +258,57 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($declarations as $declaration): ?>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shrink-0">
-                                                    <?php if (!empty($declaration['image_url'])): ?>
-                                                        <img src="<?php echo htmlspecialchars($declaration['image_url']); ?>" 
-                                                             alt="<?php echo htmlspecialchars($declaration['full_name']); ?>" 
-                                                             class="avatar-circle"
-                                                             style="width: 45px; height: 45px; object-fit: cover;">
-                                                    <?php else: ?>
-                                                        <div class="avatar-circle"><?php echo substr($declaration['full_name'], 0, 1); ?></div>
-                                                    <?php endif; ?>
+                                <?php if ($totalResults > 0): ?>
+                                    <?php foreach ($declarations as $declaration): ?>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <?php if (!empty($declaration['image_url'])): ?>
+                                                            <img src="<?php echo htmlspecialchars($declaration['image_url']); ?>" 
+                                                                 alt="<?php echo htmlspecialchars($declaration['full_name']); ?>" 
+                                                                 class="avatar-circle"
+                                                                 style="width: 45px; height: 45px; object-fit: cover;">
+                                                        <?php else: ?>
+                                                            <div class="avatar-circle"><?php echo substr($declaration['full_name'], 0, 1); ?></div>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <div class="ms-3">
+                                                        <h6 class="mb-1"><?php echo htmlspecialchars($declaration['full_name']); ?></h6>
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-building"></i> <?php echo htmlspecialchars($declaration['office']); ?>
+                                                        </small>
+                                                    </div>
                                                 </div>
-                                                <div class="ms-3">
-                                                    <h6 class="mb-1"><?php echo htmlspecialchars($declaration['full_name']); ?></h6>
-                                                    <small class="text-muted">
-                                                        <i class="bi bi-building"></i> <?php echo htmlspecialchars($declaration['office']); ?>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['title']); ?></span>
-                                        </td>
-                                        <td>
-                                            <strong><?php echo $declaration['submission_year']; ?></strong>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-warning text-dark political-badge" data-party="<?php echo htmlspecialchars($declaration['party_name']); ?>"><?php echo htmlspecialchars($declaration['party_name']); ?></span>
-                                        </td>
-                                        <td>
-                                            <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="Προβολή Λεπτομερειών Δήλωσης">
-                                                <i class="bi bi-eye"></i> Προβολή
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                                <?php if ($totalResults === 0): ?>
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4">
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($declaration['title']); ?></span>
+                                            </td>
+                                            <td>
+                                                <strong><?php echo $declaration['submission_year']; ?></strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-warning text-dark political-badge" data-party="<?php echo htmlspecialchars($declaration['party_name']); ?>"><?php echo htmlspecialchars($declaration['party_name']); ?></span>
+                                            </td>
+                                            <td>
+                                                <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="Προβολή Λεπτομερειών Δήλωσης">
+                                                    <i class="bi bi-eye"></i> Προβολή
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>  
+                                        <td></td>
+                                        <td class="text-center py-4">
                                             <div class="text-muted">
                                                 <i class="bi bi-search"></i>
                                                 <p class="mb-0">Δεν βρέθηκαν δηλώσεις που να ταιριάζουν με τα κριτήρια αναζήτησής σας.</p>
                                             </div>
                                         </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -344,9 +349,10 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     <script>
         $(document).ready(function() {
             // Initialize DataTable
-            var table = $('.table').DataTable({
+            var table = $('#declarationsTable').DataTable({
                 order: [], // No default sorting
                 pageLength: 10,
+                responsive: true,
                 dom: '<"row"<"col-12"l>>rtip', // Remove search field (f) from dom
                 language: {
                     search: "", // Remove the "Quick Search:" label
@@ -364,13 +370,13 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                 },
                 columnDefs: [
                     {
-                        targets: [0, 2], // Person Details (0) and Submission Date (2)
-                        orderable: true,
-                        orderSequence: ['asc', 'desc', null] // Use null instead of empty string
+                        targets: '_all',
+                        orderable: false
                     },
                     {
-                        targets: [1, 3, 4], // Title, Political Affiliation, and Actions
-                        orderable: false
+                        targets: [0, 2], // Person Details (0) and Submission Date (2)
+                        orderable: true,
+                        orderSequence: ['asc', 'desc', null]
                     }
                 ]
             });
