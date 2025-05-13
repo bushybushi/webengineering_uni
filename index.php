@@ -19,32 +19,7 @@ require_once 'config/db_connection.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
     <!-- Custom CSS -->
     <link href="./assets/css/style.css" rel="stylesheet">
-    <style>
-    
-        .lang-btn {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            border-radius: 50%;
-            border: none;
-            background: #e9ecef;
-            color: #000000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-       .lang-btn:hover {
-            background: #dee2e6;
-            transform: scale(1.05);
-        }
-      
-        .lang-btn.active {
-            background: #000000;
-            color: white;
-        }
-    </style>
+
 </head>
 <body>
     <!-- Navigation -->
@@ -81,17 +56,6 @@ require_once 'config/db_connection.php';
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
-                            <button class="lang-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-translate"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="?lang=en"><span class="fi fi-gb"></span> English</a></li>
-                                <li><a class="dropdown-item" href="?lang=el"><span class="fi fi-gr"></span> Ελληνικά</a></li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <div class="dropdown">
                             <button class="profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-circle"></i>
                             </button>
@@ -103,7 +67,7 @@ require_once 'config/db_connection.php';
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="./modules/favorites_module/favorites.php">
+                                        <a class="dropdown-item" href="./modules/submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
                                     </li>
@@ -170,20 +134,6 @@ require_once 'config/db_connection.php';
                                     <i class="bi bi-file-earmark-text"></i> Υποβολή
                                 </a>
                             <?php endif; ?>
-                        </li>
-                        <li class="nav-item border-top pt-3">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <i class="bi bi-translate"></i>
-                                <span class="fw-medium">Γλώσσα</span>
-                            </div>
-                            <div class="d-flex flex-column gap-2">
-                                <a href="?lang=en" class="nav-link py-2">
-                                    <span class="fi fi-gb"></span> English
-                                </a>
-                                <a href="?lang=el" class="nav-link py-2">
-                                    <span class="fi fi-gr"></span> Ελληνικά
-                                </a>
-                            </div>
                         </li>
                         <li class="nav-item border-top pt-3">
                             <div class="d-flex align-items-center gap-2 mb-2">
