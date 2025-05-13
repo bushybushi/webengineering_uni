@@ -1,11 +1,12 @@
 <?php
+session_start();
 // Database connection
 $pdo = require_once '../../config/db_connection.php';
 
 // Get declaration ID from URL
 $declaration_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Fetch personal data
+// Fetch personal data first
 $stmt = $pdo->prepare("
     SELECT pd.*, p.name as party_name 
     FROM personal_data pd 
@@ -14,6 +15,28 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$declaration_id]);
 $personal_data = $stmt->fetch();
+
+// If no declaration found, redirect to search page
+if (!$personal_data) {
+    header("Location: ../search_module/search.php");
+    exit();
+}
+
+// Check if declaration is favorited
+$is_favorited = false;
+if (isset($_SESSION['id'])) {
+    $stmt = $pdo->prepare("SELECT id FROM favorites WHERE user_id = ? AND declaration_id = ?");
+    $stmt->execute([$_SESSION['id'], $declaration_id]);
+    $is_favorited = $stmt->rowCount() > 0;
+}
+
+// Check if user is following this politician
+$is_following = false;
+if (isset($_SESSION['id'])) {
+    $stmt = $pdo->prepare("SELECT id FROM follows WHERE user_id = ? AND politician_id = ?");
+    $stmt->execute([$_SESSION['id'], $personal_data['id']]);
+    $is_following = $stmt->rowCount() > 0;
+}
 
 // Fetch properties
 $stmt = $pdo->prepare("SELECT * FROM properties WHERE declaration_id = ?");
@@ -59,12 +82,6 @@ $differences = $stmt->fetch();
 $stmt = $pdo->prepare("SELECT * FROM previous_incomes WHERE declaration_id = ?");
 $stmt->execute([$declaration_id]);
 $previous_incomes = $stmt->fetch();
-
-// If no declaration found, redirect to search page
-if (!$personal_data) {
-    header("Location: ../search_module/search.php");
-    exit();
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -78,37 +95,38 @@ if (!$personal_data) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
     <!-- Custom CSS -->
     <link href="../../assets/css/style.css" rel="stylesheet">
     <style>
-        .lang-btn {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            border-radius: 50%;
-            border: none;
-            background: #e9ecef;
-            color: #000000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
+        .favorite-btn, .follow-btn {
             transition: all 0.3s ease;
+            min-width: 40px;
         }
-        .lang-btn:hover {
-            background: #dee2e6;
-            transform: scale(1.05);
-        }
-        .lang-btn.active {
-            background: #000000;
+        .favorite-btn.active {
+            background-color: #dc3545;
             color: white;
+        }
+        .follow-btn.active {
+            background-color: #198754;
+            color: white;
+        }
+        @media (max-width: 576px) {
+            .btn-group {
+                width: 100%;
+            }
+            .btn-group .btn {
+                flex: 1;
+                margin: 2px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="../../index.php">
                 <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
@@ -124,27 +142,20 @@ if (!$personal_data) {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="../../index.php">Home</a>
+                        <a class="nav-link" href="../../index.php">Αρχική</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="../search_module/search.php">Search</a>
+                        <a class="nav-link" href="../search_module/search.php">Αναζήτηση</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../search_module/statistics.php">Statistics</a>
+                        <a class="nav-link" href="../search_module/statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./declaration-form.php">Submit</a>
-                    </li>
-                    <li class="nav-item">
-                        <div class="dropdown">
-                            <button class="lang-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-translate"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="?lang=en"><span class="fi fi-gb"></span> English</a></li>
-                                <li><a class="dropdown-item" href="?lang=el"><span class="fi fi-gr"></span> Ελληνικά</a></li>
-                            </ul>
-                        </div>
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
+                            <a class="nav-link" href="../../index.php">Υποβολή</a>
+                        <?php else: ?>
+                            <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
+                        <?php endif; ?>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -152,12 +163,116 @@ if (!$personal_data) {
                                 <i class="bi bi-person-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="../login_module/login.php"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
-                                <li><a class="dropdown-item" href="../login_module/register.php"><i class="bi bi-person-plus"></i> Register</a></li>
+                                <?php if (isset($_SESSION['id'])): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../profile_module/profile.php">
+                                            <i class="bi bi-person"></i> Το προφίλ μου
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="../favorites_module/favorites.php">
+                                            <i class="bi bi-heart"></i> Αγαπημένα
+                                        </a>
+                                    </li>
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../admin_module/dashboard.php">
+                                            <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../login_module/logout.php">
+                                            <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
+                                        </a>
+                                    </li>
+                                <?php else: ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../login_module/login.php">
+                                            <i class="bi bi-box-arrow-in-right"></i> Σύνδεση
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="../login_module/register.php">
+                                            <i class="bi bi-person-plus"></i> Εγγραφή
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
                             </ul>
                         </div>
                     </li>
                 </ul>
+            </div>
+
+            <!-- Mobile Menu (Offcanvas) -->
+            <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+                <div class="offcanvas-header border-bottom">
+                    <h5 class="offcanvas-title" id="mobileMenuLabel">Μενού</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../../index.php">
+                                <i class="bi bi-house"></i> Αρχική
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../search_module/search.php">
+                                <i class="bi bi-search"></i> Αναζήτηση
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../search_module/statistics.php">
+                                <i class="bi bi-graph-up"></i> Στατιστικά
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
+                                <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../../index.php">
+                                    <i class="bi bi-file-earmark-text"></i> Υποβολή
+                                </a>
+                            <?php else: ?>
+                                <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../submit_module/declaration-form.php">
+                                    <i class="bi bi-file-earmark-text"></i> Υποβολή
+                                </a>
+                            <?php endif; ?>
+                        </li>
+                        <li class="nav-item border-top pt-3">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-person-circle"></i>
+                                <span class="fw-medium">Λογαριασμός</span>
+                            </div>
+                            <div class="d-flex flex-column gap-2">
+                                <?php if (isset($_SESSION['id'])): ?>
+                                    <a href="../profile_module/profile.php" class="nav-link py-2">
+                                        <i class="bi bi-person"></i> Το προφίλ μου
+                                    </a>
+
+                                        <a class="dropdown-item" href="../submit_module/favorites.php">
+                                            <i class="bi bi-heart"></i> Αγαπημένα
+                                        </a>
+                                   
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                                    <a href="../admin_module/dashboard.php" class="nav-link py-2">
+                                        <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                    </a>
+                                    <?php endif; ?>
+                                    <a href="../login_module/logout.php" class="nav-link py-2">
+                                        <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
+                                    </a>
+                                <?php else: ?>
+                                    <a href="../login_module/login.php" class="nav-link py-2">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Σύνδεση
+                                    </a>
+                                    <a href="../login_module/register.php" class="nav-link py-2">
+                                        <i class="bi bi-person-plus me-2"></i> Εγγραφή
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
@@ -166,12 +281,28 @@ if (!$personal_data) {
     <div class="pt-5">
         <!-- Main Content -->
         <main class="container my-5">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>View Declaration</h1>
-                <div>
-                    <a href="../search_module/search.php" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Back to Declarations
-                    </a>
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                        <h1 class="mb-3 mb-md-0">Προβολή Δήλωσης</h1>
+                        <div class="btn-group flex-wrap">
+                            <?php if (isset($_SESSION['id'])): ?>
+                                <button class="btn btn-outline-danger favorite-btn <?php echo $is_favorited ? 'active' : ''; ?>" 
+                                        data-declaration-id="<?php echo $declaration_id; ?>">
+                                    <i class="fas fa-heart"></i>
+                                    <span class="d-none d-sm-inline favorite-text"><?php echo $is_favorited ? 'Αφαιρέστε από Αγαπημένα' : 'Προσθήκη στα Αγαπημένα'; ?></span>
+                                </button>
+                                <button class="btn btn-outline-success follow-btn <?php echo $is_following ? 'active' : ''; ?>"
+                                        data-politician-id="<?php echo $personal_data['id']; ?>">
+                                    <i class="fas fa-user-plus"></i>
+                                    <span class="d-none d-sm-inline follow-text"><?php echo $is_following ? 'Ακολουθείτε' : 'Ακολουθήστε'; ?></span>
+                                </button>
+                            <?php endif; ?>
+                            <a href="../search_module/search.php" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> <span class="d-none d-sm-inline">Πίσω στις Δηλώσεις</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -505,7 +636,53 @@ if (!$personal_data) {
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
+    <!-- Add jQuery and your scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Favorite button functionality
+            $('.favorite-btn').click(function() {
+                const button = $(this);
+                const declarationId = button.data('declaration-id');
+                const isFavorited = button.hasClass('active');
+                
+                $.post(isFavorited ? 'remove-favorite.php' : 'add-favorite.php', 
+                    { declaration_id: declarationId }, 
+                    function(response) {
+                        if (response.success) {
+                            button.toggleClass('active');
+                            button.find('.favorite-text').text(
+                                button.hasClass('active') ? 'Αφαιρέθηκε από Αγαπημένα' : 'Προσθήκη στα Αγαπημένα'
+                            );
+                        } else {
+                            alert('Error: ' + (response.message || 'Unknown error'));
+                        }
+                    }
+                );
+            });
+
+            // Follow button functionality
+            $('.follow-btn').click(function() {
+                const button = $(this);
+                const politicianId = button.data('politician-id');
+                const isFollowing = button.hasClass('active');
+                
+                $.post(isFollowing ? 'unfollow.php' : 'follow.php', 
+                    { politician_id: politicianId }, 
+                    function(response) {
+                        if (response.success) {
+                            button.toggleClass('active');
+                            button.find('.follow-text').text(
+                                button.hasClass('active') ? 'Ακολουθείτε' : 'Ακολουθήστε'
+                            );
+                        } else {
+                            alert('Error: ' + (response.message || 'Unknown error'));
+                        }
+                    }
+                );
+            });
+        });
+    </script>
 </body>
 </html> 
