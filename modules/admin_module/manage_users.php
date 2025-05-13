@@ -3,6 +3,10 @@
 $conn = include '../../config/db_connection.php';
 session_start();
 
+// Fetch all users
+$stmt = $conn->query("SELECT * FROM users ORDER BY created_at DESC");
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Handle user actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete_user'])) {
@@ -11,31 +15,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$user_id]);
     }
     
+    if (isset($_POST['suspend_user'])) {
+        $user_id = $_POST['user_id'];
+        $stmt = $conn->prepare("UPDATE users SET is_suspended = 1 WHERE id = ?");
+        $stmt->execute([$user_id]);
+    }
+    
+    if (isset($_POST['unsuspend_user'])) {
+        $user_id = $_POST['user_id'];
+        $stmt = $conn->prepare("UPDATE users SET is_suspended = 0 WHERE id = ?");
+        $stmt->execute([$user_id]);
+    }
+    
+    if (isset($_POST['edit_user'])) {
+        $user_id = $_POST['user_id'];
+        $first_name = trim($_POST['first_name']);
+        $last_name = trim($_POST['last_name']);
+        $email = trim($_POST['email']);
+        $role = trim($_POST['role']);
+        
+        $stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ?, role = ? WHERE id = ?");
+        $stmt->execute([$first_name, $last_name, $email, $role, $user_id]);
+    }
+    
     if (isset($_POST['add_user'])) {
         // Validate input
         $first_name = trim($_POST['first_name']);
         $last_name = trim($_POST['last_name']);
         $email = trim($_POST['email']);
         $password = trim($_POST['password']);
+        $confirm_password = trim($_POST['confirm_password']);
         $role = trim($_POST['role']);
         
-        // Check if email already exists
-        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        
-        if ($stmt->rowCount() == 0) {
-            // Hash password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        if ($password === $confirm_password) {
+            // Check if email already exists
+            $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->execute([$email]);
             
-            // Insert new user
-            $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$first_name, $last_name, $email, $hashed_password, $role]);
+            if ($stmt->rowCount() == 0) {
+                // Hash password
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                
+                // Insert new user
+                $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$first_name, $last_name, $email, $hashed_password, $role]);
+            }
         }
     }
 }
 
-// Fetch all users
-$stmt = $conn->query("SELECT * FROM users ORDER BY created_at DESC");
+// Get sort parameters
+$sort_by = isset($_GET['sort']) ? $_GET['sort'] : 'id';
+$sort_order = isset($_GET['order']) ? $_GET['order'] : 'asc';
+
+// Get search parameter
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+
+// Modify query based on search and sort
+$query = "SELECT * FROM users";
+if (!empty($search)) {
+    $query .= " WHERE first_name LIKE :search OR last_name LIKE :search OR email LIKE :search OR role LIKE :search";
+}
+$query .= " ORDER BY " . $sort_by . " " . $sort_order;
+
+$stmt = $conn->prepare($query);
+if (!empty($search)) {
+    $search_param = "%$search%";
+    $stmt->bindParam(':search', $search_param);
+}
+$stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -197,6 +245,45 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <main class="container mt-5 pt-5">
         <h1 class="text-center mb-4">Διαχείριση Χρηστών</h1>
         
+        <!-- Search and Sort Controls -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <form method="GET" class="d-flex gap-2">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" name="search" class="form-control" placeholder="Search users..." value="<?= htmlspecialchars($search) ?>">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex gap-2 justify-content-md-end">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Sort by: <?= ucfirst($sort_by) ?> (<?= $sort_order ?>)
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="?sort=id&order=asc&search=<?= urlencode($search) ?>">ID (Ascending)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=id&order=desc&search=<?= urlencode($search) ?>">ID (Descending)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=role&order=asc&search=<?= urlencode($search) ?>">Role (Ascending)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=role&order=desc&search=<?= urlencode($search) ?>">Role (Descending)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=first_name&order=asc&search=<?= urlencode($search) ?>">Name (Ascending)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=first_name&order=desc&search=<?= urlencode($search) ?>">Name (Descending)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=is_suspended&order=asc&search=<?= urlencode($search) ?>">Status (Ascending)</a></li>
+                                    <li><a class="dropdown-item" href="?sort=is_suspended&order=desc&search=<?= urlencode($search) ?>">Status (Descending)</a></li>
+                                </ul>
+                            </div>
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                <i class="bi bi-person-plus"></i> Add User
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Users Table -->
         <div class="card shadow-sm mb-4">
             <div class="card-body">
@@ -208,6 +295,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <th>Όνομα</th>
                                 <th>Email</th>
                                 <th>Ρόλος</th>
+                                <th>Status</th>
                                 <th>Ενέργειες</th>
                             </tr>
                         </thead>
@@ -219,80 +307,138 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= $row['email'] ?></td>
                                     <td><?= $row['role'] ?></td>
                                     <td>
-                                        <form method="POST" class="d-inline">
-                                            <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
-                                            <button type="submit" name="delete_user" class="btn btn-danger btn-sm">
-                                                <i class="bi bi-trash"></i> Διαγραφή
+                                        <?php if (isset($row['is_suspended']) && $row['is_suspended']) { ?>
+                                            <span class="badge bg-danger">Suspended</span>
+                                        <?php } else { ?>
+                                            <span class="badge bg-success">Active</span>
+                                        <?php } ?>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal<?= $row['id'] ?>">
+                                                <i class="bi bi-pencil"></i> Edit
                                             </button>
-                                        </form>
+                                            <?php if (isset($row['is_suspended']) && $row['is_suspended']) { ?>
+                                                <form method="POST" class="d-inline">
+                                                    <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
+                                                    <button type="submit" name="unsuspend_user" class="btn btn-success btn-sm">
+                                                        <i class="bi bi-unlock"></i> Unsuspend
+                                                    </button>
+                                                </form>
+                                            <?php } else { ?>
+                                                <form method="POST" class="d-inline">
+                                                    <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
+                                                    <button type="submit" name="suspend_user" class="btn btn-warning btn-sm">
+                                                        <i class="bi bi-lock"></i> Suspend
+                                                    </button>
+                                                </form>
+                                            <?php } ?>
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
+                                                <button type="submit" name="delete_user" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">
+                                                    <i class="bi bi-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
+
+                                <!-- Edit User Modal -->
+                                <div class="modal fade" id="editUserModal<?= $row['id'] ?>" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Edit User</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="POST">
+                                                <div class="modal-body">
+                                                    <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">First Name</label>
+                                                        <input type="text" name="first_name" class="form-control" value="<?= $row['first_name'] ?>" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Last Name</label>
+                                                        <input type="text" name="last_name" class="form-control" value="<?= $row['last_name'] ?>" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Email</label>
+                                                        <input type="email" name="email" class="form-control" value="<?= $row['email'] ?>" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Role</label>
+                                                        <select name="role" class="form-select" required>
+                                                            <option value="Public" <?= $row['role'] == 'Public' ? 'selected' : '' ?>>Public</option>
+                                                            <option value="Politician" <?= $row['role'] == 'Politician' ? 'selected' : '' ?>>Politician</option>
+                                                            <option value="Admin" <?= $row['role'] == 'Admin' ? 'selected' : '' ?>>Admin</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" name="edit_user" class="btn btn-primary">Save Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             <?php } ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+    </main>
 
-        <!-- Add User Form -->
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h2 class="card-title mb-4">Προσθήκη Νέου Χρήστη</h2>
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
                 <form method="POST" class="needs-validation" novalidate>
-                    <div class="row g-3">
-                        <div class="col-md-6">
+                    <div class="modal-body">
+                        <div class="mb-3">
                             <label class="form-label">First Name</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                <input type="text" name="first_name" class="form-control" required>
-                            </div>
+                            <input type="text" name="first_name" class="form-control" required>
                         </div>
-
-                        <div class="col-md-6">
+                        <div class="mb-3">
                             <label class="form-label">Last Name</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                <input type="text" name="last_name" class="form-control" required>
-                            </div>
+                            <input type="text" name="last_name" class="form-control" required>
                         </div>
-
-                        <div class="col-12">
+                        <div class="mb-3">
                             <label class="form-label">Email Address</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                <input type="email" name="email" class="form-control" required>
-                            </div>
+                            <input type="email" name="email" class="form-control" required>
                         </div>
-
-                        <div class="col-md-6">
+                        <div class="mb-3">
                             <label class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                <input type="password" name="password" class="form-control" required>
-                            </div>
+                            <input type="password" name="password" class="form-control" required>
                         </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Position/Role</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-briefcase"></i></span>
-                                <select name="role" class="form-select" required>
-                                    <option value="">Select position</option>
-                                    <option value="Public">Public</option>
-                                    <option value="Politician">Politician</option>
-                                    <option value="Admin">Admin</option>
-                                </select>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" name="confirm_password" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select name="role" class="form-select" required>
+                                <option value="">Select position</option>
+                                <option value="Public">Public</option>
+                                <option value="Politician">Politician</option>
+                                <option value="Admin">Admin</option>
+                            </select>
                         </div>
                     </div>
-
-                    <button type="submit" name="add_user" class="btn btn-warning text-dark w-100 mt-4 mb-3">
-                        <i class="bi bi-person-plus"></i> Add User
-                    </button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" name="add_user" class="btn btn-warning">Add User</button>
+                    </div>
                 </form>
             </div>
         </div>
-    </main>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-light py-4 mt-5">
