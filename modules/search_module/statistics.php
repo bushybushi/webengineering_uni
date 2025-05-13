@@ -1,24 +1,25 @@
 <?php
 require_once '../../config/db_connection.php';
+session_start();
 
 // Get database connection
-$conn = require '../../config/db_connection.php';
+$pdo = require '../../config/db_connection.php';
 
 // Calculate statistics
 try {
     // Total declarations (active officials)
-    $stmt = $conn->query("SELECT COUNT(*) as total FROM declarations WHERE status = 'Approved'");
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM declarations WHERE status = 'Approved'");
     $totalDeclarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Total unique political affiliations
-    $stmt = $conn->query("SELECT COUNT(DISTINCT p.name) as total FROM parties p 
+    $stmt = $pdo->query("SELECT COUNT(DISTINCT p.name) as total FROM parties p 
                          INNER JOIN personal_data pd ON pd.party_id = p.id 
                          INNER JOIN declarations d ON pd.declaration_id = d.id
                          WHERE p.name IS NOT NULL AND d.status = 'Approved'");
     $totalParties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Declarations by political party
-    $stmt = $conn->query("SELECT p.name as political_affiliation, COUNT(*) as count 
+    $stmt = $pdo->query("SELECT p.name as political_affiliation, COUNT(*) as count 
                          FROM declarations d 
                          INNER JOIN personal_data pd ON d.id = pd.declaration_id 
                          INNER JOIN parties p ON pd.party_id = p.id 
@@ -35,7 +36,7 @@ try {
     $submissionRate = 100; // Since we're counting from submitted records
 
     // Asset Value Distribution
-    $stmt = $conn->query("SELECT 
+    $stmt = $pdo->query("SELECT 
         CASE 
             WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 10000 THEN 'Λιγότερο από €10,000'
             WHEN CAST(REPLACE(REPLACE(amount, '€', ''), ',', '') AS DECIMAL(10,2)) < 50000 THEN '€10,000 - €50,000'
@@ -403,11 +404,9 @@ try {
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-
-                                        <a class="dropdown-item" href="../submit_module/favorites.php">
-                                            <i class="bi bi-heart"></i> Αγαπημένα
-                                        </a>
-                                   
+                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
+                                        <i class="bi bi-heart"></i> Αγαπημένα
+                                    </a>
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                                     <a href="../admin_module/dashboard.php" class="nav-link py-2">
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
@@ -418,10 +417,10 @@ try {
                                     </a>
                                 <?php else: ?>
                                     <a href="../login_module/login.php" class="nav-link py-2">
-                                        <i class="bi bi-box-arrow-in-right me-2"></i> Σύνδεση
+                                        <i class="bi bi-box-arrow-in-right"></i> Σύνδεση
                                     </a>
                                     <a href="../login_module/register.php" class="nav-link py-2">
-                                        <i class="bi bi-person-plus me-2"></i> Εγγραφή
+                                        <i class="bi bi-person-plus"></i> Εγγραφή
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -509,7 +508,7 @@ try {
                             <select class="form-select mb-3" id="person1">
                                 <option value="">Επιλέξτε πρόσωπο...</option>
                                 <?php
-                                $stmt = $conn->query("SELECT d.id, pd.full_name as name FROM declarations d 
+                                $stmt = $pdo->query("SELECT d.id, pd.full_name as name FROM declarations d 
                                                      INNER JOIN personal_data pd ON d.id = pd.declaration_id 
                                                      ORDER BY pd.full_name");
                                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -527,7 +526,7 @@ try {
                             <select class="form-select mb-3" id="person2">
                                 <option value="">Επιλέξτε πρόσωπο...</option>
                                 <?php
-                                $stmt = $conn->query("SELECT d.id, pd.full_name as name FROM declarations d 
+                                $stmt = $pdo->query("SELECT d.id, pd.full_name as name FROM declarations d 
                                                      INNER JOIN personal_data pd ON d.id = pd.declaration_id 
                                                      ORDER BY pd.full_name");
                                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
