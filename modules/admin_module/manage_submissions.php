@@ -417,6 +417,7 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
             var table = $('#declarationsTable').DataTable({
                 order: [[1, 'desc']], // Sort by ID by default
                 pageLength: 10,
+                dom: '<"row"<"col-12"l>>rtip', // Remove search field (f) from dom
                 language: {
                     search: "",
                     lengthMenu: "Εμφάνιση _MENU_ εγγραφών ανά σελίδα",
