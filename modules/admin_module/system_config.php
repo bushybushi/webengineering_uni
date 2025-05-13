@@ -38,12 +38,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $party_search = isset($_GET['party_search']) ? $_GET['party_search'] : '';
 
 // Fetch existing data with search
-$party_query = "SELECT * FROM parties";
+$party_query = "SELECT p.*, 
+                       CASE WHEN COUNT(pd.id) > 0 THEN 1 ELSE 0 END as is_used
+                FROM parties p
+                LEFT JOIN personal_data pd ON p.id = pd.party_id";
 if (!empty($party_search)) {
-    $party_query .= " WHERE name LIKE ?";
+    $party_query .= " WHERE p.name LIKE ?";
+    $party_query .= " GROUP BY p.id";
     $stmt = $conn->prepare($party_query);
     $stmt->execute(["%$party_search%"]);
 } else {
+    $party_query .= " GROUP BY p.id";
     $stmt = $conn->query($party_query);
 }
 $parties = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -255,6 +260,7 @@ $periods = $conn->query("
                             <tr>
                                 <th>ID</th>
                                 <th>Όνομα</th>
+                                <th>Κατάσταση</th>
                                 <th>Ενέργειες</th>
                             </tr>
                         </thead>
@@ -264,12 +270,25 @@ $periods = $conn->query("
                                     <td><?= $party['id'] ?></td>
                                     <td><?= htmlspecialchars($party['name']) ?></td>
                                     <td>
+                                        <?php if ($party['is_used']): ?>
+                                            <span class="badge bg-success">Σε χρήση</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary">Δεν χρησιμοποιείται</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
                                         <button type="button" class="btn btn-sm btn-warning" onclick="editParty(<?= $party['id'] ?>, '<?= htmlspecialchars($party['name']) ?>')">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteParty(<?= $party['id'] ?>, '<?= htmlspecialchars($party['name']) ?>')">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                        <?php if (!$party['is_used']): ?>
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteParty(<?= $party['id'] ?>, '<?= htmlspecialchars($party['name']) ?>')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        <?php else: ?>
+                                            <button type="button" class="btn btn-sm btn-danger" disabled title="Δεν μπορείτε να διαγράψετε ένα κόμμα που χρησιμοποιείται σε δηλώσεις">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
