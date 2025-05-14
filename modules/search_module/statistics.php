@@ -326,7 +326,7 @@ try {
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="../favorites_module/favorites.php">
+                                        <a class="dropdown-item" href="../submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
                                     </li>
@@ -334,6 +334,11 @@ try {
                                     <li>
                                         <a class="dropdown-item" href="../admin_module/dashboard.php">
                                             <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="../search_module/api_documentation.php">
+                                            <i class="bi bi-code-square"></i> API Documentation
                                         </a>
                                     </li>
                                     <?php endif; ?>
@@ -404,12 +409,17 @@ try {
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
-                                        <i class="bi bi-heart"></i> Αγαπημένα
-                                    </a>
+
+                                        <a class="dropdown-item" href="../submit_module/favorites.php">
+                                            <i class="bi bi-heart"></i> Αγαπημένα
+                                        </a>
+                                   
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                                     <a href="../admin_module/dashboard.php" class="nav-link py-2">
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                    </a>
+                                    <a href="../search_module/api_documentation.php" class="nav-link py-2">
+                                        <i class="bi bi-code-square"></i> API Documentation
                                     </a>
                                     <?php endif; ?>
                                     <a href="../login_module/logout.php" class="nav-link py-2">
@@ -417,10 +427,10 @@ try {
                                     </a>
                                 <?php else: ?>
                                     <a href="../login_module/login.php" class="nav-link py-2">
-                                        <i class="bi bi-box-arrow-in-right"></i> Σύνδεση
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Σύνδεση
                                     </a>
                                     <a href="../login_module/register.php" class="nav-link py-2">
-                                        <i class="bi bi-person-plus"></i> Εγγραφή
+                                        <i class="bi bi-person-plus me-2"></i> Εγγραφή
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -430,6 +440,7 @@ try {
             </div>
         </div>
     </nav>
+
 
 
     <!-- Add padding-top to account for fixed navbar -->
@@ -751,6 +762,16 @@ try {
                         const footer = section1.querySelector('footer');
                         if (footer) footer.remove();
                         
+                        // Add search count to the title
+                        const title = section1.querySelector('.card-title');
+                        if (title) {
+                            const table = section1.querySelector('table');
+                            if (table) {
+                                const rowCount = table.querySelectorAll('tbody tr').length;
+                                title.innerHTML = `${title.textContent} (${rowCount} αναζητήσεις)`;
+                            }
+                        }
+                        
                         col1.innerHTML = section1.outerHTML;
                     }
 
@@ -763,6 +784,16 @@ try {
                         if (headerDiv) headerDiv.remove();
                         const footer = section2.querySelector('footer');
                         if (footer) footer.remove();
+                        
+                        // Add search count to the title
+                        const title = section2.querySelector('.card-title');
+                        if (title) {
+                            const table = section2.querySelector('table');
+                            if (table) {
+                                const rowCount = table.querySelectorAll('tbody tr').length;
+                                title.innerHTML = `${title.textContent} (${rowCount} αναζητήσεις)`;
+                            }
+                        }
                         
                         col2.innerHTML = section2.outerHTML;
                     }
