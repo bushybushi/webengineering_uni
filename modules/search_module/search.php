@@ -176,7 +176,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="../favorites_module/favorites.php">
+                                        <a class="dropdown-item" href="../submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
                                     </li>
@@ -184,6 +184,11 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     <li>
                                         <a class="dropdown-item" href="../admin_module/dashboard.php">
                                             <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="../search_module/api_documentation.php">
+                                            <i class="bi bi-code-square"></i> API Documentation
                                         </a>
                                     </li>
                                     <?php endif; ?>
@@ -254,12 +259,17 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
-                                        <i class="bi bi-heart"></i> Αγαπημένα
-                                    </a>
+
+                                        <a class="dropdown-item" href="../submit_module/favorites.php">
+                                            <i class="bi bi-heart"></i> Αγαπημένα
+                                        </a>
+                                   
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                                     <a href="../admin_module/dashboard.php" class="nav-link py-2">
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                    </a>
+                                    <a href="../search_module/api_documentation.php" class="nav-link py-2">
+                                        <i class="bi bi-code-square"></i> API Documentation
                                     </a>
                                     <?php endif; ?>
                                     <a href="../login_module/logout.php" class="nav-link py-2">
@@ -267,10 +277,10 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     </a>
                                 <?php else: ?>
                                     <a href="../login_module/login.php" class="nav-link py-2">
-                                        <i class="bi bi-box-arrow-in-right"></i> Σύνδεση
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Σύνδεση
                                     </a>
                                     <a href="../login_module/register.php" class="nav-link py-2">
-                                        <i class="bi bi-person-plus"></i> Εγγραφή
+                                        <i class="bi bi-person-plus me-2"></i> Εγγραφή
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -280,7 +290,6 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
             </div>
         </div>
     </nav>
-
 
     <!-- Add padding-top to account for fixed navbar -->
     <div class="pt-5">
