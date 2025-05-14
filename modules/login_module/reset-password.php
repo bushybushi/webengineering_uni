@@ -17,14 +17,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":token", $token, PDO::PARAM_STR);
         if($stmt->execute()){
             if($stmt->rowCount() == 0){
-                $token_err = "Invalid or expired password reset link.";
+                $token_err = "Μη έγκυρος ή ληγμένος σύνδεσμος επαναφοράς κωδικού.";
             }
         } else {
-            echo "Oops! Something went wrong. Please try again later.";
+            echo "Ωχ! Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
         }
     }
 } else if(!isset($_GET["token"]) || empty($_GET["token"])){
-    $token_err = "Invalid password reset link.";
+    $token_err = "Μη έγκυρος σύνδεσμος επαναφοράς κωδικού.";
 } else {
     $token = $_GET["token"];
     // Verify token exists and is not expired
@@ -33,10 +33,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":token", $token, PDO::PARAM_STR);
         if($stmt->execute()){
             if($stmt->rowCount() == 0){
-                $token_err = "Invalid or expired password reset link.";
+                $token_err = "Μη έγκυρος ή ληγμένος σύνδεσμος επαναφοράς κωδικού.";
             }
         } else {
-            echo "Oops! Something went wrong. Please try again later.";
+            echo "Ωχ! Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
         }
     }
 }
@@ -46,20 +46,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && empty($token_err)){
     
     // Validate new password
     if(empty(trim($_POST["new_password"]))){
-        $new_password_err = "Please enter the new password.";     
+        $new_password_err = "Παρακαλώ εισάγετε τον νέο κωδικό.";     
     } elseif(strlen(trim($_POST["new_password"])) < 6){
-        $new_password_err = "Password must have at least 6 characters.";
+        $new_password_err = "Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.";
     } else{
         $new_password = trim($_POST["new_password"]);
     }
     
     // Validate confirm password
     if(empty(trim($_POST["confirm_password"]))){
-        $confirm_password_err = "Please confirm the password.";
+        $confirm_password_err = "Παρακαλώ επιβεβαιώστε τον κωδικό.";
     } else{
         $confirm_password = trim($_POST["confirm_password"]);
         if(empty($new_password_err) && ($new_password != $confirm_password)){
-            $confirm_password_err = "Password did not match.";
+            $confirm_password_err = "Οι κωδικοί δεν ταιριάζουν.";
         }
     }
     
@@ -82,7 +82,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && empty($token_err)){
                 header("location: login.php");
                 exit();
             } else{
-                echo "Oops! Something went wrong. Please try again later.";
+                echo "Ωχ! Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
             }
         }
     }
@@ -111,20 +111,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && empty($token_err)){
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
                             <img src="assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
-                            <h2 class="fw-bold">Reset Password</h2>
-                            <p class="text-muted">Enter your new password</p>
+                            <h2 class="fw-bold">Επαναφορά Κωδικού</h2>
+                            <p class="text-muted">Εισάγετε τον νέο σας κωδικό</p>
                         </div>
 
                         <?php if(!empty($token_err)): ?>
                             <div class="alert alert-danger"><?php echo $token_err; ?></div>
                             <div class="text-center">
-                                <p class="mb-0"><a href="forgot-password.php" class="text-decoration-none">Request a new password reset link</a></p>
+                                <p class="mb-0"><a href="forgot-password.php" class="text-decoration-none">Ζητήστε νέο σύνδεσμο επαναφοράς κωδικού</a></p>
                             </div>
                         <?php else: ?>
                             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="needs-validation" novalidate>
                                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
                                 <div class="mb-3">
-                                    <label class="form-label">New Password</label>
+                                    <label class="form-label">Νέος Κωδικός</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                         <input type="password" name="new_password" class="form-control <?php echo (!empty($new_password_err)) ? 'is-invalid' : ''; ?>" required>
@@ -133,7 +133,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && empty($token_err)){
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label">Confirm Password</label>
+                                    <label class="form-label">Επιβεβαίωση Κωδικού</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                                         <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>" required>
@@ -142,11 +142,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && empty($token_err)){
                                 </div>
 
                                 <button type="submit" class="btn btn-warning text-dark w-100 mb-3">
-                                    <i class="bi bi-key"></i> Reset Password
+                                    <i class="bi bi-key"></i> Επαναφορά Κωδικού
                                 </button>
 
                                 <div class="text-center">
-                                    <p class="mb-0"><a href="login.php" class="text-decoration-none">Back to Login</a></p>
+                                    <p class="mb-0"><a href="login.php" class="text-decoration-none">Επιστροφή στην Σύνδεση</a></p>
                                 </div>
                             </form>
                         <?php endif; ?>
