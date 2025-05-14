@@ -12,21 +12,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     
     // Validate first name
     if(empty(trim($_POST["first_name"]))){
-        $first_name_err = "Please enter your first name.";
+        $first_name_err = "Παρακαλώ εισάγετε το μικρό σας όνομα.";
     } else{
         $first_name = trim($_POST["first_name"]);
     }
     
     // Validate last name
     if(empty(trim($_POST["last_name"]))){
-        $last_name_err = "Please enter your last name.";
+        $last_name_err = "Παρακαλώ εισάγετε το επώνυμο σας.";
     } else{
         $last_name = trim($_POST["last_name"]);
     }
     
     // Validate email
     if(empty(trim($_POST["email"]))){
-        $email_err = "Please enter an email.";
+        $email_err = "Παρακαλώ εισάγετε ένα email.";
     } else{
         // Prepare a select statement
         $sql = "SELECT id FROM users WHERE email = :email";
@@ -37,38 +37,38 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             
             if($stmt->execute()){
                 if($stmt->rowCount() == 1){
-                    $email_err = "This email is already taken.";
+                    $email_err = "Αυτό το email χρησιμοποιείται ήδη.";
                 } else{
                     $email = trim($_POST["email"]);
                 }
             } else{
-                echo "Oops! Something went wrong. Please try again later.";
+                echo "Ωχ! Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
             }
         }
     }
     
     // Validate password
     if(empty(trim($_POST["password"]))){
-        $password_err = "Please enter a password.";     
+        $password_err = "Παρακαλώ εισάγετε έναν κωδικό.";     
     } elseif(strlen(trim($_POST["password"])) < 6){
-        $password_err = "Password must have at least 6 characters.";
+        $password_err = "Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.";
     } else{
         $password = trim($_POST["password"]);
     }
     
     // Validate confirm password
     if(empty(trim($_POST["confirm_password"]))){
-        $confirm_password_err = "Please confirm password.";     
+        $confirm_password_err = "Παρακαλώ επιβεβαιώστε τον κωδικό.";     
     } else{
         $confirm_password = trim($_POST["confirm_password"]);
         if(empty($password_err) && ($password != $confirm_password)){
-            $confirm_password_err = "Password did not match.";
+            $confirm_password_err = "Οι κωδικοί δεν ταιριάζουν.";
         }
     }
     
     // Validate role
     if(empty(trim($_POST["role"]))){
-        $role_err = "Please select a role.";
+        $role_err = "Παρακαλώ επιλέξτε έναν ρόλο.";
     } else{
         $role = trim($_POST["role"]);
     }
@@ -109,7 +109,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             exit();
             
         } catch(PDOException $e) {
-            echo "Something went wrong. Please try again later.";
+            echo "Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
         }
     }
 }
@@ -136,15 +136,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
                             <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
-                            <h2 class="fw-bold">Create Account</h2>
-                            <p class="text-muted">Join ΠΟΘΕΝ ΕΣΧΕΣ to submit your asset declarations</p>
+                            <h2 class="fw-bold">Δημιουργία Λογαριασμού</h2>
+                            <p class="text-muted">Γίνετε μέλος του ΠΟΘΕΝ ΕΣΧΕΣ για να υποβάλετε τις δηλώσεις περιουσίας σας</p>
                         </div>
 
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="needs-validation" novalidate>
                             <div class="row g-3">
                                 <!-- Basic Information -->
                                 <div class="col-md-6">
-                                    <label class="form-label">First Name</label>
+                                    <label class="form-label">Μικρό Όνομα</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
                                         <input type="text" name="first_name" class="form-control <?php echo (!empty($first_name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $first_name; ?>" required>
@@ -153,7 +153,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label">Last Name</label>
+                                    <label class="form-label">Επώνυμο</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
                                         <input type="text" name="last_name" class="form-control <?php echo (!empty($last_name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $last_name; ?>" required>
@@ -162,7 +162,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label">Email Address</label>
+                                    <label class="form-label">Διεύθυνση Email</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                         <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>" required>
@@ -171,7 +171,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label">Password</label>
+                                    <label class="form-label">Κωδικός</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                         <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" required>
@@ -180,7 +180,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label">Confirm Password</label>
+                                    <label class="form-label">Επιβεβαίωση Κωδικού</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                                         <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>" required>
@@ -189,14 +189,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label">Position/Role</label>
+                                    <label class="form-label">Θέση/Ρόλος</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-briefcase"></i></span>
                                         <select name="role" class="form-select <?php echo (!empty($role_err)) ? 'is-invalid' : ''; ?>" required>
-                                            <option value="">Select position</option>
-                                            <option value="Public" <?php echo ($role == "Public") ? 'selected' : ''; ?>>Public</option>
-                                            <option value="Politician" <?php echo ($role == "Politician") ? 'selected' : ''; ?>>Politician</option>
-                                            <option value="Admin" <?php echo ($role == "Admin") ? 'selected' : ''; ?>>Admin</option>
+                                            <option value="">Επιλέξτε θέση</option>
+                                            <option value="Public" <?php echo ($role == "Public") ? 'selected' : ''; ?>>Δημόσιος</option>
+                                            <option value="Politician" <?php echo ($role == "Politician") ? 'selected' : ''; ?>>Πολιτικός</option>
+                                            <option value="Admin" <?php echo ($role == "Admin") ? 'selected' : ''; ?>>Διαχειριστής</option>
                                         </select>
                                         <div class="invalid-feedback"><?php echo $role_err; ?></div>
                                     </div>
@@ -206,21 +206,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input" id="terms" required>
                                         <label class="form-check-label" for="terms">
-                                            I agree to the <a href="terms.php" class="text-decoration-none">Terms of Service</a> and <a href="privacy.php" class="text-decoration-none">Privacy Policy</a>
+                                            Συμφωνώ με τους <a href="terms.php" class="text-decoration-none">Όρους Χρήσης</a> και την <a href="privacy.php" class="text-decoration-none">Πολιτική Απορρήτου</a>
                                         </label>
                                     </div>
                                 </div>
                             </div>
 
                             <button type="submit" class="btn btn-warning text-dark w-100 mt-4 mb-3">
-                                <i class="bi bi-person-plus"></i> Create Account
+                                <i class="bi bi-person-plus"></i> Δημιουργία Λογαριασμού
                             </button>
 
                             <div class="text-center">
-                                <p class="mb-0">Already have an account? <a href="login.php" class="text-decoration-none">Sign in</a></p>
+                                <p class="mb-0">Έχετε ήδη λογαριασμό; <a href="login.php" class="text-decoration-none">Σύνδεση</a></p>
                             </div>
                             <div class="text-center">
-                                <p class="mb-0"><a href="../../index.php" class="text-decoration-none">Back to Home</a></p>
+                                <p class="mb-0"><a href="../../index.php" class="text-decoration-none">Επιστροφή στην Αρχική</a></p>
                             </div>
                         </form>
                     </div>
