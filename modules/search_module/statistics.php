@@ -847,6 +847,37 @@ try {
         const ctx = document.getElementById('financialChart').getContext('2d');
         let financialChart = null;
         let selectedPoliticians = new Map();
+        let politicianColors = new Map(); // Store colors for each politician
+
+        // Function to generate a random color
+        function getRandomColor() {
+            const colors = [
+                'rgba(54, 162, 235, 0.8)',   // Blue
+                'rgba(255, 99, 132, 0.8)',   // Red
+                'rgba(75, 192, 192, 0.8)',   // Teal
+                'rgba(255, 159, 64, 0.8)',   // Orange
+                'rgba(153, 102, 255, 0.8)',  // Purple
+                'rgba(255, 205, 86, 0.8)',   // Yellow
+                'rgba(201, 203, 207, 0.8)',  // Gray
+                'rgba(255, 99, 71, 0.8)',    // Tomato
+                'rgba(50, 205, 50, 0.8)',    // Lime Green
+                'rgba(30, 144, 255, 0.8)',   // Dodger Blue
+                'rgba(255, 140, 0, 0.8)',    // Dark Orange
+                'rgba(147, 112, 219, 0.8)',  // Medium Purple
+                'rgba(60, 179, 113, 0.8)',   // Medium Sea Green
+                'rgba(255, 69, 0, 0.8)',     // Red Orange
+                'rgba(106, 90, 205, 0.8)'    // Slate Blue
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Function to get or assign color for a politician
+        function getPoliticianColor(politicianName) {
+            if (!politicianColors.has(politicianName)) {
+                politicianColors.set(politicianName, getRandomColor());
+            }
+            return politicianColors.get(politicianName);
+        }
 
         // Function to fetch financial data
         async function fetchFinancialData(politicianIds) {
@@ -891,29 +922,7 @@ try {
                     type: 'bar',
                     data: {
                         labels: [],
-                        datasets: [
-                            {
-                                label: 'Αξία Ακινήτων (€)',
-                                data: [],
-                                backgroundColor: 'rgba(237, 150, 53, 0.8)',
-                                borderColor: 'rgba(237, 150, 53, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Αξία Μετοχών (€)',
-                                data: [],
-                                backgroundColor: 'rgba(214, 123, 31, 0.8)',
-                                borderColor: 'rgba(214, 123, 31, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Αξία Καταθέσεων (€)',
-                                data: [],
-                                backgroundColor: 'rgba(240, 168, 90, 0.8)',
-                                borderColor: 'rgba(240, 168, 90, 1)',
-                                borderWidth: 1
-                            }
-                        ]
+                        datasets: []
                     },
                     options: {
                         responsive: true,
@@ -922,7 +931,7 @@ try {
                                 stacked: false,
                                 title: {
                                     display: true,
-                                    text: 'Πολιτικοί'
+                                    text: 'Κατηγορίες'
                                 }
                             },
                             y: {
@@ -949,38 +958,27 @@ try {
                 financialChart.destroy();
             }
 
-            const labels = data.map(item => item.name);
-            const realEstateData = data.map(item => parseFloat(item.real_estate) || 0);
-            const stocksData = data.map(item => parseFloat(item.stocks) || 0);
-            const depositsData = data.map(item => parseFloat(item.deposits) || 0);
+            // Create datasets for each politician
+            const datasets = data.map(politician => {
+                const color = getPoliticianColor(politician.name);
+                return {
+                    label: politician.name,
+                    data: [
+                        parseFloat(politician.real_estate) || 0,
+                        parseFloat(politician.stocks) || 0,
+                        parseFloat(politician.deposits) || 0
+                    ],
+                    backgroundColor: color,
+                    borderColor: color.replace('0.8', '1'),
+                    borderWidth: 1
+                };
+            });
 
             financialChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Αξία Ακινήτων (€)',
-                            data: realEstateData,
-                            backgroundColor: 'rgba(237, 150, 53, 0.8)',
-                            borderColor: 'rgba(237, 150, 53, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Αξία Μετοχών (€)',
-                            data: stocksData,
-                            backgroundColor: 'rgba(214, 123, 31, 0.8)',
-                            borderColor: 'rgba(214, 123, 31, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Αξία Καταθέσεων (€)',
-                            data: depositsData,
-                            backgroundColor: 'rgba(240, 168, 90, 0.8)',
-                            borderColor: 'rgba(240, 168, 90, 1)',
-                            borderWidth: 1
-                        }
-                    ]
+                    labels: ['Αξία Ακινήτων', 'Αξία Μετοχών', 'Αξία Καταθέσεων'],
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
@@ -989,7 +987,7 @@ try {
                             stacked: false,
                             title: {
                                 display: true,
-                                text: 'Πολιτικοί'
+                                text: 'Κατηγορίες'
                             }
                         },
                         y: {
@@ -1005,6 +1003,43 @@ try {
                         title: {
                             display: true,
                             text: 'Οικονομική Σύγκριση'
+                        },
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 15,
+                                generateLabels: function(chart) {
+                                    const datasets = chart.data.datasets;
+                                    return datasets.map((dataset, i) => ({
+                                        text: dataset.label,
+                                        fillStyle: dataset.backgroundColor,
+                                        strokeStyle: dataset.borderColor,
+                                        lineWidth: 1,
+                                        hidden: !chart.isDatasetVisible(i),
+                                        index: i
+                                    }));
+                                }
+                            },
+                            onClick: function(e, legendItem, legend) {
+                                const index = legendItem.index;
+                                const chart = legend.chart;
+                                const dataset = chart.data.datasets[index];
+                                
+                                // Toggle visibility
+                                chart.setDatasetVisibility(index, !chart.isDatasetVisible(index));
+                                chart.update();
+                                
+                                // Remove politician from selected list if hidden
+                                if (!chart.isDatasetVisible(index)) {
+                                    const politicianName = dataset.label;
+                                    const politicianId = Array.from(selectedPoliticians.entries())
+                                        .find(([_, p]) => p.name === politicianName)?.[0];
+                                    if (politicianId) {
+                                        removePolitician(politicianId);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -1090,6 +1125,7 @@ try {
         // Event listener for clear button
         document.getElementById('clearSelection').addEventListener('click', function() {
             selectedPoliticians.clear();
+            politicianColors.clear(); // Clear stored colors
             updateSelectedPoliticiansList();
             updateChart([]);
         });
