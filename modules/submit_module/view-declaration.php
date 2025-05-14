@@ -82,6 +82,11 @@ $differences = $stmt->fetch();
 $stmt = $pdo->prepare("SELECT * FROM previous_incomes WHERE declaration_id = ?");
 $stmt->execute([$declaration_id]);
 $previous_incomes = $stmt->fetch();
+
+// Fetch other incomes
+$stmt = $pdo->prepare("SELECT * FROM other_incomes WHERE declaration_id = ?");
+$stmt->execute([$declaration_id]);
+$other_incomes = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -170,7 +175,7 @@ $previous_incomes = $stmt->fetch();
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="../submit_module/favorites.php">
+                                        <a class="dropdown-item" href="../favorites_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
                                     </li>
@@ -315,35 +320,35 @@ $previous_incomes = $stmt->fetch();
                     <div class="row">
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Ονοματεπώνυμο:</strong></p>
-                            <p><?php echo htmlspecialchars($personal_data['full_name']); ?></p>
+                            <p><?php echo !empty($personal_data['full_name']) ? htmlspecialchars($personal_data['full_name']) : '-'; ?></p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Ιδιοτήτα/Αξίωμα:</strong></p>
-                            <p><?php echo htmlspecialchars($personal_data['office']); ?></p>
+                            <p><?php echo !empty($personal_data['office']) ? htmlspecialchars($personal_data['office']) : '-'; ?></p>
                         </div>
                         <div class="col-md-12">
                             <p class="mb-1"><strong>Διεύθυνση:</strong></p>
-                            <p><?php echo htmlspecialchars($personal_data['address']); ?></p>
+                            <p><?php echo !empty($personal_data['address']) ? htmlspecialchars($personal_data['address']) : '-'; ?></p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Ημερομηνία Γέννησης:</strong></p>
-                            <p><?php echo htmlspecialchars($personal_data['dob']); ?></p>
+                            <p><?php echo !empty($personal_data['dob']) ? htmlspecialchars($personal_data['dob']) : '-'; ?></p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Αριθμός Ταυτότητας:</strong></p>
-                            <p><?php echo htmlspecialchars($personal_data['id_number']); ?></p>
+                            <p><?php echo !empty($personal_data['id_number']) ? htmlspecialchars($personal_data['id_number']) : '-'; ?></p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Οικογενειακή Κατάσταση:</strong></p>
-                            <p><?php echo htmlspecialchars($personal_data['marital_status']); ?></p>
+                            <p><?php echo !empty($personal_data['marital_status']) ? htmlspecialchars($personal_data['marital_status']) : '-'; ?></p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Αριθμός Ανηλίκων Τεκνών:</strong></p>
-                            <p><?php echo htmlspecialchars($personal_data['dependants']); ?></p>
+                            <p><?php echo !empty($personal_data['dependants']) ? htmlspecialchars($personal_data['dependants']) : '-'; ?></p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Πολιτικό Κόμμα/Παράταξη:</strong></p>
-                            <p><?php echo htmlspecialchars($personal_data['party_name'] ?? '-'); ?></p>
+                            <p><?php echo !empty($personal_data['party_name']) ? htmlspecialchars($personal_data['party_name']) : '-'; ?></p>
                         </div>
                     </div>
                 </div>
@@ -352,7 +357,7 @@ $previous_incomes = $stmt->fetch();
             <!-- Properties -->
             <div class="card feature-card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">2. Ακίνητη Ιδιοκτησία</h5>
+                    <h5 class="card-title mb-0">2. Ακίνητη Ιδιοκτησία (<?php echo count($properties); ?>)</h5>
                 </div>
                 <div class="card-body">
                     <?php if (empty($properties)): ?>
@@ -376,15 +381,15 @@ $previous_incomes = $stmt->fetch();
                                 <tbody>
                                     <?php foreach ($properties as $property): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($property['type']); ?></td>
-                                        <td><?php echo htmlspecialchars($property['location']); ?></td>
-                                        <td><?php echo htmlspecialchars($property['area']); ?></td>
-                                        <td><?php echo htmlspecialchars($property['topographic_data']); ?></td>
-                                        <td><?php echo htmlspecialchars($property['rights_burdens']); ?></td>
-                                        <td><?php echo htmlspecialchars($property['acquisition_mode']); ?></td>
-                                        <td><?php echo htmlspecialchars($property['acquisition_date']); ?></td>
-                                        <td><?php echo number_format($property['acquisition_value'], 2); ?></td>
-                                        <td><?php echo number_format($property['current_value'], 2); ?></td>
+                                        <td><?php echo !empty($property['type']) ? htmlspecialchars($property['type']) : '-'; ?></td>
+                                        <td><?php echo !empty($property['location']) ? htmlspecialchars($property['location']) : '-'; ?></td>
+                                        <td><?php echo !empty($property['area']) ? htmlspecialchars($property['area']) : '-'; ?></td>
+                                        <td><?php echo !empty($property['topographic_data']) ? htmlspecialchars($property['topographic_data']) : '-'; ?></td>
+                                        <td><?php echo !empty($property['rights_burdens']) ? htmlspecialchars($property['rights_burdens']) : '-'; ?></td>
+                                        <td><?php echo !empty($property['acquisition_mode']) ? htmlspecialchars($property['acquisition_mode']) : '-'; ?></td>
+                                        <td><?php echo !empty($property['acquisition_date']) ? htmlspecialchars($property['acquisition_date']) : '-'; ?></td>
+                                        <td><?php echo !empty($property['acquisition_value']) ? number_format($property['acquisition_value'], 2) : '-'; ?></td>
+                                        <td><?php echo !empty($property['current_value']) ? number_format($property['current_value'], 2) : '-'; ?></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -397,7 +402,7 @@ $previous_incomes = $stmt->fetch();
             <!-- Vehicles -->
             <div class="card feature-card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">3. Μηχανοκίνητα Μεταφορικά Μέσα</h5>
+                    <h5 class="card-title mb-0">3. Μηχανοκίνητα Μεταφορικά Μέσα (<?php echo count($vehicles); ?>)</h5>
                 </div>
                 <div class="card-body">
                     <?php if (empty($vehicles)): ?>
@@ -416,10 +421,10 @@ $previous_incomes = $stmt->fetch();
                                 <tbody>
                                     <?php foreach ($vehicles as $vehicle): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($vehicle['brand']); ?></td>
-                                        <td><?php echo htmlspecialchars($vehicle['type']); ?></td>
-                                        <td><?php echo htmlspecialchars($vehicle['manu_year']); ?></td>
-                                        <td><?php echo number_format($vehicle['value'], 2); ?></td>
+                                        <td><?php echo !empty($vehicle['brand']) ? htmlspecialchars($vehicle['brand']) : '-'; ?></td>
+                                        <td><?php echo !empty($vehicle['type']) ? htmlspecialchars($vehicle['type']) : '-'; ?></td>
+                                        <td><?php echo !empty($vehicle['manu_year']) ? htmlspecialchars($vehicle['manu_year']) : '-'; ?></td>
+                                        <td><?php echo !empty($vehicle['value']) ? number_format($vehicle['value'], 2) : '-'; ?></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -432,7 +437,7 @@ $previous_incomes = $stmt->fetch();
             <!-- Liquid Assets -->
             <div class="card feature-card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">4. Εισοδήματα και Περιουσιακά Στοιχεία σε Κινητές Αξίες και Τίτλους</h5>
+                    <h5 class="card-title mb-0">4. Εισοδήματα και Περιουσιακά Στοιχεία σε Κινητές Αξίες και Τίτλους (<?php echo count($liquid_assets); ?>)</h5>
                 </div>
                 <div class="card-body">
                     <?php if (empty($liquid_assets)): ?>
@@ -450,9 +455,9 @@ $previous_incomes = $stmt->fetch();
                                 <tbody>
                                     <?php foreach ($liquid_assets as $asset): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($asset['type']); ?></td>
-                                        <td><?php echo htmlspecialchars($asset['description']); ?></td>
-                                        <td><?php echo htmlspecialchars($asset['amount']); ?></td>
+                                        <td><?php echo !empty($asset['type']) ? htmlspecialchars($asset['type']) : '-'; ?></td>
+                                        <td><?php echo !empty($asset['description']) ? htmlspecialchars($asset['description']) : '-'; ?></td>
+                                        <td><?php echo !empty($asset['amount']) ? htmlspecialchars($asset['amount']) : '-'; ?></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -465,7 +470,7 @@ $previous_incomes = $stmt->fetch();
             <!-- Deposits -->
             <div class="card feature-card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">5. Καταθέσεις σε Τράπεζες</h5>
+                    <h5 class="card-title mb-0">5. Καταθέσεις σε Τράπεζες (<?php echo count($deposits); ?>)</h5>
                 </div>
                 <div class="card-body">
                     <?php if (empty($deposits)): ?>
@@ -482,8 +487,8 @@ $previous_incomes = $stmt->fetch();
                                 <tbody>
                                     <?php foreach ($deposits as $deposit): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($deposit['bank_name']); ?></td>
-                                        <td><?php echo number_format($deposit['amount'], 2); ?></td>
+                                        <td><?php echo !empty($deposit['bank_name']) ? htmlspecialchars($deposit['bank_name']) : '-'; ?></td>
+                                        <td><?php echo !empty($deposit['amount']) ? number_format($deposit['amount'], 2) : '-'; ?></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -496,7 +501,7 @@ $previous_incomes = $stmt->fetch();
             <!-- Insurance -->
             <div class="card feature-card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">6. Ασφαλιστικά Συμβόλαια</h5>
+                    <h5 class="card-title mb-0">6. Ασφαλιστικά Συμβόλαια (<?php echo count($insurance); ?>)</h5>
                 </div>
                 <div class="card-body">
                     <?php if (empty($insurance)): ?>
@@ -514,9 +519,9 @@ $previous_incomes = $stmt->fetch();
                                 <tbody>
                                     <?php foreach ($insurance as $ins): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($ins['insurance_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($ins['contract_num']); ?></td>
-                                        <td><?php echo number_format($ins['earnings'], 2); ?></td>
+                                        <td><?php echo !empty($ins['insurance_name']) ? htmlspecialchars($ins['insurance_name']) : '-'; ?></td>
+                                        <td><?php echo !empty($ins['contract_num']) ? htmlspecialchars($ins['contract_num']) : '-'; ?></td>
+                                        <td><?php echo !empty($ins['earnings']) ? number_format($ins['earnings'], 2) : '-'; ?></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -529,7 +534,7 @@ $previous_incomes = $stmt->fetch();
             <!-- Debts -->
             <div class="card feature-card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">7. Χρέη</h5>
+                    <h5 class="card-title mb-0">7. Χρέη (<?php echo count($debts); ?>)</h5>
                 </div>
                 <div class="card-body">
                     <?php if (empty($debts)): ?>
@@ -547,9 +552,9 @@ $previous_incomes = $stmt->fetch();
                                 <tbody>
                                     <?php foreach ($debts as $debt): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($debt['creditor_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($debt['type']); ?></td>
-                                        <td><?php echo number_format($debt['amount'], 2); ?></td>
+                                        <td><?php echo !empty($debt['creditor_name']) ? htmlspecialchars($debt['creditor_name']) : '-'; ?></td>
+                                        <td><?php echo !empty($debt['type']) ? htmlspecialchars($debt['type']) : '-'; ?></td>
+                                        <td><?php echo !empty($debt['amount']) ? number_format($debt['amount'], 2) : '-'; ?></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -562,7 +567,7 @@ $previous_incomes = $stmt->fetch();
             <!-- Business Participations -->
             <div class="card feature-card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">8. Συμμετοχές σε Επιχειρήσεις</h5>
+                    <h5 class="card-title mb-0">8. Συμμετοχές σε Επιχειρήσεις (<?php echo count($business); ?>)</h5>
                 </div>
                 <div class="card-body">
                     <?php if (empty($business)): ?>
@@ -580,9 +585,40 @@ $previous_incomes = $stmt->fetch();
                                 <tbody>
                                     <?php foreach ($business as $biz): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($biz['business_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($biz['business_type']); ?></td>
-                                        <td><?php echo htmlspecialchars($biz['participation_type']); ?></td>
+                                        <td><?php echo !empty($biz['business_name']) ? htmlspecialchars($biz['business_name']) : '-'; ?></td>
+                                        <td><?php echo !empty($biz['business_type']) ? htmlspecialchars($biz['business_type']) : '-'; ?></td>
+                                        <td><?php echo !empty($biz['participation_type']) ? htmlspecialchars($biz['participation_type']) : '-'; ?></td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Other Incomes -->
+            <div class="card feature-card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">9. Άλλα Εισοδήματα (<?php echo count($other_incomes); ?>)</h5>
+                </div>
+                <div class="card-body">
+                    <?php if (empty($other_incomes)): ?>
+                        <p class="text-muted">Δεν έχουν δηλωθεί άλλα εισοδήματα.</p>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Τύπος Εισοδήματος</th>
+                                        <th>Ποσό (€)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($other_incomes as $income): ?>
+                                    <tr>
+                                        <td><?php echo !empty($income['type']) ? htmlspecialchars($income['type']) : '-'; ?></td>
+                                        <td><?php echo !empty($income['amount']) ? number_format($income['amount'], 2) : '-'; ?></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -593,28 +629,32 @@ $previous_incomes = $stmt->fetch();
             </div>
 
             <!-- Differences -->
-            <?php if ($differences): ?>
             <div class="card feature-card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">9. Διαφορές στα Περιουσιακά Στοιχεία</h5>
+                    <h5 class="card-title mb-0">10. Διαφορές στα Περιουσιακά Στοιχεία</h5>
                 </div>
                 <div class="card-body">
-                    <p><?php echo nl2br(htmlspecialchars($differences['content'])); ?></p>
+                    <?php if (empty($differences['content'])): ?>
+                        <p class="text-muted">Δεν έχουν δηλωθεί διαφορές στα περιουσιακά στοιχεία.</p>
+                    <?php else: ?>
+                        <p><?php echo nl2br(htmlspecialchars($differences['content'])); ?></p>
+                    <?php endif; ?>
                 </div>
             </div>
-            <?php endif; ?>
 
             <!-- Previous Incomes -->
-            <?php if ($previous_incomes): ?>
             <div class="card feature-card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">10. Εισοδήματα Προηγούμενων Ετών</h5>
+                    <h5 class="card-title mb-0">11. Εισοδήματα Προηγούμενων Ετών</h5>
                 </div>
                 <div class="card-body">
-                    <?php echo $previous_incomes['html_content']; ?>
+                    <?php if (empty($previous_incomes['html_content'])): ?>
+                        <p class="text-muted">Δεν έχουν δηλωθεί εισοδήματα προηγούμενων ετών.</p>
+                    <?php else: ?>
+                        <?php echo $previous_incomes['html_content']; ?>
+                    <?php endif; ?>
                 </div>
             </div>
-            <?php endif; ?>
         </main>
     </div>
 
