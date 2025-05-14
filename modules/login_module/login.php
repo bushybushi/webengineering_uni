@@ -20,14 +20,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
  
     // Check if email is empty
     if(empty(trim($_POST["email"]))){
-        $email_err = "Please enter email.";
+        $email_err = "Παρακαλώ εισάγετε το email σας.";
     } else{
         $email = trim($_POST["email"]);
     }
     
     // Check if password is empty
     if(empty(trim($_POST["password"]))){
-        $password_err = "Please enter your password.";
+        $password_err = "Παρακαλώ εισάγετε τον κωδικό σας.";
     } else{
         $password = trim($_POST["password"]);
     }
@@ -56,9 +56,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         
                         // Check if user is suspended
                         if($is_suspended == 1) {
-                            $login_err = "Your account has been suspended. Please contact the administrator.";
+                            $login_err = "Ο λογαριασμός σας έχει ανασταλεί. Παρακαλώ επικοινωνήστε με τον διαχειριστή.";
                         } else if($is_suspended == 2) {
-                            $login_err = "This account has been deleted. Please create a new account if you wish to use the service.";
+                            $login_err = "Αυτός ο λογαριασμός έχει διαγραφεί. Παρακαλώ δημιουργήστε νέο λογαριασμό αν επιθυμείτε να χρησιμοποιήσετε την υπηρεσία.";
                         } else if(password_verify($password, $hashed_password)){
                             // Password is correct, so start a new session
                             session_start();
@@ -80,15 +80,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             exit();
                         } else{
                             // Password is not valid, display a generic error message
-                            $login_err = "Invalid email or password.";
+                            $login_err = "Μη έγκυρο email ή κωδικός.";
                         }
                     }
                 } else{
                     // Email doesn't exist, display a generic error message
-                    $login_err = "Invalid email or password.";
+                    $login_err = "Μη έγκυρο email ή κωδικός.";
                 }
             } else{
-                echo "Oops! Something went wrong. Please try again later.";
+                echo "Ωχ! Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
             }
         }
     }
@@ -116,8 +116,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
                             <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
-                            <h2 class="fw-bold">Sign In</h2>
-                            <p class="text-muted">Welcome back to ΠΟΘΕΝ ΕΣΧΕΣ</p>
+                            <h2 class="fw-bold">Σύνδεση</h2>
+                            <p class="text-muted">Καλώς ήρθατε στο ΠΟΘΕΝ ΕΣΧΕΣ</p>
                         </div>
 
                         <?php 
@@ -128,7 +128,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="needs-validation" novalidate>
                             <div class="mb-3">
-                                <label class="form-label">Email Address</label>
+                                <label class="form-label">Διεύθυνση Email</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                     <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>" required>
@@ -137,7 +137,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Password</label>
+                                <label class="form-label">Κωδικός</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                     <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" required>
@@ -147,21 +147,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                             <div class="mb-3 form-check">
                                 <input type="checkbox" class="form-check-input" id="remember">
-                                <label class="form-check-label" for="remember">Remember me</label>
+                                <label class="form-check-label" for="remember">Να με θυμάσαι</label>
                             </div>
 
                             <button type="submit" class="btn btn-warning text-dark w-100 mb-3">
-                                <i class="bi bi-box-arrow-in-right"></i> Sign In
+                                <i class="bi bi-box-arrow-in-right"></i> Σύνδεση
                             </button>
 
                             <div class="text-center">
-                                <p class="mb-0">Don't have an account? <a href="register.php" class="text-decoration-none">Sign up</a></p>
+                                <p class="mb-0">Δεν έχετε λογαριασμό; <a href="register.php" class="text-decoration-none">Εγγραφείτε</a></p>
                             </div>
                             <div class="text-center">
-                                <p class="mb-0"><a href="forgot-password.php" class="text-decoration-none">Forgot your password?</a></p>
+                                <p class="mb-0"><a href="forgot-password.php" class="text-decoration-none">Ξεχάσατε τον κωδικό σας;</a></p>
                             </div>
                             <div class="text-center">
-                                <p class="mb-0"><a href="../../index.php" class="text-decoration-none">Back to Home</a></p>
+                                <p class="mb-0"><a href="../../index.php" class="text-decoration-none">Επιστροφή στην Αρχική</a></p>
                             </div>
                         </form>
                     </div>
@@ -175,4 +175,4 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <!-- Custom JS -->
     <script src="assets/js/main.js"></script>
 </body>
-</html> 
+</html>
