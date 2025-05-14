@@ -45,7 +45,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     
     // Validate email
     if(empty(trim($_POST["email"]))){
-        $email_err = "Please enter your email.";
+        $email_err = "Παρακαλώ εισάγετε το email σας.";
     } else{
         $email = trim($_POST["email"]);
         
@@ -92,17 +92,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                     
                                     // Create email content
                                     $reset_link = "http://" . $_SERVER['HTTP_HOST'] . "/myDomain/PothenEsxes/LoginWITHfunctionality/reset-password.php?token=" . $token;
-                                    $email_content = "Hello " . $row["first_name"] . ",<br><br>" .
-                                        "You have requested to reset your password. Click the link below to reset your password:<br><br>" .
-                                        "<a href=\"$reset_link\">Reset Password</a><br><br>" .
-                                        "Or copy and paste this URL into your browser:<br>" .
+                                    $email_content = "Γεια σας " . $row["first_name"] . ",<br><br>" .
+                                        "Έχετε ζητήσει επαναφορά του κωδικού σας. Κάντε κλικ στον παρακάτω σύνδεσμο για να επαναφέρετε τον κωδικό σας:<br><br>" .
+                                        "<a href=\"$reset_link\">Επαναφορά Κωδικού</a><br><br>" .
+                                        "Ή αντιγράψτε και επικολλήστε αυτή τη διεύθυνση URL στον περιηγητή σας:<br>" .
                                         "<span style=\"word-break:break-all;\">$reset_link</span><br><br>" .
-                                        "<strong>Important Security Information:</strong><br>" .
-                                        "- This link will expire in 1 hour<br>" .
-                                        "- This link can only be used once<br>" .
-                                        "- If you did not request this password reset, please ignore this email and ensure your account is secure<br><br>" .
-                                        "Best regards,<br>" .
-                                        "ΠΟΘΕΝ ΕΣΧΕΣ Team";
+                                        "<strong>Σημαντικές Πληροφορίες Ασφαλείας:</strong><br>" .
+                                        "- Αυτός ο σύνδεσμος θα λήξει σε 1 ώρα<br>" .
+                                        "- Αυτός ο σύνδεσμος μπορεί να χρησιμοποιηθεί μόνο μία φορά<br>" .
+                                        "- Εάν δεν ζητήσατε αυτή την επαναφορά κωδικού, παρακαλώ αγνοήστε αυτό το email και βεβαιωθείτε ότι ο λογαριασμός σας είναι ασφαλής<br><br>" .
+                                        "Με εκτίμηση,<br>" .
+                                        "Η Ομάδα ΠΟΘΕΝ ΕΣΧΕΣ";
                                     
                                     // Prepare email data
                                     $data = [
@@ -120,7 +120,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                             "email" => "pothenesxesmailsender@gmail.com",
                                             "name" => "ΠΟΘΕΝ ΕΣΧΕΣ"
                                         ],
-                                        "subject" => "Password Reset Request",
+                                        "subject" => "Αίτηση Επαναφοράς Κωδικού",
                                         "content" => [
                                             [
                                                 "type" => "text/html",
@@ -143,7 +143,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                     error_log('SendGrid Response Body: ' . $response->body());
                                     
                                     if($response->statusCode() == 202) {
-                                        $success_msg = "If an account exists with this email, you will receive password reset instructions.";
+                                        $success_msg = "Εάν υπάρχει λογαριασμός με αυτό το email, θα λάβετε οδηγίες επαναφοράς κωδικού.";
                                     } else {
                                         $error_message = 'Failed to send email. Status code: ' . $response->statusCode() . ', Body: ' . $response->body();
                                         error_log($error_message);
@@ -153,17 +153,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                     error_log('SendGrid Error: ' . $e->getMessage());
                                     error_log('SendGrid Error Trace: ' . $e->getTraceAsString());
                                     error_log('SendGrid Error File: ' . $e->getFile() . ' Line: ' . $e->getLine());
-                                    echo "There was an error sending the email. Please try again later.";
+                                    echo "Ωχ! Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
                                 }
                             }
                         }
                     }
                 } else {
                     // Don't reveal if email exists or not
-                    $success_msg = "If an account exists with this email, you will receive password reset instructions.";
+                    $success_msg = "Εάν υπάρχει λογαριασμός με αυτό το email, θα λάβετε οδηγίες επαναφοράς κωδικού.";
                 }
             } else {
-                echo "Oops! Something went wrong. Please try again later.";
+                echo "Ωχ! Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
             }
         }
     }
@@ -192,8 +192,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
                             <img src="assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
-                            <h2 class="fw-bold">Forgot Password</h2>
-                            <p class="text-muted">Enter your email to reset your password</p>
+                            <h2 class="fw-bold">Ξεχάσατε τον Κωδικό</h2>
+                            <p class="text-muted">Εισάγετε το email σας για να επαναφέρετε τον κωδικό σας</p>
                         </div>
 
                         <?php if(!empty($success_msg)): ?>
@@ -202,7 +202,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="needs-validation" novalidate>
                             <div class="mb-3">
-                                <label class="form-label">Email Address</label>
+                                <label class="form-label">Διεύθυνση Email</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                     <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>" required>
@@ -211,14 +211,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             </div>
 
                             <button type="submit" class="btn btn-warning text-dark w-100 mb-3">
-                                <i class="bi bi-send"></i> Send Reset Link
+                                <i class="bi bi-send"></i> Αποστολή Συνδέσμου Επαναφοράς
                             </button>
 
                             <div class="text-center">
-                                <p class="mb-0">Remember your password? <a href="login.php" class="text-decoration-none">Sign in</a></p>
+                                <p class="mb-0">Θυμάστε τον κωδικό σας; <a href="login.php" class="text-decoration-none">Σύνδεση</a></p>
                             </div>
                             <div class="text-center">
-                                <p class="mb-0"><a href="../index.php" class="text-decoration-none">Back to Home</a></p>
+                                <p class="mb-0"><a href="../index.php" class="text-decoration-none">Επιστροφή στην Αρχική</a></p>
                             </div>
                         </form>
                     </div>
