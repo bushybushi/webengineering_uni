@@ -481,10 +481,63 @@ try {
                 </div>
             </div>
 
+            <!-- Filters Section -->
+            <div class="card feature-card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Φίλτρα Στατιστικών</h5>
+                    <form id="statsFilters" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Περίοδος Υποβολής</label>
+                            <select class="form-select" id="submissionPeriod">
+                                <option value="">Όλες οι Περιόδους</option>
+                                <?php
+                                $stmt = $pdo->query("SELECT DISTINCT year FROM submission_periods ORDER BY year DESC");
+                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    echo "<option value='{$row['year']}'>{$row['year']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Πολιτικό Κόμμα</label>
+                            <select class="form-select" id="politicalParty">
+                                <option value="">Όλα τα Κόμματα</option>
+                                <?php
+                                $stmt = $pdo->query("SELECT DISTINCT name FROM parties WHERE name IS NOT NULL ORDER BY name");
+                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    echo "<option value='{$row['name']}'>{$row['name']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Διότητα/Αξίωμα</label>
+                            <select class="form-select" id="position">
+                                <option value="">Όλες οι Διότητες</option>
+                                <?php
+                                $stmt = $pdo->query("SELECT DISTINCT office FROM personal_data WHERE office IS NOT NULL ORDER BY office");
+                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    echo "<option value='{$row['office']}'>{$row['office']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-warning text-dark">
+                                <i class="bi bi-search"></i> Εφαρμογή Φίλτρων
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Καθαρισμός Φίλτρων
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Charts Section -->
             <div class="row">
-                <!-- Declarations by Party -->
-                <div class="col-lg-6">
+                <!-- Chart 1: Declarations by Party -->
+                <div class="col-lg-6 mb-4">
                     <div class="card feature-card">
                         <div class="card-body">
                             <h5 class="card-title mb-4">Δηλώσεις ανά Πολιτικό Κόμμα</h5>
@@ -494,13 +547,35 @@ try {
                         </div>
                     </div>
                 </div>
-                <!-- Asset Value Distribution -->
-                <div class="col-lg-6">
+                <!-- Chart 2: Asset Value Distribution -->
+                <div class="col-lg-6 mb-4">
                     <div class="card feature-card">
                         <div class="card-body">
                             <h5 class="card-title mb-4">Κατανομή Αξίας Περιουσίας</h5>
                             <div class="chart-container">
                                 <canvas id="valueDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Chart 3: Declarations by Position -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card feature-card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Δηλώσεις ανά Διότητα/Αξίωμα</h5>
+                            <div class="chart-container">
+                                <canvas id="positionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Chart 4: Declarations by Year -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card feature-card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Δηλώσεις ανά Έτος</h5>
+                            <div class="chart-container">
+                                <canvas id="yearChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -620,101 +695,172 @@ try {
     <!-- Custom JS -->
     <script src="../../assets/js/main.js"></script>
     <script>
-        // Party Chart
-        const partyCtx = document.getElementById('partyChart').getContext('2d');
-        new Chart(partyCtx, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($partyLabels); ?>,
-                datasets: [{
-                    label: 'Αριθμός Δηλώσεων',
-                    data: <?php echo json_encode($partyCounts); ?>,
-                    backgroundColor: [
-                        '#ED9635',
-                        '#d67b1f',
-                        '#f0a85a',
-                        '#ffc107',
-                        '#6c757d',
-                        '#495057',
-                        '#343a40'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Δηλώσεις ανά Πολιτικό Κόμμα'
-                    },
-                    legend: {
-                        labels: {
-                            font: {
-                                size: 12
-                            }
-                        }
-                    }
+        // Initialize charts
+        let partyChart = null;
+        let valueDistributionChart = null;
+        let positionChart = null;
+        let yearChart = null;
+
+        // Function to update all charts
+        function updateCharts(filters = {}) {
+            // Fetch data with filters
+            fetch('get_statistics.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Αριθμός Δηλώσεων'
+                body: JSON.stringify(filters)
+            })
+            .then(response => response.json())
+            .then(data => {
+                updatePartyChart(data.partyData);
+                updateValueDistributionChart(data.valueData);
+                updatePositionChart(data.positionData);
+                updateYearChart(data.yearData);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Function to update party chart
+        function updatePartyChart(data) {
+            const ctx = document.getElementById('partyChart').getContext('2d');
+            if (partyChart) partyChart.destroy();
+            
+            partyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Αριθμός Δηλώσεων',
+                        data: data.values,
+                        backgroundColor: '#ED9635'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
                         }
                     },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Πολιτικά Κόμματα'
+                    scales: {
+                        y: {
+                            beginAtZero: true
                         }
                     }
                 }
-            }
+            });
+        }
+
+        // Function to update value distribution chart
+        function updateValueDistributionChart(data) {
+            const ctx = document.getElementById('valueDistributionChart').getContext('2d');
+            if (valueDistributionChart) valueDistributionChart.destroy();
+            
+            valueDistributionChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                        backgroundColor: [
+                            '#ED9635',
+                            '#d67b1f',
+                            '#f0a85a',
+                            '#ffc107'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Function to update position chart
+        function updatePositionChart(data) {
+            const ctx = document.getElementById('positionChart').getContext('2d');
+            if (positionChart) positionChart.destroy();
+            
+            positionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                        backgroundColor: [
+                            '#ED9635',
+                            '#d67b1f',
+                            '#f0a85a',
+                            '#ffc107',
+                            '#6c757d'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Function to update year chart
+        function updateYearChart(data) {
+            const ctx = document.getElementById('yearChart').getContext('2d');
+            if (yearChart) yearChart.destroy();
+            
+            yearChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Αριθμός Δηλώσεων',
+                        data: data.values,
+                        borderColor: '#ED9635',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Add event listener for filter form
+        document.getElementById('statsFilters').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const filters = {
+                year: document.getElementById('submissionPeriod').value,
+                party: document.getElementById('politicalParty').value,
+                position: document.getElementById('position').value
+            };
+            updateCharts(filters);
         });
 
-        // Value Distribution Chart
-        const valueCtx = document.getElementById('valueDistributionChart').getContext('2d');
-        new Chart(valueCtx, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($valueLabels); ?>,
-                datasets: [{
-                    label: 'Αριθμός Περιουσιακών Στοιχείων',
-                    data: <?php echo json_encode($valueCounts); ?>,
-                    backgroundColor: '#ED9635'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Κατανομή Αξίας Περιουσίας'
-                    },
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Αριθμός Περιουσιακών Στοιχείων'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Εύρος Αξίας'
-                        }
-                    }
-                }
-            }
+        // Add event listener for reset button
+        document.getElementById('statsFilters').addEventListener('reset', function(e) {
+            e.preventDefault();
+            document.getElementById('submissionPeriod').value = '';
+            document.getElementById('politicalParty').value = '';
+            document.getElementById('position').value = '';
+            updateCharts();
         });
+
+        // Initial chart update
+        updateCharts();
 
         const person1Select = document.getElementById('person1');
         const person2Select = document.getElementById('person2');
