@@ -15,6 +15,7 @@ require_once 'config/db_connection.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <!-- Flag Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
     <!-- Custom CSS -->
@@ -269,9 +270,10 @@ require_once 'config/db_connection.php';
                         <h5 class="card-title mb-4">Πρόσφατες Δηλώσεις</h5>
                         <?php
                         // Get latest declarations
-                        $latest_query = "SELECT d.id, d.title, d.submission_date, pd.office
+                        $latest_query = "SELECT d.id, d.title, d.submission_date, pd.office, sp.year as submission_year
                                         FROM declarations d
                                         JOIN personal_data pd ON d.id = pd.declaration_id
+                                        JOIN submission_periods sp ON d.submission_period_id = sp.id
                                         ORDER BY d.submission_date DESC
                                         LIMIT 5";
 
@@ -294,6 +296,7 @@ require_once 'config/db_connection.php';
                                                         <?php 
                                                         echo htmlspecialchars($declaration['office'] ?? 'Μέλος του Κοινοβουλίου');
                                                         echo ' - ' . $formatted_date;
+                                                        echo ' (' . htmlspecialchars($declaration['submission_year']) . ')';
                                                         ?>
                                                     </small>
                                                 </div>
@@ -318,12 +321,9 @@ require_once 'config/db_connection.php';
                         <h5 class="card-title mb-4">Χρειάζεστε Βοήθεια?</h5>
                         <p class="card-text">Χρειάζεστε βοήθεια με τις δηλώσεις; Μάθετε περισσότερα για το σύστημα και τις λειτουργίες του εδώ.</p>
                         <div class="d-grid gap-2">
-                            <a href="contact.html" class="btn btn-primary" style="background-color: #ED9635; border-color: #ED9635;">
-                                <i class="bi bi-envelope"></i> Επικοινωνία
-                            </a>
-                            <a href="about.html" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">
+                            <button type="button" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;" data-bs-toggle="modal" data-bs-target="#manualModal">
                                 <i class="bi bi-info-circle"></i> Μάθε Περισσότερα
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -332,22 +332,28 @@ require_once 'config/db_connection.php';
     </main>
 
     <!-- Footer -->
-    <footer class="bg-light py-4 mt-auto">
+    <footer class="bg-light py-4 mt-auto border-top">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0"> 2025 Πόθεν Εσχες &copy; all rights reserved.</p>
-                </div>
-                <div class="col-12 col-md-6 text-center text-md-end">
-                    <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.html" class="text-decoration-none">Ποιοι είμαστε</a>
-                        <a href="contact.html" class="text-decoration-none">Επικοινωνία</a>
-                        <a href="privacy.html" class="text-decoration-none">Πολιτική Απορρήτου</a>
+            <div class="row justify-content-center align-items-center">
+                
+                <div class="col-12 text-center mb-2">
+                    <div class="mb-2">
+                        <img src="assets/images/iconlogo.png" alt="Πόθεν Έσχες Logo" style="height: 42px; width: 42px; object-fit: contain;" />
                     </div>
+                    <a href="#" class="text-decoration-none fw-medium" style="color: #ED9635;" data-bs-toggle="modal" data-bs-target="#aboutUsModal">
+                        <i class="bi bi-person-badge me-1"></i>Ποιοι είμαστε
+                    </a>
+                </div>
+                <div class="col-12 text-center mb-2">
+                    <span class="fw-bold small" style="color: #ED9635; font-size: 0.95rem;"><a href="#" style="text-decoration: none; color: #ED9635;">Πόθεν Έσχες</a></span>
+                    <span class="text-muted small">&copy; 2025. All rights reserved.</span>
                 </div>
             </div>
         </div>
     </footer>
+
+    <?php include 'includes/about-us-modal.php'; ?>
+    <?php include 'includes/manual-modal.php'; ?>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
