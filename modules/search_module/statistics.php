@@ -908,16 +908,6 @@ try {
                         const footer = section1.querySelector('footer');
                         if (footer) footer.remove();
                         
-                        // Add search count to the title
-                        const title = section1.querySelector('.card-title');
-                        if (title) {
-                            const table = section1.querySelector('table');
-                            if (table) {
-                                const rowCount = table.querySelectorAll('tbody tr').length;
-                                title.innerHTML = `${title.textContent} (${rowCount} αναζητήσεις)`;
-                            }
-                        }
-                        
                         col1.innerHTML = section1.outerHTML;
                     }
 
@@ -930,16 +920,6 @@ try {
                         if (headerDiv) headerDiv.remove();
                         const footer = section2.querySelector('footer');
                         if (footer) footer.remove();
-                        
-                        // Add search count to the title
-                        const title = section2.querySelector('.card-title');
-                        if (title) {
-                            const table = section2.querySelector('table');
-                            if (table) {
-                                const rowCount = table.querySelectorAll('tbody tr').length;
-                                title.innerHTML = `${title.textContent} (${rowCount} αναζητήσεις)`;
-                            }
-                        }
                         
                         col2.innerHTML = section2.outerHTML;
                     }
