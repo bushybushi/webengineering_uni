@@ -469,16 +469,9 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                         previous: "Previous"
                     }
                 },
-                columnDefs: [
-                    {
-                        targets: '_all',
-                        orderable: false
-                    },
-                    {
-                        targets: [0, 2], // Person Details (0) and Submission Date (2)
-                        orderable: true,
-                        orderSequence: ['asc', 'desc', null]
-                    }
+               columnDefs: [
+                    { targets: [0, 1, 2], orderable: true, orderSequence: ['asc', 'desc', null] },
+                    { targets: [3, 4], orderable: false }
                 ]
             });
 
