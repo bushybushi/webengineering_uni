@@ -522,6 +522,50 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
 
+                    <!-- Combined Search -->
+                    <div class="card api-card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-filter me-2"></i>
+                                Συνδυασμένη Αναζήτηση
+                            </h5>
+                            <p class="card-text">Επιστρέφει αποτελέσματα με βάση συνδυασμό κριτηρίων (κόμμα, έτος, αξίωμα).</p>
+                            <div class="form-group mb-3">
+                                <label for="combined-party" class="form-label">Επιλέξτε κόμμα:</label>
+                                <select class="form-select" id="combined-party">
+                                    <option value="">Επιλέξτε κόμμα...</option>
+                                    <?php foreach ($parties as $party): ?>
+                                        <option value="<?php echo htmlspecialchars($party); ?>"><?php echo htmlspecialchars($party); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="combined-year" class="form-label">Επιλέξτε έτος:</label>
+                                <select class="form-select" id="combined-year">
+                                    <option value="">Επιλέξτε έτος...</option>
+                                    <?php foreach ($years as $year): ?>
+                                        <option value="<?php echo htmlspecialchars($year); ?>"><?php echo htmlspecialchars($year); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="combined-position" class="form-label">Επιλέξτε αξίωμα:</label>
+                                <select class="form-select" id="combined-position">
+                                    <option value="">Επιλέξτε αξίωμα...</option>
+                                    <?php foreach ($positions as $position): ?>
+                                        <option value="<?php echo htmlspecialchars($position); ?>"><?php echo htmlspecialchars($position); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="url-display mb-2" id="combined-url">
+                                <?php echo "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/api.php"; ?>
+                            </div>
+                            <button class="btn btn-outline-primary copy-btn" id="combined-copy-btn">
+                                <i class="fas fa-copy me-2"></i>Αντιγραφή URL
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Get Specific Politician -->
                     <div class="card api-card">
                         <div class="card-body">
@@ -588,59 +632,61 @@ Cookie: PHPSESSID={your_session_id}</pre>
             "type": "Κύρια Κατοικία",
             "location": "Τοποθεσία",
             "area": 100,
-            "value": 100000
+            "topographic_data": "Δεδομένα",
+            "rights_burdens": "Δικαιώματα/Βάρη",
+            "acquisition_mode": "Τρόπος απόκτησης",
+            "acquisition_date": "YYYY-MM-DD",
+            "acquisition_value": 100000,
+            "current_value": 150000
         }
     ],
     "vehicles": [
         {
             "type": "Αυτοκίνητο",
-            "model": "Μοντέλο",
-            "year": 2020,
+            "brand": "Μάρκα",
+            "manu_year": 2020,
             "value": 20000
         }
     ],
     "liquid_assets": [
         {
             "type": "Μετρητά",
+            "description": "Περιγραφή",
             "amount": 5000
         }
     ],
     "deposits": [
         {
-            "bank": "Τράπεζα",
-            "account_number": "123456789",
+            "bank_name": "Τράπεζα",
             "amount": 10000
         }
     ],
     "insurance": [
         {
-            "type": "Ασφάλεια Ζωής",
-            "company": "Εταιρεία",
-            "amount": 5000
+            "insurance_name": "Εταιρεία",
+            "contract_num": "123456",
+            "earnings": 5000
         }
     ],
     "debts": [
         {
+            "creditor_name": "Πιστωτής",
             "type": "Δάνειο",
-            "creditor": "Πιστωτής",
             "amount": 15000
         }
     ],
     "business": [
         {
-            "type": "Εταιρεία",
-            "name": "Όνομα Εταιρείας",
-            "value": 50000
+            "business_name": "Όνομα Εταιρείας",
+            "business_type": "Τύπος",
+            "participation_type": "Τύπος συμμετοχής"
         }
     ],
     "differences": {
-        "total_assets": 200000,
-        "total_liabilities": 15000,
-        "net_worth": 185000
+        "content": "Περιεχόμενο διαφορών"
     },
     "previous_incomes": {
-        "year": 2023,
-        "amount": 50000
+        "html_content": "Περιεχόμενο προηγούμενων εισοδημάτων"
     }
 }</pre>
                             </div>
@@ -674,7 +720,88 @@ Cookie: PHPSESSID={your_session_id}</pre>
                                     <li><code>id</code>: Το ID της δήλωσης προς ενημέρωση</li>
                                 </ul>
                                 <h6 class="fw-bold">Request Body:</h6>
-                                <p class="text-muted">Ίδιο με το POST request body</p>
+                                <pre class="bg-light p-2 rounded">
+{
+    "title": "Δήλωση Περιουσιακής Κατάστασης",
+    "personal_data": {
+        "full_name": "Όνομα Επώνυμο",
+        "office": "Αξίωμα",
+        "address": "Διεύθυνση",
+        "dob": "YYYY-MM-DD",
+        "id_number": "Αριθμός Ταυτότητας",
+        "marital_status": "Οικογενειακή Κατάσταση",
+        "dependants": 0,
+        "party_id": 1
+    },
+    "properties": [
+        {
+            "type": "Κύρια Κατοικία",
+            "location": "Τοποθεσία",
+            "area": 100,
+            "topographic_data": "Δεδομένα",
+            "rights_burdens": "Δικαιώματα/Βάρη",
+            "acquisition_mode": "Τρόπος απόκτησης",
+            "acquisition_date": "YYYY-MM-DD",
+            "acquisition_value": 100000,
+            "current_value": 150000
+        }
+    ],
+    "vehicles": [
+        {
+            "type": "Αυτοκίνητο",
+            "brand": "Μάρκα",
+            "manu_year": 2020,
+            "value": 20000
+        }
+    ],
+    "liquid_assets": [
+        {
+            "type": "Μετρητά",
+            "description": "Περιγραφή",
+            "amount": 5000
+        }
+    ],
+    "deposits": [
+        {
+            "bank_name": "Τράπεζα",
+            "amount": 10000
+        }
+    ],
+    "insurance": [
+        {
+            "insurance_name": "Εταιρεία",
+            "contract_num": "123456",
+            "earnings": 5000
+        }
+    ],
+    "debts": [
+        {
+            "creditor_name": "Πιστωτής",
+            "type": "Δάνειο",
+            "amount": 15000
+        }
+    ],
+    "business": [
+        {
+            "business_name": "Όνομα Εταιρείας",
+            "business_type": "Τύπος",
+            "participation_type": "Τύπος συμμετοχής"
+        }
+    ],
+    "differences": {
+        "content": "Περιεχόμενο διαφορών"
+    },
+    "previous_incomes": {
+        "html_content": "Περιεχόμενο προηγούμενων εισοδημάτων"
+    }
+}</pre>
+                                <h6 class="fw-bold">Response:</h6>
+                                <pre class="bg-light p-2 rounded">
+{
+    "status": "success",
+    "message": "Declaration updated successfully",
+    "declaration_id": 123
+}</pre>
                             </div>
                             <button class="btn btn-outline-primary copy-btn" data-url="<?php echo "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/api.php?id="; ?>">
                                 <i class="fas fa-copy me-2"></i>Αντιγραφή URL
@@ -706,12 +833,34 @@ Cookie: PHPSESSID={your_session_id}</pre>
                                     <li><code>id</code>: Το ID της δήλωσης προς ενημέρωση</li>
                                 </ul>
                                 <h6 class="fw-bold">Request Body:</h6>
+                                <p class="text-muted">Μπορείτε να συμπεριλάβετε μόνο τα πεδία που θέλετε να ενημερώσετε.</p>
                                 <pre class="bg-light p-2 rounded">
 {
     "title": "Νέος Τίτλος Δήλωσης",
     "personal_data": {
-        "office": "Νέο Αξίωμα"
-    }
+        "office": "Νέο Αξίωμα",
+        "address": "Νέα Διεύθυνση"
+    },
+    "properties": [
+        {
+            "type": "Νέος Τύπος",
+            "location": "Νέα Τοποθεσία",
+            "area": 150
+        }
+    ],
+    "vehicles": [
+        {
+            "brand": "Νέα Μάρκα",
+            "value": 25000
+        }
+    ]
+}</pre>
+                                <h6 class="fw-bold">Response:</h6>
+                                <pre class="bg-light p-2 rounded">
+{
+    "status": "success",
+    "message": "Declaration partially updated successfully",
+    "declaration_id": 123
 }</pre>
                             </div>
                             <button class="btn btn-outline-primary copy-btn" data-url="<?php echo "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/api.php?id="; ?>">
@@ -723,38 +872,123 @@ Cookie: PHPSESSID={your_session_id}</pre>
 
                 <!-- DELETE Tab -->
                 <div class="method-content d-none" id="delete-content">
+                    <!-- Delete by Party -->
                     <div class="card api-card">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <i class="fas fa-trash-alt me-2"></i>
-                                Διαγραφή Δήλωσης
+                                <i class="fas fa-users me-2"></i>
+                                Διαγραφή ανά Κόμμα
                             </h5>
-                            <p class="card-text">Διαγραφή συγκεκριμένης δήλωσης περιουσιακής κατάστασης.</p>
-                            <div class="url-display mb-2" id="delete-url">
-                                <?php echo "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/api.php?id="; ?>
-                            </div>
-                            <div class="mb-3">
-                                <h6 class="fw-bold">Method: DELETE</h6>
-                                <h6 class="fw-bold">Headers:</h6>
-                                <pre class="bg-light p-2 rounded">
-Cookie: PHPSESSID={your_session_id}</pre>
-                                <h6 class="fw-bold">URL Parameters:</h6>
-                                <ul>
-                                    <li><code>id</code>: Το ID της δήλωσης προς διαγραφή</li>
-                                </ul>
-                            </div>
-                            <div class="form-group">
-                                <label for="delete-id-input">Επιλέξτε δήλωση προς διαγραφή:</label>
-                                <select class="form-select" id="delete-id-input">
-                                    <option value="">Επιλέξτε δήλωση...</option>
-                                    <?php foreach ($politicians as $politician): ?>
-                                        <option value="<?php echo htmlspecialchars($politician['id']); ?>">
-                                            <?php echo htmlspecialchars($politician['full_name']); ?>
-                                        </option>
+                            <p class="card-text">Διαγραφή δηλώσεων συγκεκριμένου κόμματος.</p>
+                            <div class="form-group mb-4">
+                                <label for="delete-party-input" class="form-label fw-bold mb-2">Επιλέξτε κόμμα:</label>
+                                <select class="form-select form-select-lg" id="delete-party-input">
+                                    <option value="">Επιλέξτε κόμμα...</option>
+                                    <?php foreach ($parties as $party): ?>
+                                        <option value="<?php echo htmlspecialchars($party); ?>"><?php echo htmlspecialchars($party); ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <button class="btn btn-outline-primary copy-btn" id="delete-copy-btn">
+                            <div class="url-display mb-3" id="delete-party-url">
+                                <?php echo "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/api.php?party="; ?>
+                            </div>
+                            <button class="btn btn-outline-primary copy-btn" id="delete-party-copy-btn">
+                                <i class="fas fa-copy me-2"></i>Αντιγραφή URL
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Delete by Year -->
+                    <div class="card api-card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-calendar me-2"></i>
+                                Διαγραφή ανά Έτος
+                            </h5>
+                            <p class="card-text">Διαγραφή δηλώσεων συγκεκριμένου έτους.</p>
+                            <div class="form-group">
+                                <label for="delete-year-input" class="form-label fw-bold mb-2">Επιλέξτε έτος:</label>
+                                <select class="form-select form-select-lg" id="delete-year-input">
+                                    <option value="">Επιλέξτε έτος...</option>
+                                    <?php foreach ($years as $year): ?>
+                                        <option value="<?php echo htmlspecialchars($year); ?>"><?php echo htmlspecialchars($year); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="url-display mb-2" id="delete-year-url">
+                                <?php echo "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/api.php?year="; ?>
+                            </div>
+                            <button class="btn btn-outline-primary copy-btn" id="delete-year-copy-btn">
+                                <i class="fas fa-copy me-2"></i>Αντιγραφή URL
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Delete by Position -->
+                    <div class="card api-card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-user-tie me-2"></i>
+                                Διαγραφή ανά Αξίωμα
+                            </h5>
+                            <p class="card-text">Διαγραφή δηλώσεων πολιτικών με συγκεκριμένο αξίωμα.</p>
+                            <div class="form-group">
+                                <label for="delete-position-input" class="form-label fw-bold mb-2">Επιλέξτε αξίωμα:</label>
+                                <select class="form-select form-select-lg" id="delete-position-input">
+                                    <option value="">Επιλέξτε αξίωμα...</option>
+                                    <?php foreach ($positions as $position): ?>
+                                        <option value="<?php echo htmlspecialchars($position); ?>"><?php echo htmlspecialchars($position); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="url-display mb-2" id="delete-position-url">
+                                <?php echo "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/api.php?position="; ?>
+                            </div>
+                            <button class="btn btn-outline-primary copy-btn" id="delete-position-copy-btn">
+                                <i class="fas fa-copy me-2"></i>Αντιγραφή URL
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Combined Delete -->
+                    <div class="card api-card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-filter me-2"></i>
+                                Συνδυασμένη Διαγραφή
+                            </h5>
+                            <p class="card-text">Διαγραφή δηλώσεων με βάση συνδυασμό κριτηρίων (κόμμα, έτος, αξίωμα).</p>
+                            <div class="form-group mb-3">
+                                <label for="delete-combined-party" class="form-label fw-bold mb-2">Επιλέξτε κόμμα:</label>
+                                <select class="form-select form-select-lg" id="delete-combined-party">
+                                    <option value="">Επιλέξτε κόμμα...</option>
+                                    <?php foreach ($parties as $party): ?>
+                                        <option value="<?php echo htmlspecialchars($party); ?>"><?php echo htmlspecialchars($party); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="delete-combined-year" class="form-label fw-bold mb-2">Επιλέξτε έτος:</label>
+                                <select class="form-select form-select-lg" id="delete-combined-year">
+                                    <option value="">Επιλέξτε έτος...</option>
+                                    <?php foreach ($years as $year): ?>
+                                        <option value="<?php echo htmlspecialchars($year); ?>"><?php echo htmlspecialchars($year); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="delete-combined-position" class="form-label fw-bold mb-2">Επιλέξτε αξίωμα:</label>
+                                <select class="form-select form-select-lg" id="delete-combined-position">
+                                    <option value="">Επιλέξτε αξίωμα...</option>
+                                    <?php foreach ($positions as $position): ?>
+                                        <option value="<?php echo htmlspecialchars($position); ?>"><?php echo htmlspecialchars($position); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="url-display mb-2" id="delete-combined-url">
+                                <?php echo "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/api.php"; ?>
+                            </div>
+                            <button class="btn btn-outline-primary copy-btn" id="delete-combined-copy-btn">
                                 <i class="fas fa-copy me-2"></i>Αντιγραφή URL
                             </button>
                         </div>
@@ -924,6 +1158,16 @@ Cookie: PHPSESSID={your_session_id}</pre>
                 copyUrl($(this).data('url'));
             });
 
+            // Delete search
+            $('#delete-id-input').on('select2:select', function(e) {
+                const url = `${baseUrl}?id=${e.target.value}`;
+                updateUrlDisplay('delete-url', url);
+                $('#delete-copy-btn').data('url', url);
+            });
+            $('#delete-copy-btn').on('click', function() {
+                copyUrl($(this).data('url'));
+            });
+
             // Combined search
             function updateCombinedUrl() {
                 const params = new URLSearchParams();
@@ -946,13 +1190,55 @@ Cookie: PHPSESSID={your_session_id}</pre>
                 copyUrl($(this).data('url'));
             });
 
-            // Delete search
-            $('#delete-id-input').on('select2:select', function(e) {
-                const url = `${baseUrl}?id=${e.target.value}`;
-                updateUrlDisplay('delete-url', url);
-                $('#delete-copy-btn').data('url', url);
+            // Delete by Party
+            $('#delete-party-input').on('select2:select', function(e) {
+                const url = `${baseUrl}?party=${encodeURIComponent(e.target.value)}`;
+                updateUrlDisplay('delete-party-url', url);
+                $('#delete-party-copy-btn').data('url', url);
             });
-            $('#delete-copy-btn').on('click', function() {
+            $('#delete-party-copy-btn').on('click', function() {
+                copyUrl($(this).data('url'));
+            });
+
+            // Delete by Year
+            $('#delete-year-input').on('select2:select', function(e) {
+                const url = `${baseUrl}?year=${e.target.value}`;
+                updateUrlDisplay('delete-year-url', url);
+                $('#delete-year-copy-btn').data('url', url);
+            });
+            $('#delete-year-copy-btn').on('click', function() {
+                copyUrl($(this).data('url'));
+            });
+
+            // Delete by Position
+            $('#delete-position-input').on('select2:select', function(e) {
+                const url = `${baseUrl}?position=${encodeURIComponent(e.target.value)}`;
+                updateUrlDisplay('delete-position-url', url);
+                $('#delete-position-copy-btn').data('url', url);
+            });
+            $('#delete-position-copy-btn').on('click', function() {
+                copyUrl($(this).data('url'));
+            });
+
+            // Combined Delete
+            function updateCombinedDeleteUrl() {
+                const params = new URLSearchParams();
+                const party = $('#delete-combined-party').val();
+                const year = $('#delete-combined-year').val();
+                const position = $('#delete-combined-position').val();
+
+                if (party) params.append('party', party);
+                if (year) params.append('year', year);
+                if (position) params.append('position', position);
+                
+                const url = `${baseUrl}?${params.toString()}`;
+                updateUrlDisplay('delete-combined-url', url);
+                $('#delete-combined-copy-btn').data('url', url);
+            }
+
+            $('#delete-combined-party, #delete-combined-year, #delete-combined-position').on('select2:select', updateCombinedDeleteUrl);
+
+            $('#delete-combined-copy-btn').on('click', function() {
                 copyUrl($(this).data('url'));
             });
 
