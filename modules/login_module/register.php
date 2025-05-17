@@ -6,6 +6,7 @@ $pdo = require_once "../../config/db_connection.php";
 $first_name = $last_name = $email = $password = $confirm_password = $role = "";
 $title = $office = $address = $dob = $id_number = $marital_status = $num_of_dependents = $political_affiliation = "";
 $first_name_err = $last_name_err = $email_err = $password_err = $confirm_password_err = $role_err = "";
+$front_photo_err = $back_photo_err = "";
 
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -83,32 +84,74 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $num_of_dependents = isset($_POST["num_of_dependents"]) ? (int)trim($_POST["num_of_dependents"]) : 0;
     $political_affiliation = isset($_POST["political_affiliation"]) ? trim($_POST["political_affiliation"]) : "";
     
+    // Validate ID photos for politicians
+    if($role === "Politician") {
+        if(!isset($_FILES["front_photo"]) || $_FILES["front_photo"]["error"] == UPLOAD_ERR_NO_FILE) {
+            $front_photo_err = "Παρακαλώ ανεβάστε τη μπροστινή πλευρά της ταυτότητάς σας.";
+        }
+        if(!isset($_FILES["back_photo"]) || $_FILES["back_photo"]["error"] == UPLOAD_ERR_NO_FILE) {
+            $back_photo_err = "Παρακαλώ ανεβάστε την πίσω πλευρά της ταυτότητάς σας.";
+        }
+    }
+    
     // Check input errors before inserting in database
-    if(empty($first_name_err) && empty($last_name_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err) && empty($role_err)){
+    if(empty($first_name_err) && empty($last_name_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err) && empty($role_err) && 
+       ($role !== "Politician" || (empty($front_photo_err) && empty($back_photo_err)))) {
         
         try {
+            $pdo->beginTransaction();
+            
             // Insert into users table
-            $sql = "INSERT INTO users (first_name, last_name, email, password, role) 
-                    VALUES (:first_name, :last_name, :email, :password, :role)";
+            $sql = "INSERT INTO users (first_name, last_name, email, password, role, verification_status) 
+                    VALUES (:first_name, :last_name, :email, :password, :role, :verification_status)";
             
             $stmt = $pdo->prepare($sql);
             
             // Set parameters
             $param_password = password_hash($password, PASSWORD_DEFAULT);
+            $verification_status = ($role === "Politician") ? "pending" : NULL;
             
             $stmt->bindParam(":first_name", $first_name);
             $stmt->bindParam(":last_name", $last_name);
             $stmt->bindParam(":email", $email);
             $stmt->bindParam(":password", $param_password);
             $stmt->bindParam(":role", $role);
+            $stmt->bindParam(":verification_status", $verification_status);
             
             $stmt->execute();
+            $user_id = $pdo->lastInsertId();
+            
+            // Handle ID photos for politicians
+            if($role === "Politician") {
+                $upload_dir = "../../uploads/id_photos/";
+                if(!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                $front_photo_name = $user_id . "_front_" . time() . ".jpg";
+                $back_photo_name = $user_id . "_back_" . time() . ".jpg";
+                
+                move_uploaded_file($_FILES["front_photo"]["tmp_name"], $upload_dir . $front_photo_name);
+                move_uploaded_file($_FILES["back_photo"]["tmp_name"], $upload_dir . $back_photo_name);
+                
+                $sql = "INSERT INTO politician_id_photos (user_id, front_photo_path, back_photo_path) 
+                        VALUES (:user_id, :front_photo_path, :back_photo_path)";
+                
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(":user_id", $user_id);
+                $stmt->bindParam(":front_photo_path", $front_photo_name);
+                $stmt->bindParam(":back_photo_path", $back_photo_name);
+                $stmt->execute();
+            }
+            
+            $pdo->commit();
             
             // Redirect to login page
             header("location: login.php");
             exit();
             
         } catch(PDOException $e) {
+            $pdo->rollBack();
             echo "Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
         }
     }
@@ -140,7 +183,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <p class="text-muted">Γίνετε μέλος του ΠΟΘΕΝ ΕΣΧΕΣ για να υποβάλετε τις δηλώσεις περιουσίας σας</p>
                         </div>
 
-                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="needs-validation" novalidate>
+                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
                             <div class="row g-3">
                                 <!-- Basic Information -->
                                 <div class="col-md-6">
@@ -192,13 +235,34 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                     <label class="form-label">Θέση/Ρόλος</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-briefcase"></i></span>
-                                        <select name="role" class="form-select <?php echo (!empty($role_err)) ? 'is-invalid' : ''; ?>" required>
+                                        <select name="role" class="form-select <?php echo (!empty($role_err)) ? 'is-invalid' : ''; ?>" required onchange="toggleIdPhotos(this.value)">
                                             <option value="">Επιλέξτε θέση</option>
                                             <option value="Public" <?php echo ($role == "Public") ? 'selected' : ''; ?>>Δημόσιος</option>
                                             <option value="Politician" <?php echo ($role == "Politician") ? 'selected' : ''; ?>>Πολιτικός</option>
                                             <option value="Admin" <?php echo ($role == "Admin") ? 'selected' : ''; ?>>Διαχειριστής</option>
                                         </select>
                                         <div class="invalid-feedback"><?php echo $role_err; ?></div>
+                                    </div>
+                                </div>
+
+                                <!-- ID Photos for Politicians -->
+                                <div id="idPhotosSection" style="display: none;">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Μπροστινή Πλευρά Ταυτότητας</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-card-image"></i></span>
+                                            <input type="file" name="front_photo" class="form-control <?php echo (!empty($front_photo_err)) ? 'is-invalid' : ''; ?>" accept="image/*">
+                                            <div class="invalid-feedback"><?php echo $front_photo_err; ?></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Πίσω Πλευρά Ταυτότητας</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-card-image"></i></span>
+                                            <input type="file" name="back_photo" class="form-control <?php echo (!empty($back_photo_err)) ? 'is-invalid' : ''; ?>" accept="image/*">
+                                            <div class="invalid-feedback"><?php echo $back_photo_err; ?></div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -233,5 +297,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="assets/js/main.js"></script>
+
+    <script>
+    function toggleIdPhotos(role) {
+        const idPhotosSection = document.getElementById('idPhotosSection');
+        if (role === 'Politician') {
+            idPhotosSection.style.display = 'block';
+        } else {
+            idPhotosSection.style.display = 'none';
+        }
+    }
+
+    // Call on page load to set initial state
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.querySelector('select[name="role"]');
+        toggleIdPhotos(roleSelect.value);
+    });
+    </script>
 </body>
 </html> 
