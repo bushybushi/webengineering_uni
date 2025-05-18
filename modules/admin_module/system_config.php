@@ -481,6 +481,9 @@ $periods = $conn->query("
         </div>
     </footer>
 
+    <?php include '../../includes/about-us-modal.php'; ?>
+    <?php include '../../includes/manual-modal.php'; ?>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     

@@ -566,57 +566,8 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </footer>
 
-    <?php foreach ($pending_politicians as $politician): ?>
-    <!-- Verify Politician Modal -->
-    <div class="modal fade" id="verifyPoliticianModal<?= $politician['id'] ?>" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Επιβεβαίωση Πολιτικού</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Πληροφορίες Χρήστη</h6>
-                            <p><strong>Όνομα:</strong> <?= htmlspecialchars($politician['first_name'] . ' ' . $politician['last_name']) ?></p>
-                            <p><strong>Email:</strong> <?= htmlspecialchars($politician['email']) ?></p>
-                            <p><strong>Ημερομηνία Εγγραφής:</strong> <?= date('d/m/Y', strtotime($politician['created_at'])) ?></p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Φωτογραφίες Ταυτότητας</h6>
-                            <?php if ($politician['front_photo_path'] && $politician['back_photo_path']): ?>
-                                <div class="row g-2">
-                                    <div class="col-6">
-                                        <p class="mb-1">Μπροστινή πλευρά:</p>
-                                        <img src="../../<?= htmlspecialchars($politician['front_photo_path']) ?>" class="img-fluid rounded" alt="Front ID">
-                                    </div>
-                                    <div class="col-6">
-                                        <p class="mb-1">Πίσω πλευρά:</p>
-                                        <img src="../../<?= htmlspecialchars($politician['back_photo_path']) ?>" class="img-fluid rounded" alt="Back ID">
-                                    </div>
-                                </div>
-                            <?php else: ?>
-                                <p class="text-muted">Δεν έχουν ανεβεί φωτογραφίες ταυτότητας</p>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <form method="POST" class="d-inline">
-                        <input type="hidden" name="user_id" value="<?= $politician['id'] ?>">
-                        <button type="submit" name="reject_politician" class="btn btn-danger">
-                            <i class="bi bi-x-circle"></i> Απόρριψη
-                        </button>
-                        <button type="submit" name="approve_politician" class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> Έγκριση
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php endforeach; ?>
+    <?php include '../../includes/about-us-modal.php'; ?>
+    <?php include '../../includes/manual-modal.php'; ?>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
