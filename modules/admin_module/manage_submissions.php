@@ -239,8 +239,13 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
     </nav>
 
     <!-- Main Content -->
-    <main class="container mt-5 pt-5">
-        <h1 class="text-center mb-4">Διαχείριση Δηλώσεων</h1>
+    <div class="container mt-4">
+        <div class="d-flex align-items-center mb-4">
+            <a href="dashboard.php" class="btn btn-outline-primary me-3">
+                <i class="fas fa-arrow-left"></i> Επιστροφή στο Dashboard
+            </a>
+            <h2>Διαχείριση Υποβολών</h2>
+        </div>
         
         <!-- Search and Filter Form -->
         <div class="card feature-card mb-4">
@@ -359,7 +364,7 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                 </form>
             </div>
         </div>
-    </main>
+    </div>
 
     <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmationModal" tabindex="-1">
@@ -385,25 +390,24 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
     </div>
 
     <!-- Footer -->
-    <footer class="bg-light py-4 mt-5">
-        <div class="container">
+    <footer class="footer mt-auto py-3 bg-light">
+        <div class="container text-center">
             <div class="row align-items-center">
-                <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0"> 2025 Πόθεν Εσχες &copy; all rights reserved.</p>
+                <div class="col-md-4">
+                    <img src="../../assets/images/logo.png" alt="Logo" height="40">
                 </div>
-                <div class="col-12 col-md-6 text-center text-md-end">
-                    <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.html" class="text-decoration-none">Ποιοι είμαστε</a>
-                        <a href="contact.html" class="text-decoration-none">Επικοινωνία</a>
-                        <a href="privacy.html" class="text-decoration-none">Πολιτική Απορρήτου</a>
-                    </div>
+                <div class="col-md-4">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#aboutModal" class="text-decoration-none text-dark">About Us</a>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted">&copy; 2025 All rights reserved.</span>
                 </div>
             </div>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <!-- DataTables JS -->

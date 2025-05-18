@@ -219,288 +219,50 @@ $periods = $conn->query("
     </nav>
 
     <!-- Main Content -->
-    <main class="container mt-5 pt-5">
-        <h1 class="text-center mb-4">Ρυθμίσεις Συστήματος</h1>
-        
-        <!-- Political Parties Section -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h2 class="card-title mb-4">Πολιτικά Κόμματα</h2>
-                
-                <!-- Party Search -->
-                <form method="GET" class="mb-4">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="party_search" placeholder="Αναζήτηση κόμματος..." value="<?= htmlspecialchars($party_search) ?>">
-                        <button type="submit" class="btn btn-warning">
-                            <i class="bi bi-search"></i> Αναζήτηση
-                        </button>
-                        <?php if (!empty($party_search)): ?>
-                            <a href="system_config.php" class="btn btn-secondary">
-                                <i class="bi bi-x-circle"></i> Καθαρισμός
-                            </a>
-                        <?php endif; ?>
-                    </div>
-                </form>
-
-                <!-- Add Party Form -->
-                <form method="POST" class="mb-4">
-                    <div class="mb-3">
-                        <label for="party" class="form-label">Όνομα Κόμματος</label>
-                        <input type="text" class="form-control" id="party" name="party" required>
-                    </div>
-                    <button type="submit" name="add_party" class="btn btn-primary" style="background-color: #ED9635; border-color: #ED9635;">
-                        <i class="bi bi-plus-circle"></i> Προσθήκη Κόμματος
-                    </button>
-                </form>
-                
-                <!-- Parties Table -->
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Όνομα</th>
-                                <th>Κατάσταση</th>
-                                <th>Ενέργειες</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($parties as $party): ?>
-                                <tr>
-                                    <td><?= $party['id'] ?></td>
-                                    <td><?= htmlspecialchars($party['name']) ?></td>
-                                    <td>
-                                        <?php if ($party['is_used']): ?>
-                                            <span class="badge bg-success">Σε χρήση</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">Δεν χρησιμοποιείται</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-warning" onclick="editParty(<?= $party['id'] ?>, '<?= htmlspecialchars($party['name']) ?>')">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <?php if (!$party['is_used']): ?>
-                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteParty(<?= $party['id'] ?>, '<?= htmlspecialchars($party['name']) ?>')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        <?php else: ?>
-                                            <button type="button" class="btn btn-sm btn-danger" disabled title="Δεν μπορείτε να διαγράψετε ένα κόμμα που χρησιμοποιείται σε δηλώσεις">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="container mt-4">
+        <div class="d-flex align-items-center mb-4">
+            <a href="dashboard.php" class="btn btn-outline-primary me-3">
+                <i class="fas fa-arrow-left"></i> Επιστροφή στο Dashboard
+            </a>
+            <h2>Ρυθμίσεις Συστήματος</h2>
         </div>
         
-        <!-- Submission Periods Section -->
-        <div class="card shadow-sm">
+        <!-- System Configuration Form -->
+        <div class="card">
             <div class="card-body">
-                <h2 class="card-title mb-4">Περίοδοι Υποβολής</h2>
-
-                <!-- Add Period Form -->
-                <form method="POST" class="mb-4">
+                <form method="POST" action="">
                     <div class="mb-3">
-                        <label for="year" class="form-label">Έτος</label>
-                        <input type="number" class="form-control" id="year" name="year" required>
+                        <label for="submission_period" class="form-label">Περίοδος Υποβολής</label>
+                        <input type="text" class="form-control" id="submission_period" name="submission_period" value="<?php echo htmlspecialchars($config['submission_period']); ?>">
                     </div>
-                    <button type="submit" name="add_period" class="btn btn-primary" style="background-color: #ED9635; border-color: #ED9635;">
-                        <i class="bi bi-plus-circle"></i> Προσθήκη Έτους
-                    </button>
+                    <div class="mb-3">
+                        <label for="max_submissions" class="form-label">Μέγιστος Αριθμός Υποβολών</label>
+                        <input type="number" class="form-control" id="max_submissions" name="max_submissions" value="<?php echo htmlspecialchars($config['max_submissions']); ?>">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Αποθήκευση Ρυθμίσεων</button>
                 </form>
-                
-                <!-- Periods Table -->
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Έτος</th>
-                                <th>Κατάσταση</th>
-                                <th>Ενέργειες</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($periods as $period): ?>
-                                <tr>
-                                    <td><?= $period['id'] ?></td>
-                                    <td><?= $period['year'] ?></td>
-                                    <td>
-                                        <?php if ($period['is_used']): ?>
-                                            <span class="badge bg-success">Σε χρήση</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">Δεν χρησιμοποιείται</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-warning" onclick="editPeriod(<?= $period['id'] ?>, '<?= $period['year'] ?>')">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <?php if (!$period['is_used']): ?>
-                                            <button type="button" class="btn btn-sm btn-danger" onclick="deletePeriod(<?= $period['id'] ?>, '<?= $period['year'] ?>')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        <?php else: ?>
-                                            <button type="button" class="btn btn-sm btn-danger" disabled title="Δεν μπορείτε να διαγράψετε μια περίοδο που χρησιμοποιείται σε δηλώσεις">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Edit Party Modal -->
-    <div class="modal fade" id="editPartyModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Επεξεργασία Κόμματος</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form method="POST">
-                    <div class="modal-body">
-                        <input type="hidden" name="party_id" id="edit_party_id">
-                        <div class="mb-3">
-                            <label for="party_name" class="form-label">Όνομα Κόμματος</label>
-                            <input type="text" class="form-control" id="party_name" name="party_name" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ακύρωση</button>
-                        <button type="submit" name="edit_party" class="btn btn-warning">Αποθήκευση</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Party Modal -->
-    <div class="modal fade" id="deletePartyModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Διαγραφή Κόμματος</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Είστε σίγουροι ότι θέλετε να διαγράψετε το κόμμα <span id="delete_party_name"></span>;</p>
-                </div>
-                <div class="modal-footer">
-                    <form method="POST">
-                        <input type="hidden" name="party_id" id="delete_party_id">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ακύρωση</button>
-                        <button type="submit" name="delete_party" class="btn btn-danger">Διαγραφή</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Period Modal -->
-    <div class="modal fade" id="editPeriodModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Επεξεργασία Έτους</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form method="POST">
-                    <div class="modal-body">
-                        <input type="hidden" name="period_id" id="edit_period_id">
-                        <div class="mb-3">
-                            <label for="edit_year" class="form-label">Έτος</label>
-                            <input type="number" class="form-control" id="edit_year" name="year" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ακύρωση</button>
-                        <button type="submit" name="edit_period" class="btn btn-warning">Αποθήκευση</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Period Modal -->
-    <div class="modal fade" id="deletePeriodModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Διαγραφή Έτους</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Είστε σίγουροι ότι θέλετε να διαγράψετε το έτος <span id="delete_period_year"></span>;</p>
-                </div>
-                <div class="modal-footer">
-                    <form method="POST">
-                        <input type="hidden" name="period_id" id="delete_period_id">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ακύρωση</button>
-                        <button type="submit" name="delete_period" class="btn btn-danger">Διαγραφή</button>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="bg-light py-4 mt-5">
-        <div class="container">
+    <footer class="footer mt-auto py-3 bg-light">
+        <div class="container text-center">
             <div class="row align-items-center">
-                <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0"> 2025 Πόθεν Εσχες &copy; all rights reserved.</p>
+                <div class="col-md-4">
+                    <img src="../../assets/images/logo.png" alt="Logo" height="40">
                 </div>
-                <div class="col-12 col-md-6 text-center text-md-end">
-                    <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.html" class="text-decoration-none">Ποιοι είμαστε</a>
-                        <a href="contact.html" class="text-decoration-none">Επικοινωνία</a>
-                        <a href="privacy.html" class="text-decoration-none">Πολιτική Απορρήτου</a>
-                    </div>
+                <div class="col-md-4">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#aboutModal" class="text-decoration-none text-dark">About Us</a>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted">&copy; 2025 All rights reserved.</span>
                 </div>
             </div>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Party functions
-        function editParty(id, name) {
-            document.getElementById('edit_party_id').value = id;
-            document.getElementById('party_name').value = name;
-            new bootstrap.Modal(document.getElementById('editPartyModal')).show();
-        }
-
-        function deleteParty(id, name) {
-            document.getElementById('delete_party_id').value = id;
-            document.getElementById('delete_party_name').textContent = name;
-            new bootstrap.Modal(document.getElementById('deletePartyModal')).show();
-        }
-
-        // Period functions
-        function editPeriod(id, year) {
-            document.getElementById('edit_period_id').value = id;
-            document.getElementById('edit_year').value = year;
-            new bootstrap.Modal(document.getElementById('editPeriodModal')).show();
-        }
-
-        function deletePeriod(id, year) {
-            document.getElementById('delete_period_id').value = id;
-            document.getElementById('delete_period_year').textContent = year;
-            new bootstrap.Modal(document.getElementById('deletePeriodModal')).show();
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
