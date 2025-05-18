@@ -98,8 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Hash password
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                 
-                // Insert new user
-                $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)");
+                // Insert new user with verification_status set to 'approved'
+                $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, role, verification_status) VALUES (?, ?, ?, ?, ?, 'approved')");
                 $stmt->execute([$first_name, $last_name, $email, $hashed_password, $role]);
             }
         }
