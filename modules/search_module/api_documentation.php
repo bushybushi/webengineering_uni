@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'Admin') {
+if (!isset($_SESSION['id']) || !in_array($_SESSION['role'], ['Admin', 'Public', 'Politician'])) {
     header('Location: ../login_module/login.php');
     exit;
 }
@@ -31,6 +31,24 @@ $idsQuery = "SELECT d.id, pd.full_name
              ORDER BY pd.full_name";
 $idsStmt = $pdo->query($idsQuery);
 $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get API keys from database
+$apiKeysQuery = "SELECT role, key_value FROM api_keys";
+$apiKeysStmt = $pdo->query($apiKeysQuery);
+$apiKeys = $apiKeysStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Check if user is admin
+$isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'Admin';
+
+// Get the appropriate API key based on user role
+$userRole = $_SESSION['role'];
+$apiKey = '';
+foreach ($apiKeys as $key) {
+    if ($key['role'] === strtolower($userRole)) {
+        $apiKey = $key['key_value'];
+        break;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="el">
@@ -404,6 +422,7 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fas fa-arrow-down"></i>
                         <span>GET</span>
                     </button>
+                    <?php if ($isAdmin): ?>
                     <button type="button" class="method-btn post-btn" data-method="post">
                         <i class="fas fa-plus"></i>
                         <span>POST</span>
@@ -420,6 +439,7 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fas fa-trash"></i>
                         <span>DELETE</span>
                     </button>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -435,6 +455,12 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 Αναζήτηση Όλων των Πολιτικών
                             </h5>
                             <p class="card-text">Επιστρέφει λίστα με όλους τους πολιτικούς που έχουν υποβάλλει δήλωση.</p>
+                            <div class="mb-3">
+                                <h6 class="fw-bold">Headers:</h6>
+                                <pre class="bg-light p-2 rounded">
+Content-Type: application/json
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
+                            </div>
                             <div class="url-display mb-2" id="all-politicians-url">
                                 <?php echo "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/api.php"; ?>
                             </div>
@@ -452,6 +478,12 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 Αναζήτηση ανά Κόμμα
                             </h5>
                             <p class="card-text">Επιστρέφει λίστα με πολιτικούς συγκεκριμένου κόμματος.</p>
+                            <div class="mb-3">
+                                <h6 class="fw-bold">Headers:</h6>
+                                <pre class="bg-light p-2 rounded">
+Content-Type: application/json
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
+                            </div>
                             <div class="form-group mb-4">
                                 <label for="party-input" class="form-label fw-bold mb-2">Επιλέξτε κόμμα:</label>
                                 <select class="form-select form-select-lg" id="party-input">
@@ -478,6 +510,12 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 Αναζήτηση ανά Έτος
                             </h5>
                             <p class="card-text">Επιστρέφει δηλώσεις συγκεκριμένου έτους.</p>
+                            <div class="mb-3">
+                                <h6 class="fw-bold">Headers:</h6>
+                                <pre class="bg-light p-2 rounded">
+Content-Type: application/json
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
+                            </div>
                             <div class="form-group">
                                 <label for="year-input">Επιλέξτε έτος:</label>
                                 <select class="form-select" id="year-input">
@@ -504,6 +542,12 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 Αναζήτηση ανά Αξίωμα
                             </h5>
                             <p class="card-text">Επιστρέφει πολιτικούς με συγκεκριμένο αξίωμα.</p>
+                            <div class="mb-3">
+                                <h6 class="fw-bold">Headers:</h6>
+                                <pre class="bg-light p-2 rounded">
+Content-Type: application/json
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
+                            </div>
                             <div class="form-group">
                                 <label for="position-input">Επιλέξτε αξίωμα:</label>
                                 <select class="form-select" id="position-input">
@@ -530,6 +574,12 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 Συνδυασμένη Αναζήτηση
                             </h5>
                             <p class="card-text">Επιστρέφει αποτελέσματα με βάση συνδυασμό κριτηρίων (κόμμα, έτος, αξίωμα).</p>
+                            <div class="mb-3">
+                                <h6 class="fw-bold">Headers:</h6>
+                                <pre class="bg-light p-2 rounded">
+Content-Type: application/json
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
+                            </div>
                             <div class="form-group mb-3">
                                 <label for="combined-party" class="form-label">Επιλέξτε κόμμα:</label>
                                 <select class="form-select" id="combined-party">
@@ -574,6 +624,12 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 Λήψη Στοιχείων Συγκεκριμένου Πολιτικού
                             </h5>
                             <p class="card-text">Επιστρέφει αναλυτικά στοιχεία συγκεκριμένου πολιτικού.</p>
+                            <div class="mb-3">
+                                <h6 class="fw-bold">Headers:</h6>
+                                <pre class="bg-light p-2 rounded">
+Content-Type: application/json
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
+                            </div>
                             <div class="form-group">
                                 <label for="id-input">Επιλέξτε πολιτικό:</label>
                                 <select class="form-select" id="id-input">
@@ -595,6 +651,7 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
+                <?php if ($isAdmin): ?>
                 <!-- POST Tab -->
                 <div class="method-content d-none" id="post-content">
                     <div class="card api-card">
@@ -612,7 +669,7 @@ $politicians = $idsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <h6 class="fw-bold">Headers:</h6>
                                 <pre class="bg-light p-2 rounded">
 Content-Type: application/json
-Cookie: PHPSESSID={your_session_id}</pre>
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
                                 <h6 class="fw-bold">Request Body:</h6>
                                 <pre class="bg-light p-2 rounded">
 {
@@ -714,7 +771,7 @@ Cookie: PHPSESSID={your_session_id}</pre>
                                 <h6 class="fw-bold">Headers:</h6>
                                 <pre class="bg-light p-2 rounded">
 Content-Type: application/json
-Cookie: PHPSESSID={your_session_id}</pre>
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
                                 <h6 class="fw-bold">URL Parameters:</h6>
                                 <ul>
                                     <li><code>id</code>: Το ID της δήλωσης προς ενημέρωση</li>
@@ -827,7 +884,7 @@ Cookie: PHPSESSID={your_session_id}</pre>
                                 <h6 class="fw-bold">Headers:</h6>
                                 <pre class="bg-light p-2 rounded">
 Content-Type: application/json
-Cookie: PHPSESSID={your_session_id}</pre>
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
                                 <h6 class="fw-bold">URL Parameters:</h6>
                                 <ul>
                                     <li><code>id</code>: Το ID της δήλωσης προς ενημέρωση</li>
@@ -994,6 +1051,7 @@ Cookie: PHPSESSID={your_session_id}</pre>
                         </div>
                     </div>
                 </div>
+                <?php endif; ?>
             </div>
 
             <style>
