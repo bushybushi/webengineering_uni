@@ -239,13 +239,15 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
     </nav>
 
     <!-- Main Content -->
-    <div class="container mt-4">
-        <div class="d-flex align-items-center mb-4">
-            <a href="dashboard.php" class="btn btn-outline-primary me-3">
-                <i class="fas fa-arrow-left"></i> Επιστροφή στο Dashboard
+    <main class="container mt-5 pt-5">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="dashboard.php" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Επιστροφή στο Dashboard
             </a>
-            <h2>Διαχείριση Υποβολών</h2>
         </div>
+        
+        <h1 class="text-center mb-4">Διαχείριση Δηλώσεων</h1>
         
         <!-- Search and Filter Form -->
         <div class="card feature-card mb-4">
@@ -364,7 +366,7 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                 </form>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmationModal" tabindex="-1">
@@ -390,24 +392,27 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
     </div>
 
     <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-light">
-        <div class="container text-center">
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <img src="../../assets/images/logo.png" alt="Logo" height="40">
+    <footer class="bg-light py-4 mt-auto border-top">
+        <div class="container">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-12 text-center mb-2">
+                    <div class="mb-2">
+                        <img src="../../assets/images/iconlogo.png" alt="Πόθεν Έσχες Logo" style="height: 42px; width: 42px; object-fit: contain;" />
+                    </div>
+                    <a href="#" class="text-decoration-none fw-medium" style="color: #ED9635;" data-bs-toggle="modal" data-bs-target="#aboutUsModal">
+                        <i class="bi bi-person-badge me-1"></i>Ποιοι είμαστε
+                    </a>
                 </div>
-                <div class="col-md-4">
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#aboutModal" class="text-decoration-none text-dark">About Us</a>
-                </div>
-                <div class="col-md-4">
-                    <span class="text-muted">&copy; 2025 All rights reserved.</span>
+                <div class="col-12 text-center mb-2">
+                    <span class="fw-bold small" style="color: #ED9635; font-size: 0.95rem;"><a href="#" style="text-decoration: none; color: #ED9635;">Πόθεν Έσχες</a></span>
+                    <span class="text-muted small">&copy; 2025. All rights reserved.</span>
                 </div>
             </div>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <!-- DataTables JS -->

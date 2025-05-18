@@ -94,7 +94,7 @@ $sort_order = isset($_GET['order']) ? $_GET['order'] : 'asc';
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 
 // Modify query based on search and sort
-$query = "SELECT * FROM users WHERE verification_status = 'approved'";
+$query = "SELECT * FROM users WHERE (role = 'Politician' AND verification_status = 'approved') OR role != 'Politician'";
 if (!empty($search)) {
     $query .= " AND (first_name LIKE :search OR last_name LIKE :search OR email LIKE :search OR role LIKE :search)";
 }
@@ -265,13 +265,14 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Main Content -->
     <main class="container mt-5 pt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Back Button -->
+        <div class="mb-4">
             <a href="dashboard.php" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Επιστροφή στο Dashboard
             </a>
-            <h1 class="mb-0">Διαχείριση Χρηστών</h1>
-            <div style="width: 120px;"></div> <!-- Spacer for alignment -->
         </div>
+        
+        <h1 class="text-center mb-4">Διαχείριση Χρηστών</h1>
         
         <!-- Search and Sort Controls -->
         <div class="card shadow-sm mb-4">

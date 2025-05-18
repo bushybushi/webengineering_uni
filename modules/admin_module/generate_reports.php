@@ -195,115 +195,115 @@ $people_without_declarations = $conn->query("
     </nav>
 
     <!-- Main Content -->
-    <div class="container mt-4">
-        <div class="d-flex align-items-center mb-4">
-            <a href="dashboard.php" class="btn btn-outline-primary me-3">
-                <i class="fas fa-arrow-left"></i> Επιστροφή στο Dashboard
+    <main class="container mt-5 pt-5">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="dashboard.php" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Επιστροφή στο Dashboard
             </a>
-            <h2>Δημιουργία Αναφορών</h2>
         </div>
         
-        <!-- Reports Form -->
-        <div class="card">
-            <div class="card-body">
-                <!-- Quick Stats -->
-                <div class="row g-4 mb-5">
-                    <div class="col-md-4">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <i class="bi bi-file-text feature-icon mb-3" style="font-size: 2rem; color: #ED9635;"></i>
-                                <h5 class="card-title">Συνολικές Δηλώσεις</h5>
-                                <h2 class="mb-0"><?= $total_declarations ?></h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <i class="bi bi-calendar-check feature-icon mb-3" style="font-size: 2rem; color: #28a745;"></i>
-                                <h5 class="card-title">Ενεργές Περιόδους</h5>
-                                <h2 class="mb-0"><?= count($declarations_by_year) ?></h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <i class="bi bi-building feature-icon mb-3" style="font-size: 2rem; color: #dc3545;"></i>
-                                <h5 class="card-title">Κόμματα με Δηλώσεις</h5>
-                                <h2 class="mb-0"><?= count($declarations_by_party) ?></h2>
-                            </div>
-                        </div>
+        <h1 class="text-center mb-4">Αναφορές και Στατιστικά</h1>
+        
+        <!-- Quick Stats -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-file-text feature-icon mb-3" style="font-size: 2rem; color: #ED9635;"></i>
+                        <h5 class="card-title">Συνολικές Δηλώσεις</h5>
+                        <h2 class="mb-0"><?= $total_declarations ?></h2>
                     </div>
                 </div>
-                
-                <!-- Charts -->
-                <div class="row g-4 mb-5">
-                    <div class="col-md-6">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Δηλώσεις ανά Έτος</h5>
-                                <canvas id="declarationsByYearChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Δηλώσεις ανά Κόμμα</h5>
-                                <canvas id="declarationsByPartyChart"></canvas>
-                            </div>
-                        </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-calendar-check feature-icon mb-3" style="font-size: 2rem; color: #28a745;"></i>
+                        <h5 class="card-title">Ενεργές Περιόδους</h5>
+                        <h2 class="mb-0"><?= count($declarations_by_year) ?></h2>
                     </div>
                 </div>
-                
-                <!-- People Without Declarations -->
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">Άτομα χωρίς Δηλώσεις</h5>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Όνομα</th>
-                                        <th>Κόμμα</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($people_without_declarations as $person) { ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($person['full_name']) ?></td>
-                                            <td><?= htmlspecialchars($person['party_name']) ?></td>
-                                        </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
-                        </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-building feature-icon mb-3" style="font-size: 2rem; color: #dc3545;"></i>
+                        <h5 class="card-title">Κόμματα με Δηλώσεις</h5>
+                        <h2 class="mb-0"><?= count($declarations_by_party) ?></h2>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+        
+        <!-- Charts -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Δηλώσεις ανά Έτος</h5>
+                        <canvas id="declarationsByYearChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Δηλώσεις ανά Κόμμα</h5>
+                        <canvas id="declarationsByPartyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- People Without Declarations -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Άτομα χωρίς Δηλώσεις</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Όνομα</th>
+                                <th>Κόμμα</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($people_without_declarations as $person) { ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($person['full_name']) ?></td>
+                                    <td><?= htmlspecialchars($person['party_name']) ?></td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-light">
-        <div class="container text-center">
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <img src="../../assets/images/logo.png" alt="Logo" height="40">
+    <footer class="bg-light py-4 mt-auto border-top">
+        <div class="container">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-12 text-center mb-2">
+                    <div class="mb-2">
+                        <img src="../../assets/images/iconlogo.png" alt="Πόθεν Έσχες Logo" style="height: 42px; width: 42px; object-fit: contain;" />
+                    </div>
+                    <a href="#" class="text-decoration-none fw-medium" style="color: #ED9635;" data-bs-toggle="modal" data-bs-target="#aboutUsModal">
+                        <i class="bi bi-person-badge me-1"></i>Ποιοι είμαστε
+                    </a>
                 </div>
-                <div class="col-md-4">
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#aboutModal" class="text-decoration-none text-dark">About Us</a>
-                </div>
-                <div class="col-md-4">
-                    <span class="text-muted">&copy; 2025 All rights reserved.</span>
+                <div class="col-12 text-center mb-2">
+                    <span class="fw-bold small" style="color: #ED9635; font-size: 0.95rem;"><a href="#" style="text-decoration: none; color: #ED9635;">Πόθεν Έσχες</a></span>
+                    <span class="text-muted small">&copy; 2025. All rights reserved.</span>
                 </div>
             </div>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Charts -->
     <script>

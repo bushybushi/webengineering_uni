@@ -276,8 +276,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
 
 </head>
 <body>
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="../../index.php">
                 <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
@@ -363,7 +363,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                 </div>
                 <div class="offcanvas-body">
                     <ul class="navbar-nav">
-                        <li class="nav-item">
+                    <li class="nav-item">
                             <a class="nav-link d-flex align-items-center gap-2 mb-2" href="../../index.php">
                                 <i class="bi bi-house"></i> Αρχική
                             </a>
@@ -420,9 +420,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                         <i class="bi bi-person-plus me-2"></i> Εγγραφή
                                     </a>
                                 <?php endif; ?>
-                            </div>
-                        </li>
-                    </ul>
+                        </div>
+                    </li>
+                </ul>
                 </div>
             </div>
         </div>
