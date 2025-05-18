@@ -299,23 +299,28 @@ $followed_politicians = $stmt->fetchAll();
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-light py-4 mt-auto">
+     <!-- Footer -->
+    <footer class="bg-light py-4 mt-auto border-top">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0">&copy; 2025 Asset Declaration System. All rights reserved.</p>
-                </div>
-                <div class="col-12 col-md-6 text-center text-md-end">
-                    <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="../../about.php" class="text-decoration-none">About</a>
-                        <a href="../../contact.php" class="text-decoration-none">Contact</a>
-                        <a href="../../privacy.php" class="text-decoration-none">Privacy Policy</a>
+            <div class="row justify-content-center align-items-center">
+                
+                <div class="col-12 text-center mb-2">
+                    <div class="mb-2">
+                        <img src="../../assets/images/iconlogo.png" alt="Πόθεν Έσχες Logo" style="height: 42px; width: 42px; object-fit: contain;" />
                     </div>
+                    <a href="#" class="text-decoration-none fw-medium" style="color: #ED9635;" data-bs-toggle="modal" data-bs-target="#aboutUsModal">
+                        <i class="bi bi-person-badge me-1"></i>Ποιοι είμαστε
+                    </a>
+                </div>
+                <div class="col-12 text-center mb-2">
+                    <span class="fw-bold small" style="color: #ED9635; font-size: 0.95rem;"><a href="#" style="text-decoration: none; color: #ED9635;">Πόθεν Έσχες</a></span>
+                    <span class="text-muted small">&copy; 2025. All rights reserved.</span>
                 </div>
             </div>
         </div>
     </footer>
+
+    <?php include '../../includes/about-us-modal.php'; ?>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
