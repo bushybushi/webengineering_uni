@@ -35,7 +35,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (isset($_POST['reject_politician'])) {
         $user_id = $_POST['user_id'];
-        $stmt = $conn->prepare("UPDATE users SET verification_status = 'rejected' WHERE id = ?");
+        // First delete the ID photos if they exist
+        $stmt = $conn->prepare("SELECT front_photo_path, back_photo_path FROM politician_id_photos WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        $photos = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($photos) {
+            // Delete the actual files
+            if ($photos['front_photo_path'] && file_exists("../../" . $photos['front_photo_path'])) {
+                unlink("../../" . $photos['front_photo_path']);
+            }
+            if ($photos['back_photo_path'] && file_exists("../../" . $photos['back_photo_path'])) {
+                unlink("../../" . $photos['back_photo_path']);
+            }
+            
+            // Delete the database records
+            $stmt = $conn->prepare("DELETE FROM politician_id_photos WHERE user_id = ?");
+            $stmt->execute([$user_id]);
+        }
+        
+        // Finally delete the user
+        $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
         $stmt->execute([$user_id]);
     }
     
@@ -589,11 +609,17 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <p class="mb-1">Μπροστινή πλευρά:</p>
-                                        <img src="../../<?= htmlspecialchars($politician['front_photo_path']) ?>" class="img-fluid rounded" alt="Front ID">
+                                        <img src="../../<?= htmlspecialchars($politician['front_photo_path']) ?>" 
+                                             class="img-fluid rounded" 
+                                             alt="Front ID"
+                                             style="max-height: 200px; width: auto; object-fit: contain;">
                                     </div>
                                     <div class="col-6">
                                         <p class="mb-1">Πίσω πλευρά:</p>
-                                        <img src="../../<?= htmlspecialchars($politician['back_photo_path']) ?>" class="img-fluid rounded" alt="Back ID">
+                                        <img src="../../<?= htmlspecialchars($politician['back_photo_path']) ?>" 
+                                             class="img-fluid rounded" 
+                                             alt="Back ID"
+                                             style="max-height: 200px; width: auto; object-fit: contain;">
                                     </div>
                                 </div>
                             <?php else: ?>
@@ -605,7 +631,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="modal-footer">
                     <form method="POST" class="d-inline">
                         <input type="hidden" name="user_id" value="<?= $politician['id'] ?>">
-                        <button type="submit" name="reject_politician" class="btn btn-danger">
+                        <button type="submit" name="reject_politician" class="btn btn-danger" onclick="return confirm('Είστε σίγουροι ότι θέλετε να απορρίψετε και να διαγράψετε αυτόν τον χρήστη;')">
                             <i class="bi bi-x-circle"></i> Απόρριψη
                         </button>
                         <button type="submit" name="approve_politician" class="btn btn-success">
