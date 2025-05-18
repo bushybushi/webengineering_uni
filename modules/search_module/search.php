@@ -186,6 +186,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                             <i class="bi bi-speedometer2"></i> Admin Dashboard
                                         </a>
                                     </li>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <li>
                                         <a class="dropdown-item" href="../search_module/api_documentation.php">
                                             <i class="bi bi-code-square"></i> API Documentation
@@ -268,6 +270,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     <a href="../admin_module/dashboard.php" class="nav-link py-2">
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
                                     </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <a href="../search_module/api_documentation.php" class="nav-link py-2">
                                         <i class="bi bi-code-square"></i> API Documentation
                                     </a>
@@ -469,9 +473,16 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                         previous: "Previous"
                     }
                 },
-               columnDefs: [
-                    { targets: [0, 1, 2], orderable: true, orderSequence: ['asc', 'desc', null] },
-                    { targets: [3, 4], orderable: false }
+                columnDefs: [
+                    {
+                        targets: '_all',
+                        orderable: false
+                    },
+                    {
+                        targets: [0, 2], // Person Details (0) and Submission Date (2)
+                        orderable: true,
+                        orderSequence: ['asc', 'desc', null]
+                    }
                 ]
             });
 
