@@ -336,6 +336,8 @@ try {
                                             <i class="bi bi-speedometer2"></i> Admin Dashboard
                                         </a>
                                     </li>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <li>
                                         <a class="dropdown-item" href="../search_module/api_documentation.php">
                                             <i class="bi bi-code-square"></i> API Documentation
@@ -418,6 +420,8 @@ try {
                                     <a href="../admin_module/dashboard.php" class="nav-link py-2">
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
                                     </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <a href="../search_module/api_documentation.php" class="nav-link py-2">
                                         <i class="bi bi-code-square"></i> API Documentation
                                     </a>
