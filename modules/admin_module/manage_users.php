@@ -609,17 +609,21 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <p class="mb-1">Μπροστινή πλευρά:</p>
-                                        <img src="../../<?= htmlspecialchars($politician['front_photo_path']) ?>" 
-                                             class="img-fluid rounded" 
-                                             alt="Front ID"
-                                             style="max-height: 200px; width: auto; object-fit: contain;">
+                                        <div class="border rounded p-2">
+                                            <img src="<?= htmlspecialchars($politician['front_photo_path']) ?>" 
+                                                 class="img-fluid" 
+                                                 alt="Front ID"
+                                                 style="max-height: 200px; width: 100%; object-fit: contain;">
+                                        </div>
                                     </div>
                                     <div class="col-6">
                                         <p class="mb-1">Πίσω πλευρά:</p>
-                                        <img src="../../<?= htmlspecialchars($politician['back_photo_path']) ?>" 
-                                             class="img-fluid rounded" 
-                                             alt="Back ID"
-                                             style="max-height: 200px; width: auto; object-fit: contain;">
+                                        <div class="border rounded p-2">
+                                            <img src="<?= htmlspecialchars($politician['back_photo_path']) ?>" 
+                                                 class="img-fluid" 
+                                                 alt="Back ID"
+                                                 style="max-height: 200px; width: 100%; object-fit: contain;">
+                                        </div>
                                     </div>
                                 </div>
                             <?php else: ?>
