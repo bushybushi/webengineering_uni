@@ -27,6 +27,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$user_id]);
     }
     
+    if (isset($_POST['approve_politician'])) {
+        $user_id = $_POST['user_id'];
+        $stmt = $conn->prepare("UPDATE users SET verification_status = 'approved' WHERE id = ?");
+        $stmt->execute([$user_id]);
+    }
+    
+    if (isset($_POST['reject_politician'])) {
+        $user_id = $_POST['user_id'];
+        $stmt = $conn->prepare("UPDATE users SET verification_status = 'rejected' WHERE id = ?");
+        $stmt->execute([$user_id]);
+    }
+    
     if (isset($_POST['edit_user'])) {
         $user_id = $_POST['user_id'];
         $first_name = trim($_POST['first_name']);
@@ -288,6 +300,52 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addUserModal">
                                 <i class="bi bi-person-plus"></i> Προσθήκη Χρήστη
                             </button>
+                            <?php
+                            // Get count of pending politicians
+                            $pending_stmt = $conn->query("SELECT COUNT(*) FROM users WHERE role = 'Politician' AND verification_status = 'pending'");
+                            $pending_count = $pending_stmt->fetchColumn();
+                            ?>
+                            <div class="dropdown d-inline-block">
+                                <button class="btn btn-primary position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-bell"></i> Ειδοποιήσεις
+                                    <?php if ($pending_count > 0): ?>
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            <?= $pending_count ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" style="width: 300px;">
+                                    <?php
+                                    $pending_politicians = $conn->query("SELECT u.*, pip.front_photo_path, pip.back_photo_path 
+                                                                        FROM users u 
+                                                                        LEFT JOIN politician_id_photos pip ON u.id = pip.user_id 
+                                                                        WHERE u.role = 'Politician' AND u.verification_status = 'pending'
+                                                                        ORDER BY u.created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+                                    
+                                    if (count($pending_politicians) > 0):
+                                        foreach ($pending_politicians as $politician):
+                                    ?>
+                                        <li>
+                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#verifyPoliticianModal<?= $politician['id'] ?>">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="bi bi-person-circle fs-4"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-2">
+                                                        <div class="fw-medium"><?= htmlspecialchars($politician['first_name'] . ' ' . $politician['last_name']) ?></div>
+                                                        <small class="text-muted"><?= htmlspecialchars($politician['email']) ?></small>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    <?php 
+                                        endforeach;
+                                    else:
+                                    ?>
+                                        <li><span class="dropdown-item text-muted">Δεν υπάρχουν εκκρεμείς αιτήσεις</span></li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -482,22 +540,76 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <!-- Footer -->
-    <footer class="bg-light py-4 mt-5">
+    <footer class="bg-light py-4 mt-auto border-top">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0"> 2025 Πόθεν Εσχες &copy; all rights reserved.</p>
-                </div>
-                <div class="col-12 col-md-6 text-center text-md-end">
-                    <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.html" class="text-decoration-none">Ποιοι είμαστε</a>
-                        <a href="contact.html" class="text-decoration-none">Επικοινωνία</a>
-                        <a href="privacy.html" class="text-decoration-none">Πολιτική Απορρήτου</a>
+            <div class="row justify-content-center align-items-center">
+                <div class="col-12 text-center mb-2">
+                    <div class="mb-2">
+                        <img src="../../assets/images/iconlogo.png" alt="Πόθεν Έσχες Logo" style="height: 42px; width: 42px; object-fit: contain;" />
                     </div>
+                    <a href="#" class="text-decoration-none fw-medium" style="color: #ED9635;" data-bs-toggle="modal" data-bs-target="#aboutUsModal">
+                        <i class="bi bi-person-badge me-1"></i>Ποιοι είμαστε
+                    </a>
+                </div>
+                <div class="col-12 text-center mb-2">
+                    <span class="fw-bold small" style="color: #ED9635; font-size: 0.95rem;"><a href="#" style="text-decoration: none; color: #ED9635;">Πόθεν Έσχες</a></span>
+                    <span class="text-muted small">&copy; 2025. All rights reserved.</span>
                 </div>
             </div>
         </div>
     </footer>
+
+    <?php foreach ($pending_politicians as $politician): ?>
+    <!-- Verify Politician Modal -->
+    <div class="modal fade" id="verifyPoliticianModal<?= $politician['id'] ?>" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Επιβεβαίωση Πολιτικού</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Πληροφορίες Χρήστη</h6>
+                            <p><strong>Όνομα:</strong> <?= htmlspecialchars($politician['first_name'] . ' ' . $politician['last_name']) ?></p>
+                            <p><strong>Email:</strong> <?= htmlspecialchars($politician['email']) ?></p>
+                            <p><strong>Ημερομηνία Εγγραφής:</strong> <?= date('d/m/Y', strtotime($politician['created_at'])) ?></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Φωτογραφίες Ταυτότητας</h6>
+                            <?php if ($politician['front_photo_path'] && $politician['back_photo_path']): ?>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <p class="mb-1">Μπροστινή πλευρά:</p>
+                                        <img src="../../<?= htmlspecialchars($politician['front_photo_path']) ?>" class="img-fluid rounded" alt="Front ID">
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="mb-1">Πίσω πλευρά:</p>
+                                        <img src="../../<?= htmlspecialchars($politician['back_photo_path']) ?>" class="img-fluid rounded" alt="Back ID">
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <p class="text-muted">Δεν έχουν ανεβεί φωτογραφίες ταυτότητας</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <form method="POST" class="d-inline">
+                        <input type="hidden" name="user_id" value="<?= $politician['id'] ?>">
+                        <button type="submit" name="reject_politician" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Απόρριψη
+                        </button>
+                        <button type="submit" name="approve_politician" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Έγκριση
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endforeach; ?>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
