@@ -1,16 +1,47 @@
 <?php
 require_once '../../config/db_connection.php';
-session_start();
-
-// Check if user is logged in and is an admin
-if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'Admin') {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized access']);
-    exit;
-}
 
 // Get database connection
 $pdo = require '../../config/db_connection.php';
+
+// Function to validate API key
+function validateApiKey($pdo, $apiKey) {
+    if (empty($apiKey)) {
+        return false;
+    }
+
+    $stmt = $pdo->prepare("SELECT role FROM api_keys WHERE key_value = ?");
+    $stmt->execute([$apiKey]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        // Update last used timestamp
+        $updateStmt = $pdo->prepare("UPDATE api_keys SET last_used = CURRENT_TIMESTAMP WHERE key_value = ?");
+        $updateStmt->execute([$apiKey]);
+        return $result['role'];
+    }
+
+    return false;
+}
+
+// Get API key from header
+$apiKey = isset($_SERVER['HTTP_X_API_KEY']) ? $_SERVER['HTTP_X_API_KEY'] : '';
+
+// Validate API key
+$role = validateApiKey($pdo, $apiKey);
+if (!$role) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Invalid or missing API key']);
+    exit;
+}
+
+// Check permissions based on role and request method
+$method = $_SERVER['REQUEST_METHOD'];
+if ($role !== 'admin' && $method !== 'GET') {
+    http_response_code(403);
+    echo json_encode(['error' => 'Access denied. Only admin users can perform ' . $method . ' requests']);
+    exit;
+}
 
 // Handle POST request for creating new declaration
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
