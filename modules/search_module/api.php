@@ -57,11 +57,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Start transaction
         $pdo->beginTransaction();
 
-        // Insert into declarations table
-        $declarationQuery = "INSERT INTO declarations (title, status, submission_date) VALUES (?, 'Pending', NOW())";
+        // Find the next available ID
+        $maxIdQuery = "SELECT MAX(id) as max_id FROM declarations";
+        $maxIdStmt = $pdo->query($maxIdQuery);
+        $maxId = $maxIdStmt->fetch(PDO::FETCH_ASSOC)['max_id'];
+        $nextId = $maxId + 1;
+
+        // Insert into declarations table with explicit ID
+        $declarationQuery = "INSERT INTO declarations (id, title, status, submission_date) VALUES (?, ?, 'Pending', NOW())";
         $declarationStmt = $pdo->prepare($declarationQuery);
-        $declarationStmt->execute([$data['title']]);
-        $declarationId = $pdo->lastInsertId();
+        $declarationStmt->execute([$nextId, $data['title']]);
+        $declarationId = $nextId;
 
         // Insert personal data
         $personalDataQuery = "INSERT INTO personal_data (declaration_id, full_name, office, address, dob, id_number, marital_status, dependants, party_id) 
@@ -475,13 +481,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
         }
 
         // Update personal data if provided
-        if (isset($data['personal_data'])) {
+        if (isset($data['personal_data']) && is_array($data['personal_data'])) {
             $updateFields = [];
             $params = [];
             
-            foreach ($data['personal_data'] as $field => $value) {
-                $updateFields[] = "$field = ?";
-                $params[] = $value;
+            $allowedFields = [
+                'full_name',
+                'office',
+                'address',
+                'dob',
+                'id_number',
+                'marital_status',
+                'dependants',
+                'party_id'
+            ];
+            
+            foreach ($allowedFields as $field) {
+                if (isset($data['personal_data'][$field])) {
+                    $updateFields[] = "$field = ?";
+                    $params[] = $data['personal_data'][$field];
+                }
             }
             
             if (!empty($updateFields)) {
