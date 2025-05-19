@@ -937,6 +937,12 @@ X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
                                 Διαγραφή ανά Κόμμα
                             </h5>
                             <p class="card-text">Διαγραφή δηλώσεων συγκεκριμένου κόμματος.</p>
+                            <div class="mb-3">
+                                <h6 class="fw-bold">Headers:</h6>
+                                <pre class="bg-light p-2 rounded">
+Content-Type: application/json
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
+                            </div>
                             <div class="form-group mb-4">
                                 <label for="delete-party-input" class="form-label fw-bold mb-2">Επιλέξτε κόμμα:</label>
                                 <select class="form-select form-select-lg" id="delete-party-input">
@@ -963,6 +969,12 @@ X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
                                 Διαγραφή ανά Έτος
                             </h5>
                             <p class="card-text">Διαγραφή δηλώσεων συγκεκριμένου έτους.</p>
+                            <div class="mb-3">
+                                <h6 class="fw-bold">Headers:</h6>
+                                <pre class="bg-light p-2 rounded">
+Content-Type: application/json
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
+                            </div>
                             <div class="form-group">
                                 <label for="delete-year-input" class="form-label fw-bold mb-2">Επιλέξτε έτος:</label>
                                 <select class="form-select form-select-lg" id="delete-year-input">
@@ -989,6 +1001,12 @@ X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
                                 Διαγραφή ανά Αξίωμα
                             </h5>
                             <p class="card-text">Διαγραφή δηλώσεων πολιτικών με συγκεκριμένο αξίωμα.</p>
+                            <div class="mb-3">
+                                <h6 class="fw-bold">Headers:</h6>
+                                <pre class="bg-light p-2 rounded">
+Content-Type: application/json
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
+                            </div>
                             <div class="form-group">
                                 <label for="delete-position-input" class="form-label fw-bold mb-2">Επιλέξτε αξίωμα:</label>
                                 <select class="form-select form-select-lg" id="delete-position-input">
@@ -1015,6 +1033,12 @@ X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
                                 Συνδυασμένη Διαγραφή
                             </h5>
                             <p class="card-text">Διαγραφή δηλώσεων με βάση συνδυασμό κριτηρίων (κόμμα, έτος, αξίωμα).</p>
+                            <div class="mb-3">
+                                <h6 class="fw-bold">Headers:</h6>
+                                <pre class="bg-light p-2 rounded">
+Content-Type: application/json
+X-API-Key: <?php echo htmlspecialchars($apiKey); ?></pre>
+                            </div>
                             <div class="form-group mb-3">
                                 <label for="delete-combined-party" class="form-label fw-bold mb-2">Επιλέξτε κόμμα:</label>
                                 <select class="form-select form-select-lg" id="delete-combined-party">
