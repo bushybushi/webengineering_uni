@@ -135,8 +135,8 @@ $other_incomes = $stmt->fetchAll();
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="../../index.php">
                 <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="40" class="me-3">
@@ -161,9 +161,7 @@ $other_incomes = $stmt->fetchAll();
                         <a class="nav-link" href="../search_module/statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
-                            <a class="nav-link" href="../../index.php">Υποβολή</a>
-                        <?php else: ?>
+                        <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
                             <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
                         <?php endif; ?>
                     </li>
@@ -180,7 +178,7 @@ $other_incomes = $stmt->fetchAll();
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="../submit_module/favorites.php">
+                                        <a class="dropdown-item" href="../favorites_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
                                     </li>
@@ -188,6 +186,13 @@ $other_incomes = $stmt->fetchAll();
                                     <li>
                                         <a class="dropdown-item" href="../admin_module/dashboard.php">
                                             <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../api_module/api_documentation.php">
+                                            <i class="bi bi-code-square"></i> API Documentation
                                         </a>
                                     </li>
                                     <?php endif; ?>
@@ -238,11 +243,7 @@ $other_incomes = $stmt->fetchAll();
                             </a>
                         </li>
                         <li class="nav-item">
-                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
-                                <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../../index.php">
-                                    <i class="bi bi-file-earmark-text"></i> Υποβολή
-                                </a>
-                            <?php else: ?>
+                            <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
                                 <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../submit_module/declaration-form.php">
                                     <i class="bi bi-file-earmark-text"></i> Υποβολή
                                 </a>
@@ -266,6 +267,11 @@ $other_incomes = $stmt->fetchAll();
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                                     <a href="../admin_module/dashboard.php" class="nav-link py-2">
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
+                                    <a href="../api_module/api_documentation.php" class="nav-link py-2">
+                                        <i class="bi bi-code-square"></i> API Documentation
                                     </a>
                                     <?php endif; ?>
                                     <a href="../login_module/logout.php" class="nav-link py-2">
