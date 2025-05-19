@@ -189,7 +189,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     <?php endif; ?>
                                     <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <li>
-                                        <a class="dropdown-item" href="../search_module/api_documentation.php">
+                                        <a class="dropdown-item" href="../api_module/api_documentation.php">
                                             <i class="bi bi-code-square"></i> API Documentation
                                         </a>
                                     </li>
@@ -272,7 +272,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     </a>
                                     <?php endif; ?>
                                     <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
-                                    <a href="../search_module/api_documentation.php" class="nav-link py-2">
+                                    <a href="../api_module/api_documentation.php" class="nav-link py-2">
                                         <i class="bi bi-code-square"></i> API Documentation
                                     </a>
                                     <?php endif; ?>
