@@ -23,7 +23,7 @@ require_once 'config/db_connection.php';
 
 </head>
 <body>
-    <!-- Navigation -->
+       <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="./index.php">
@@ -49,9 +49,7 @@ require_once 'config/db_connection.php';
                         <a class="nav-link" href="./modules/search_module/statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
-                            <a class="nav-link" href="./index.php">Υποβολή</a>
-                        <?php else: ?>
+                        <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
                             <a class="nav-link" href="./modules/submit_module/declaration-form.php">Υποβολή</a>
                         <?php endif; ?>
                     </li>
@@ -76,6 +74,13 @@ require_once 'config/db_connection.php';
                                     <li>
                                         <a class="dropdown-item" href="./modules/admin_module/dashboard.php">
                                             <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="./modules/api_module/api_documentation.php">
+                                            <i class="bi bi-code-square"></i> API Documentation
                                         </a>
                                     </li>
                                     <?php endif; ?>
@@ -126,11 +131,7 @@ require_once 'config/db_connection.php';
                             </a>
                         </li>
                         <li class="nav-item">
-                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
-                                <a class="nav-link d-flex align-items-center gap-2 mb-3" href="./index.php">
-                                    <i class="bi bi-file-earmark-text"></i> Υποβολή
-                                </a>
-                            <?php else: ?>
+                            <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
                                 <a class="nav-link d-flex align-items-center gap-2 mb-3" href="./modules/submit_module/declaration-form.php">
                                     <i class="bi bi-file-earmark-text"></i> Υποβολή
                                 </a>
@@ -154,6 +155,11 @@ require_once 'config/db_connection.php';
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                                     <a href="./modules/admin_module/dashboard.php" class="nav-link py-2">
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
+                                    <a href="./modules/api_module/api_documentation.php" class="nav-link py-2">
+                                        <i class="bi bi-code-square"></i> API Documentation
                                     </a>
                                     <?php endif; ?>
                                     <a href="./modules/login_module/logout.php" class="nav-link py-2">
