@@ -8,7 +8,7 @@
             </div>
             <div class="modal-body">
                 <div class="text-center mb-4">
-                    <img src="cei326-omada4.cut.ac.cy/assets/images/cutlogo.jpg" alt="Cyprus University of Technology Logo" style="max-width: 200px; margin-bottom: 15px;">
+                    <img src="/assets/images/cutlogo.jpg" alt="Cyprus University of Technology Logo" style="max-width: 200px; margin-bottom: 15px;">
                 </div>
                 <p class="text-center">Το σύστημα αναπτύχθηκε από τους: Αντώνης Ανδρέου, Gabriel Vasile, Γεώργιος Αρχιτεκτονίδης, Γιώργος Ξύδιας, Κυριάκος Ανδρέου, Στυλιανός Κυπριανού, 
                     τριτοετείς φοιτητές του τμήματος Ηλεκτρολόγων Μηχανικών και Μηχανικών Ηλεκτρονικών Υπολογιστών και Πληροφορικής του Τεχνολογικού Πανεπιστημίου Κύπρου,
