@@ -307,9 +307,7 @@ try {
                         <a class="nav-link" href="../search_module/statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
-                            <a class="nav-link" href="../../index.php">Υποβολή</a>
-                        <?php else: ?>
+                        <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
                             <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
                         <?php endif; ?>
                     </li>
@@ -326,7 +324,7 @@ try {
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="../submit_module/favorites.php">
+                                        <a class="dropdown-item" href="../favorites_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
                                     </li>
@@ -391,11 +389,7 @@ try {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Public'): ?>
-                                <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../../index.php">
-                                    <i class="bi bi-file-earmark-text"></i> Υποβολή
-                                </a>
-                            <?php else: ?>
+                            <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
                                 <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../submit_module/declaration-form.php">
                                     <i class="bi bi-file-earmark-text"></i> Υποβολή
                                 </a>
@@ -677,18 +671,21 @@ try {
     </div>
 
     <!-- Footer -->
-    <footer class="bg-light py-4 mt-auto">
+    <footer class="bg-light py-4 mt-auto border-top">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0">&copy; 2025 Πόθεν Εσχες © all rights reserved.</p>
-                </div>
-                <div class="col-12 col-md-6 text-center text-md-end">
-                    <div class="d-flex justify-content-center justify-content-md-end gap-3">
-                        <a href="about.php" class="text-decoration-none">Ποιοι είμαστε</a>
-                        <a href="contact.php" class="text-decoration-none">Επικοινωνία</a>
-                        <a href="privacy.php" class="text-decoration-none">Πολιτική Απορρήτου</a>
+            <div class="row justify-content-center align-items-center">
+                
+                <div class="col-12 text-center mb-2">
+                    <div class="mb-2">
+                        <img src="../../assets/images/iconlogo.png" alt="Πόθεν Έσχες Logo" style="height: 42px; width: 42px; object-fit: contain;" />
                     </div>
+                    <a href="#" class="text-decoration-none fw-medium" style="color: #ED9635;" data-bs-toggle="modal" data-bs-target="#aboutUsModal">
+                        <i class="bi bi-person-badge me-1"></i>Ποιοι είμαστε
+                    </a>
+                </div>
+                <div class="col-12 text-center mb-2">
+                    <span class="fw-bold small" style="color: #ED9635; font-size: 0.95rem;"><a href="#" style="text-decoration: none; color: #ED9635;">Πόθεν Έσχες</a></span>
+                    <span class="text-muted small">&copy; 2025. All rights reserved.</span>
                 </div>
             </div>
         </div>
