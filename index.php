@@ -296,6 +296,9 @@ require_once 'config/db_connection.php';
                                     <div class="declaration-item">
                                         <a href="./modules/submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="text-decoration-none text-dark">
                                             <div class="d-flex align-items-center">
+                                                <div class="avatar-circle" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background-color: #e9ecef; color: #495057; font-weight: bold;">
+                                                    <?php echo mb_substr($declaration['title'], 0, 1); ?>
+                                                </div>
                                                 <div class="ms-3">
                                                     <h6 class="mb-1"><?php echo htmlspecialchars($declaration['title']); ?></h6>
                                                     <small class="text-muted">
