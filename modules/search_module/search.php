@@ -369,7 +369,9 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                                                  class="avatar-circle"
                                                                  style="width: 45px; height: 45px; object-fit: cover;">
                                                         <?php else: ?>
-                                                            <div class="avatar-circle"><?php echo substr($declaration['full_name'], 0, 1); ?></div>
+                                                            <div class="avatar-circle" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background-color: #e9ecef; color: #495057; font-weight: bold;">
+                                                                <?php echo mb_substr($declaration['full_name'], 0, 1); ?>
+                                                            </div>
                                                         <?php endif; ?>
                                                     </div>
                                                     <div class="ms-3">
