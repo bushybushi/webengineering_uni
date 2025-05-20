@@ -68,13 +68,16 @@ $periods = $conn->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ρυθμίσεις Συστήματος - ΠΟΘΕΝ ΕΣΧΕΣ</title>
+    <title>System Configuration - ΠΟΘΕΝ ΕΣΧΕΣ</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="../../assets/images/iconlogo.png">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <!-- Flag Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
     <!-- Custom CSS -->
     <link href="../../assets/css/style.css" rel="stylesheet">
 </head>
@@ -105,18 +108,9 @@ $periods = $conn->query("
                         <a class="nav-link" href="../search_module/statistics.php">Στατιστικά</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
-                    </li>
-                    <li class="nav-item">
-                        <div class="dropdown">
-                            <button class="lang-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-translate"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="?lang=en"><span class="fi fi-gb"></span> English</a></li>
-                                <li><a class="dropdown-item" href="?lang=el"><span class="fi fi-gr"></span> Ελληνικά</a></li>
-                            </ul>
-                        </div>
+                        <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
+                            <a class="nav-link" href="../submit_module/declaration-form.php">Υποβολή</a>
+                        <?php endif; ?>
                     </li>
                     <li class="nav-item">
                         <div class="dropdown">
@@ -124,26 +118,48 @@ $periods = $conn->query("
                                 <i class="bi bi-person-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" href="../profile_module/profile.php">
-                                        <i class="bi bi-person"></i> Το προφίλ μου
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="../favorites_module/favorites.php">
-                                        <i class="bi bi-heart"></i> Αγαπημένα
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="../admin_module/dashboard.php">
-                                        <i class="bi bi-speedometer2"></i> Admin Dashboard
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="../login_module/logout.php">
-                                        <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
-                                    </a>
-                                </li>
+                                <?php if (isset($_SESSION['id'])): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../profile_module/profile.php">
+                                            <i class="bi bi-person"></i> Το προφίλ μου
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="../favorites_module/favorites.php">
+                                            <i class="bi bi-heart"></i> Αγαπημένα
+                                        </a>
+                                    </li>
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../admin_module/dashboard.php">
+                                            <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../api_module/api_documentation.php">
+                                            <i class="bi bi-code-square"></i> API Documentation
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../login_module/logout.php">
+                                            <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
+                                        </a>
+                                    </li>
+                                <?php else: ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../login_module/login.php">
+                                            <i class="bi bi-box-arrow-in-right"></i> Σύνδεση
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="../login_module/register.php">
+                                            <i class="bi bi-person-plus"></i> Εγγραφή
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
                             </ul>
                         </div>
                     </li>
@@ -174,23 +190,11 @@ $periods = $conn->query("
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../submit_module/declaration-form.php">
-                                <i class="bi bi-file-earmark-text"></i> Υποβολή
-                            </a>
-                        </li>
-                        <li class="nav-item border-top pt-3">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <i class="bi bi-translate"></i>
-                                <span class="fw-medium">Γλώσσα</span>
-                            </div>
-                            <div class="d-flex flex-column gap-2">
-                                <a href="?lang=en" class="nav-link py-2">
-                                    <span class="fi fi-gb"></span> English
+                            <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
+                                <a class="nav-link d-flex align-items-center gap-2 mb-3" href="../submit_module/declaration-form.php">
+                                    <i class="bi bi-file-earmark-text"></i> Υποβολή
                                 </a>
-                                <a href="?lang=el" class="nav-link py-2">
-                                    <span class="fi fi-gr"></span> Ελληνικά
-                                </a>
-                            </div>
+                            <?php endif; ?>
                         </li>
                         <li class="nav-item border-top pt-3">
                             <div class="d-flex align-items-center gap-2 mb-2">
@@ -198,18 +202,34 @@ $periods = $conn->query("
                                 <span class="fw-medium">Λογαριασμός</span>
                             </div>
                             <div class="d-flex flex-column gap-2">
-                                <a href="../profile_module/profile.php" class="nav-link py-2">
-                                    <i class="bi bi-person"></i> Το προφίλ μου
-                                </a>
-                                <a href="../favorites_module/favorites.php" class="nav-link py-2">
-                                    <i class="bi bi-heart"></i> Αγαπημένα
-                                </a>
-                                <a href="../admin_module/dashboard.php" class="nav-link py-2">
-                                    <i class="bi bi-speedometer2"></i> Admin Dashboard
-                                </a>
-                                <a href="../login_module/logout.php" class="nav-link py-2">
-                                    <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
-                                </a>
+                                <?php if (isset($_SESSION['id'])): ?>
+                                    <a href="../profile_module/profile.php" class="nav-link py-2">
+                                        <i class="bi bi-person"></i> Το προφίλ μου
+                                    </a>
+                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
+                                        <i class="bi bi-heart"></i> Αγαπημένα
+                                    </a>
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                                    <a href="../admin_module/dashboard.php" class="nav-link py-2">
+                                        <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
+                                    <a href="../api_module/api_documentation.php" class="nav-link py-2">
+                                        <i class="bi bi-code-square"></i> API Documentation
+                                    </a>
+                                    <?php endif; ?>
+                                    <a href="../login_module/logout.php" class="nav-link py-2">
+                                        <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
+                                    </a>
+                                <?php else: ?>
+                                    <a href="../login_module/login.php" class="nav-link py-2">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Σύνδεση
+                                    </a>
+                                    <a href="../login_module/register.php" class="nav-link py-2">
+                                        <i class="bi bi-person-plus me-2"></i> Εγγραφή
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </li>
                     </ul>
