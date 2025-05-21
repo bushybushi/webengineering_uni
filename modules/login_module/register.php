@@ -255,7 +255,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                         <span class="input-group-text"><i class="bi bi-briefcase"></i></span>
                                         <select name="role" class="form-select <?php echo (!empty($role_err)) ? 'is-invalid' : ''; ?>" required onchange="toggleIdPhotos(this.value)">
                                             <option value="">Επιλέξτε θέση</option>
-                                            <option value="Public" <?php echo ($role == "Public") ? 'selected' : ''; ?>>Δημόσιος</option>
+                                            <option value="Public" <?php echo ($role == "Public") ? 'selected' : ''; ?>>Απλός Χρήστης</option>
                                             <option value="Politician" <?php echo ($role == "Politician") ? 'selected' : ''; ?>>Πολιτικός</option>
                                         </select>
                                         <div class="invalid-feedback"><?php echo $role_err; ?></div>
