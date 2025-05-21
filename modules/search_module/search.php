@@ -391,7 +391,9 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                                 <strong><?php echo $declaration['submission_year']; ?></strong>
                                             </td>
                                             <td>
-                                                <span class="badge bg-warning text-dark political-badge" data-party="<?php echo htmlspecialchars($declaration['party_name']); ?>"><?php echo htmlspecialchars($declaration['party_name']); ?></span>
+                                                  <span class="badge bg-warning text-dark political-badge" data-party="<?php echo htmlspecialchars($declaration['party_name'] ?? 'Δ/Δ'); ?>">
+                                                    <?php echo htmlspecialchars($declaration['party_name'] ?? 'Δ/Δ'); ?>
+                                                </span>                                           
                                             </td>
                                             <td>
                                                 <a href="../submit_module/view-declaration.php?id=<?php echo $declaration['id']; ?>" class="btn btn-sm btn-warning text-dark" title="Προβολή Λεπτομερειών Δήλωσης">
