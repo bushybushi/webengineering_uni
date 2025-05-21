@@ -8,39 +8,52 @@ $title = $office = $address = $dob = $id_number = $marital_status = $num_of_depe
 $first_name_err = $last_name_err = $email_err = $password_err = $confirm_password_err = $role_err = "";
 $front_photo_err = $back_photo_err = "";
 
+// Sanitization functions
+function sanitizeString($input) {
+    return htmlspecialchars(strip_tags(trim($input)), ENT_QUOTES, 'UTF-8');
+}
+
+function sanitizeEmail($input) {
+    return filter_var(trim($input), FILTER_SANITIZE_EMAIL);
+}
+
+function sanitizeRole($input) {
+    $allowed_roles = ['Public', 'Politician'];
+    $input = trim($input);
+    return in_array($input, $allowed_roles) ? $input : '';
+}
+
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     
-    // Validate first name
+    // Validate and sanitize first name
     if(empty(trim($_POST["first_name"]))){
         $first_name_err = "Παρακαλώ εισάγετε το μικρό σας όνομα.";
     } else{
-        $first_name = trim($_POST["first_name"]);
+        $first_name = sanitizeString($_POST["first_name"]);
     }
     
-    // Validate last name
+    // Validate and sanitize last name
     if(empty(trim($_POST["last_name"]))){
         $last_name_err = "Παρακαλώ εισάγετε το επώνυμο σας.";
     } else{
-        $last_name = trim($_POST["last_name"]);
+        $last_name = sanitizeString($_POST["last_name"]);
     }
     
-    // Validate email
+    // Validate and sanitize email
     if(empty(trim($_POST["email"]))){
         $email_err = "Παρακαλώ εισάγετε ένα email.";
     } else{
+        $email = sanitizeEmail($_POST["email"]);
         // Prepare a select statement
         $sql = "SELECT id FROM users WHERE email = :email AND is_suspended != 2";
         
         if($stmt = $pdo->prepare($sql)){
-            $stmt->bindParam(":email", $param_email, PDO::PARAM_STR);
-            $param_email = trim($_POST["email"]);
+            $stmt->bindParam(":email", $email, PDO::PARAM_STR);
             
             if($stmt->execute()){
                 if($stmt->rowCount() > 0){
                     $email_err = "Αυτό το email χρησιμοποιείται ήδη.";
-                } else{
-                    $email = trim($_POST["email"]);
                 }
             } else{
                 echo "Ωχ! Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
@@ -48,7 +61,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }
     
-    // Validate password
+    // Validate password (no sanitization needed as it will be hashed)
     if(empty(trim($_POST["password"]))){
         $password_err = "Παρακαλώ εισάγετε έναν κωδικό.";     
     } elseif(strlen(trim($_POST["password"])) < 6){
@@ -67,22 +80,25 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }
     
-    // Validate role
+    // Validate and sanitize role
     if(empty(trim($_POST["role"]))){
         $role_err = "Παρακαλώ επιλέξτε έναν ρόλο.";
     } else{
-        $role = trim($_POST["role"]);
+        $role = sanitizeRole($_POST["role"]);
+        if(empty($role)) {
+            $role_err = "Μη έγκυρος ρόλος.";
+        }
     }
 
-    // Get additional fields
-    $title = isset($_POST["title"]) ? trim($_POST["title"]) : "";
-    $office = isset($_POST["office"]) ? trim($_POST["office"]) : "";
-    $address = isset($_POST["address"]) ? trim($_POST["address"]) : "";
-    $dob = isset($_POST["dob"]) ? trim($_POST["dob"]) : null;
-    $id_number = isset($_POST["id_number"]) ? trim($_POST["id_number"]) : "";
-    $marital_status = isset($_POST["marital_status"]) ? trim($_POST["marital_status"]) : "";
-    $num_of_dependents = isset($_POST["num_of_dependents"]) ? (int)trim($_POST["num_of_dependents"]) : 0;
-    $political_affiliation = isset($_POST["political_affiliation"]) ? trim($_POST["political_affiliation"]) : "";
+    // Get and sanitize additional fields
+    $title = isset($_POST["title"]) ? sanitizeString($_POST["title"]) : "";
+    $office = isset($_POST["office"]) ? sanitizeString($_POST["office"]) : "";
+    $address = isset($_POST["address"]) ? sanitizeString($_POST["address"]) : "";
+    $dob = isset($_POST["dob"]) ? sanitizeString($_POST["dob"]) : null;
+    $id_number = isset($_POST["id_number"]) ? sanitizeString($_POST["id_number"]) : "";
+    $marital_status = isset($_POST["marital_status"]) ? sanitizeString($_POST["marital_status"]) : "";
+    $num_of_dependents = isset($_POST["num_of_dependents"]) ? (int)filter_var($_POST["num_of_dependents"], FILTER_SANITIZE_NUMBER_INT) : 0;
+    $political_affiliation = isset($_POST["political_affiliation"]) ? sanitizeString($_POST["political_affiliation"]) : "";
     
     // Validate ID photos for politicians
     if($role === "Politician") {
