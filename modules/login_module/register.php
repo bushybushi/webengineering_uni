@@ -241,7 +241,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                             <option value="">Επιλέξτε θέση</option>
                                             <option value="Public" <?php echo ($role == "Public") ? 'selected' : ''; ?>>Δημόσιος</option>
                                             <option value="Politician" <?php echo ($role == "Politician") ? 'selected' : ''; ?>>Πολιτικός</option>
-                                            <option value="Admin" <?php echo ($role == "Admin") ? 'selected' : ''; ?>>Διαχειριστής</option>
                                         </select>
                                         <div class="invalid-feedback"><?php echo $role_err; ?></div>
                                     </div>
