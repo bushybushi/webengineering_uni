@@ -251,7 +251,7 @@ require_once 'config/db_connection.php';
                     <div class="card-body text-center p-4">
                         <i class="bi bi-file-earmark-text feature-icon"></i>
                         <h5 class="card-title">Υποβολή Δήλωσης</h5>
-                        <p class="card-text">Οι δημόσιοι λειτουργοί μπορούν να υποβάλουν τις δηλώσεις τους μέσω της ασφαλούς μας πλατφόρμας. Παρακολούθηση κατάστασης και ειδοποιήσεις.</p>
+                        <p class="card-text">Οι Δημοσίων Αξιωματούχοι μπορούν να υποβάλουν τις δηλώσεις τους μέσω της ασφαλούς μας πλατφόρμας. Παρακολούθηση κατάστασης και ειδοποιήσεις.</p>
                         <a href="./modules/submit_module/declaration-form.php" class="btn btn-outline-primary" style="color: #ED9635; border-color: #ED9635;">Υποβολή Δήλωσης</a>
                     </div>
                 </div>
