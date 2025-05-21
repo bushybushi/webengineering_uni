@@ -282,15 +282,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="col-12">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="terms" required>
-                                        <label class="form-check-label" for="terms">
-                                            Συμφωνώ με τους <a href="terms.php" class="text-decoration-none">Όρους Χρήσης</a> και την <a href="privacy.php" class="text-decoration-none">Πολιτική Απορρήτου</a>
-                                        </label>
-                                    </div>
-                                </div>
                             </div>
 
                             <button type="submit" class="btn btn-warning text-dark w-100 mt-4 mb-3">
