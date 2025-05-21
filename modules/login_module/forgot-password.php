@@ -9,7 +9,7 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 }
 
 // Load environment variables
-$env_file = __DIR__ . '/../.env';
+$env_file = __DIR__ . '/../../.env';
 if (file_exists($env_file)) {
     $env_vars = parse_ini_file($env_file);
     if ($env_vars === false) {
