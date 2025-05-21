@@ -82,7 +82,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                     $sendgrid = new \SendGrid($sendgrid_api_key);
                                     
                                     // Test API key first
-                                    /*
                                     $test_response = $sendgrid->client->api_keys()->get();
                                     error_log('API Key Test Response: ' . $test_response->statusCode());
                                     error_log('API Key Test Body: ' . $test_response->body());
@@ -90,10 +89,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                     if ($test_response->statusCode() !== 200) {
                                         throw new Exception('SendGrid API key validation failed: ' . $test_response->body());
                                     }
-                                    */
                                     
                                     // Create email content
-                                    $reset_link = "http://" . $_SERVER['HTTP_HOST'] . "/myDomain/PothenEsxes/LoginWITHfunctionality/reset-password.php?token=" . $token;
+                                    $reset_link = "http://" . $_SERVER['HTTP_HOST'] . "/modules/login_module/reset-password.php?token=" . $token;
                                     $email_content = "Γεια σας " . $row["first_name"] . ",<br><br>" .
                                         "Έχετε ζητήσει επαναφορά του κωδικού σας. Κάντε κλικ στον παρακάτω σύνδεσμο για να επαναφέρετε τον κωδικό σας:<br><br>" .
                                         "<a href=\"$reset_link\">Επαναφορά Κωδικού</a><br><br>" .
