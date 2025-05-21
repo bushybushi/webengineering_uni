@@ -189,7 +189,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <div class="row g-3">
                                 <!-- Basic Information -->
                                 <div class="col-md-6">
-                                    <label class="form-label">Μικρό Όνομα</label>
+                                    <label class="form-label">Όνομα</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
                                         <input type="text" name="first_name" class="form-control <?php echo (!empty($first_name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $first_name; ?>" required>
