@@ -468,13 +468,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                             <div class="card-body p-5">
                                 <form method="POST" class="needs-validation" novalidate>
                                     <!-- Personal Information -->
+                                    <!-- Personal Information -->
                                     <div class="mb-5">
                                         <h4 class="mb-4">1. Προσωπικά Στοιχεία</h4>
                                         <div class="row border rounded p-3 mb-3 g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label">Ονοματεπώνυμο *</label>
                                                 <input type="text" name="full_name" class="form-control <?php echo isset($field_errors['full_name']) ? 'is-invalid' : ''; ?>" 
-                                                       value="<?php echo isset($_POST['full_name']) ? htmlspecialchars($_POST['full_name']) : ''; ?>" required>
+                                                       value="<?php echo (!empty($error_message) && isset($_POST['full_name'])) ? htmlspecialchars($_POST['full_name']) : ''; ?>" required>
                                                 <div class="invalid-feedback">
                                                     Παρακαλώ εισάγετε το ονοματεπώνυμο
                                                 </div>
@@ -483,18 +484,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                 <label class="form-label">Ιδιοτήτα/Αξίωμα *</label>
                                                 <select name="office" class="form-select <?php echo isset($field_errors['office']) ? 'is-invalid' : ''; ?>" required>
                                                     <option value="">Επιλέξτε Ιδιοτήτα/Αξίωμα</option>
-                                                    <option value="Πρόεδρος της Δημοκρατίας" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Πρόεδρος της Δημοκρατίας') ? 'selected' : ''; ?>>Πρόεδρος της Δημοκρατίας</option>
-                                                    <option value="Πρόεδρος της Βουλής των Αντιπροσώπων" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Πρόεδρος της Βουλής των Αντιπροσώπων') ? 'selected' : ''; ?>>Πρόεδρος της Βουλής των Αντιπροσώπων</option>
-                                                    <option value="Υπουργοί" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Υπουργοί') ? 'selected' : ''; ?>>Υπουργός</option>
-                                                    <option value="Βουλευτές" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Βουλευτές') ? 'selected' : ''; ?>>Βουλευτής</option>
-                                                    <option value="Ευρωβουλευτές" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Ευρωβουλευτές') ? 'selected' : ''; ?>>Ευρωβουλευτής</option>
-                                                    <option value="Υφυπουργοί" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Υφυπουργοί') ? 'selected' : ''; ?>>Υφυπουργός</option>
-                                                    <option value="Τέως Πρόεδρος της Δημοκρατίας" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Πρόεδρος της Δημοκρατίας') ? 'selected' : ''; ?>>Τέως Πρόεδρος της Δημοκρατίας</option>
-                                                    <option value="Τέως Πρόεδρος της Βουλής των Αντιπροσώπων" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Πρόεδρος της Βουλής των Αντιπροσώπων') ? 'selected' : ''; ?>>Τέως Πρόεδρος της Βουλής των Αντιπροσώπων</option>
-                                                    <option value="Τέως Υπουργοί" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Υπουργοί') ? 'selected' : ''; ?>>Τέως Υπουργός</option>
-                                                    <option value="Τέως Βουλευτές" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Βουλευτές') ? 'selected' : ''; ?>>Τέως Βουλευτής</option>
-                                                    <option value="Τέως Ευρωβουλευτές" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Ευρωβουλευτές') ? 'selected' : ''; ?>>Τέως Ευρωβουλευτής</option>
-                                                    <option value="Τέως Υφυπουργοί" <?php echo (isset($_POST['office']) && $_POST['office'] == 'Τέως Υφυπουργοί') ? 'selected' : ''; ?>>Τέως Υφυπουργός</option>
+                                                    <option value="Πρόεδρος της Δημοκρατίας" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Πρόεδρος της Δημοκρατίας') ? 'selected' : ''; ?>>Πρόεδρος της Δημοκρατίας</option>
+                                                    <option value="Πρόεδρος της Βουλής των Αντιπροσώπων" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Πρόεδρος της Βουλής των Αντιπροσώπων') ? 'selected' : ''; ?>>Πρόεδρος της Βουλής των Αντιπροσώπων</option>
+                                                    <option value="Υπουργοί" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Υπουργοί') ? 'selected' : ''; ?>>Υπουργός</option>
+                                                    <option value="Βουλευτές" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Βουλευτές') ? 'selected' : ''; ?>>Βουλευτής</option>
+                                                    <option value="Ευρωβουλευτές" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Ευρωβουλευτές') ? 'selected' : ''; ?>>Ευρωβουλευτής</option>
+                                                    <option value="Υφυπουργοί" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Υφυπουργοί') ? 'selected' : ''; ?>>Υφυπουργός</option>
+                                                    <option value="Τέως Πρόεδρος της Δημοκρατίας" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Τέως Πρόεδρος της Δημοκρατίας') ? 'selected' : ''; ?>>Τέως Πρόεδρος της Δημοκρατίας</option>
+                                                    <option value="Τέως Πρόεδρος της Βουλής των Αντιπροσώπων" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Τέως Πρόεδρος της Βουλής των Αντιπροσώπων') ? 'selected' : ''; ?>>Τέως Πρόεδρος της Βουλής των Αντιπροσώπων</option>
+                                                    <option value="Τέως Υπουργοί" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Τέως Υπουργοί') ? 'selected' : ''; ?>>Τέως Υπουργός</option>
+                                                    <option value="Τέως Βουλευτές" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Τέως Βουλευτές') ? 'selected' : ''; ?>>Τέως Βουλευτής</option>
+                                                    <option value="Τέως Ευρωβουλευτές" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Τέως Ευρωβουλευτές') ? 'selected' : ''; ?>>Τέως Ευρωβουλευτής</option>
+                                                    <option value="Τέως Υφυπουργοί" <?php echo (!empty($error_message) && isset($_POST['office']) && $_POST['office'] == 'Τέως Υφυπουργοί') ? 'selected' : ''; ?>>Τέως Υφυπουργός</option>
                                                 </select>
                                                 <div class="invalid-feedback">
                                                     Παρακαλώ επιλέξτε Ιδιοτήτα/Αξίωμα
@@ -506,7 +507,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                                     <option value="">Επιλέξτε Κόμμα</option>
                                                     <?php foreach ($parties as $party): ?>
                                                         <option value="<?php echo htmlspecialchars($party['id']); ?>" 
-                                                            <?php echo (isset($_POST['party_id']) && $_POST['party_id'] == $party['id']) ? 'selected' : ''; ?>>
+                                                            <?php echo (!empty($error_message) && isset($_POST['party_id']) && $_POST['party_id'] == $party['id']) ? 'selected' : ''; ?>>
                                                             <?php echo htmlspecialchars($party['name']); ?>
                                                         </option>
                                                     <?php endforeach; ?>
@@ -518,7 +519,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                             <div class="col-md-6">
                                                 <label class="form-label">Ημερομηνία Γέννησης *</label>
                                                 <input type="date" name="dob" class="form-control <?php echo isset($field_errors['dob']) ? 'is-invalid' : ''; ?>" 
-                                                       value="<?php echo isset($_POST['dob']) ? htmlspecialchars($_POST['dob']) : ''; ?>"
+                                                       value="<?php echo (!empty($error_message) && isset($_POST['dob'])) ? htmlspecialchars($_POST['dob']) : ''; ?>"
                                                        min="1900-01-01" max="<?php echo date('Y-m-d'); ?>" required>
                                                 <div class="invalid-feedback">
                                                     Παρακαλώ εισάγετε την Ημερομηνία Γέννησης
@@ -526,28 +527,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                             </div>
                                             <div class="col-md-12">
                                                 <label class="form-label">Διεύθυνση </label>
-                                                <textarea name="address" class="form-control" rows="3"><?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?></textarea>
+                                                <textarea name="address" class="form-control" rows="3"><?php echo (!empty($error_message) && isset($_POST['address'])) ? htmlspecialchars($_POST['address']) : ''; ?></textarea>
                                             </div>
                                            
                                             <div class="col-md-6">
                                                 <label class="form-label">Αριθμος ταυτότητας</label>
                                                 <input type="text" name="id_number" class="form-control" 
-                                                       value="<?php echo isset($_POST['id_number']) ? htmlspecialchars($_POST['id_number']) : ''; ?>">
+                                                       value="<?php echo (!empty($error_message) && isset($_POST['id_number'])) ? htmlspecialchars($_POST['id_number']) : ''; ?>">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Οικογενειακή Κατάσταση</label>
                                                 <select name="marital_status" class="form-select">
                                                     <option value="">Επιλέξτε Κατάσταση</option>
-                                                    <option value="Άγαμος/η" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Άγαμος/η') ? 'selected' : ''; ?>>Άγαμος/η</option>
-                                                    <option value="Έγγαμος/η" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Έγγαμος/η') ? 'selected' : ''; ?>>Έγγαμος/η</option>
-                                                    <option value="Διαζευγμένος/η" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Διαζευγμένος/η') ? 'selected' : ''; ?>>Διαζευγμένος/η</option>
-                                                    <option value="Άλλο" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'Άλλο') ? 'selected' : ''; ?>>Άλλο</option>
+                                                    <option value="Άγαμος/η" <?php echo (!empty($error_message) && isset($_POST['marital_status']) && $_POST['marital_status'] == 'Άγαμος/η') ? 'selected' : ''; ?>>Άγαμος/η</option>
+                                                    <option value="Έγγαμος/η" <?php echo (!empty($error_message) && isset($_POST['marital_status']) && $_POST['marital_status'] == 'Έγγαμος/η') ? 'selected' : ''; ?>>Έγγαμος/η</option>
+                                                    <option value="Διαζευγμένος/η" <?php echo (!empty($error_message) && isset($_POST['marital_status']) && $_POST['marital_status'] == 'Διαζευγμένος/η') ? 'selected' : ''; ?>>Διαζευγμένος/η</option>
+                                                    <option value="Άλλο" <?php echo (!empty($error_message) && isset($_POST['marital_status']) && $_POST['marital_status'] == 'Άλλο') ? 'selected' : ''; ?>>Άλλο</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Αριθμος ανηλίκων τεκνών</label>
                                                 <input type="number" name="dependants" class="form-control" 
-                                                       value="<?php echo isset($_POST['dependants']) ? htmlspecialchars($_POST['dependants']) : ''; ?>"
+                                                       value="<?php echo (!empty($error_message) && isset($_POST['dependants'])) ? htmlspecialchars($_POST['dependants']) : ''; ?>"
                                                        min="0">
                                             </div>
                                           
