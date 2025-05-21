@@ -190,7 +190,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="../favorites_module/favorites.php">
+                                        <a class="dropdown-item" href="../submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
                                     </li>
