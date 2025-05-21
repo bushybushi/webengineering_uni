@@ -191,7 +191,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="card feature-card shadow-sm">
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
-                            <img src="assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
+                            <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
                             <h2 class="fw-bold">Ξεχάσατε τον Κωδικό</h2>
                             <p class="text-muted">Εισάγετε το email σας για να επαναφέρετε τον κωδικό σας</p>
                         </div>
