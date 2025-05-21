@@ -460,16 +460,16 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                 dom: '<"row"<"col-12"l>>rtip', // Remove search field (f) from dom
                 language: {
                     search: "", // Remove the "Quick Search:" label
-                    lengthMenu: "Show _MENU_ entries per page",
-                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                    infoEmpty: "Showing 0 to 0 of 0 entries",
-                    infoFiltered: "(filtered from _MAX_ total entries)",
-                    zeroRecords: "No matching records found",
+                    lengthMenu: "Εμφάνιση _MENU_ εγγραφών ανά σελίδα",
+                    info: "Εμφάνιση _START_ έως _END_ από _TOTAL_ εγγραφές",
+                    infoEmpty: "Εμφάνιση 0 έως 0 από 0 εγγραφές",
+                    infoFiltered: "(φιλτραρισμένες από _MAX_ συνολικές εγγραφές)",
+                    zeroRecords: "Δεν βρέθηκαν εγγραφές που να ταιριάζουν",
                     paginate: {
-                        first: "First",
-                        last: "Last",
-                        next: "Next",
-                        previous: "Previous"
+                        first: "Πρώτη",
+                        last: "Τελευταία",
+                        next: "Επόμενη",
+                        previous: "Προηγούμενη"
                     }
                 },
                 columnDefs: [
