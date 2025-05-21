@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$party_id]);
     } elseif (isset($_POST['add_period'])) {
         $year = $_POST['year'];
-        $stmt = $conn->prepare("INSERT INTO submission_periods (year) VALUES (?)");
+        $stmt = $conn->prepare("INSERT INTO submission_periods (year, is_active) VALUES (?, 0)");
         $stmt->execute([$year]);
     } elseif (isset($_POST['edit_period'])) {
         $period_id = $_POST['period_id'];
@@ -206,7 +206,7 @@ $periods = $conn->query("
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
+                                    <a href="../submit_module/favorites.php" class="nav-link py-2">
                                         <i class="bi bi-heart"></i> Αγαπημένα
                                     </a>
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
@@ -502,8 +502,7 @@ $periods = $conn->query("
     </footer>
 
     <?php include '../../includes/about-us-modal.php'; ?>
-    <?php include '../../includes/manual-modal.php'; ?>
-
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     

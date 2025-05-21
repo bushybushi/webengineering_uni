@@ -14,7 +14,7 @@ $total_declarations = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 $stmt = $conn->query("SELECT COUNT(*) AS total FROM parties");
 $total_parties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-$stmt = $conn->query("SELECT COUNT(*) AS total FROM submission_periods WHERE is_active = 1");
+$stmt = $conn->query("SELECT COUNT(*) AS total FROM submission_periods");
 $active_periods = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 ?>
 <!DOCTYPE html>
@@ -160,7 +160,7 @@ $active_periods = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
+                                    <a href="../submit_module/favorites.php" class="nav-link py-2">
                                         <i class="bi bi-heart"></i> Αγαπημένα
                                     </a>
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
@@ -229,7 +229,7 @@ $active_periods = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body text-center">
                         <i class="bi bi-calendar-check feature-icon mb-3" style="font-size: 2rem; color: #ffc107;"></i>
-                        <h5 class="card-title">Ενεργές Περιόδους</h5>
+                        <h5 class="card-title">Περίοδοι Υποβολής</h5>
                         <h2 class="mb-0"><?= $active_periods ?></h2>
                     </div>
                 </div>
@@ -306,7 +306,6 @@ $active_periods = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     </footer>
 
     <?php include '../../includes/about-us-modal.php'; ?>
-    <?php include '../../includes/manual-modal.php'; ?>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

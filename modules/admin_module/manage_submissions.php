@@ -224,7 +224,7 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
+                                    <a href="../submit_module/favorites.php" class="nav-link py-2">
                                         <i class="bi bi-heart"></i> Αγαπημένα
                                     </a>
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
@@ -430,8 +430,7 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
     </footer>
 
     <?php include '../../includes/about-us-modal.php'; ?>
-    <?php include '../../includes/manual-modal.php'; ?>
-
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->

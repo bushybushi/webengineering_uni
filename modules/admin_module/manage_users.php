@@ -42,11 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($photos) {
             // Delete the actual files
-            if ($photos['front_photo_path'] && file_exists("../../" . $photos['front_photo_path'])) {
-                unlink("../../" . $photos['front_photo_path']);
+            if ($photos['front_photo_path'] && file_exists("../../uploads/id_photos/" . $photos['front_photo_path'])) {
+                unlink("../../uploads/id_photos/" . $photos['front_photo_path']);
             }
-            if ($photos['back_photo_path'] && file_exists("../../" . $photos['back_photo_path'])) {
-                unlink("../../" . $photos['back_photo_path']);
+            if ($photos['back_photo_path'] && file_exists("../../uploads/id_photos/" . $photos['back_photo_path'])) {
+                unlink("../../uploads/id_photos/" . $photos['back_photo_path']);
             }
             
             // Delete the database records
@@ -271,7 +271,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
+                                    <a href="../submit_module/favorites.php" class="nav-link py-2">
                                         <i class="bi bi-heart"></i> Αγαπημένα
                                     </a>
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
@@ -669,8 +669,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php endforeach; ?>
 
     <?php include '../../includes/about-us-modal.php'; ?>
-    <?php include '../../includes/manual-modal.php'; ?>
-
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

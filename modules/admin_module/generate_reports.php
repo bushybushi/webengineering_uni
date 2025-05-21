@@ -182,7 +182,7 @@ $people_without_declarations = $conn->query("
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
+                                    <a href="../submit_module/favorites.php" class="nav-link py-2">
                                         <i class="bi bi-heart"></i> Αγαπημένα
                                     </a>
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
@@ -240,7 +240,7 @@ $people_without_declarations = $conn->query("
                 <div class="card shadow-sm h-100">
                     <div class="card-body text-center">
                         <i class="bi bi-calendar-check feature-icon mb-3" style="font-size: 2rem; color: #28a745;"></i>
-                        <h5 class="card-title">Ενεργές Περιόδους</h5>
+                        <h5 class="card-title">Ενεργές Περιόδοι</h5>
                         <h2 class="mb-0"><?= count($declarations_by_year) ?></h2>
                     </div>
                 </div>
@@ -323,7 +323,6 @@ $people_without_declarations = $conn->query("
     </footer>
 
     <?php include '../../includes/about-us-modal.php'; ?>
-    <?php include '../../includes/manual-modal.php'; ?>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
