@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("UPDATE declarations SET status = 'Approved' WHERE id = ?");
             $stmt->execute([$declaration_id]);
         } elseif ($status === 'Rejected') {
-            $stmt = $conn->prepare("DELETE FROM declarations WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE declarations SET status = 'Rejected' WHERE id = ?");
             $stmt->execute([$declaration_id]);
         }
     }
@@ -26,7 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'approve') {
             $stmt = $conn->prepare("UPDATE declarations SET status = 'Approved' WHERE id IN (" . implode(',', array_fill(0, count($selected_ids), '?')) . ")");
             $stmt->execute($selected_ids);
-        } elseif ($action === 'reject' || $action === 'delete') {
+        } elseif ($action === 'reject') {
+            $stmt = $conn->prepare("UPDATE declarations SET status = 'Rejected' WHERE id IN (" . implode(',', array_fill(0, count($selected_ids), '?')) . ")");
+            $stmt->execute($selected_ids);
+        } elseif ($action === 'delete') {
             $stmt = $conn->prepare("DELETE FROM declarations WHERE id IN (" . implode(',', array_fill(0, count($selected_ids), '?')) . ")");
             $stmt->execute($selected_ids);
         }
@@ -292,6 +295,7 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                             <option value="">Όλες οι Καταστάσεις</option>
                             <option value="Pending" <?php echo $status == 'Pending' ? 'selected' : ''; ?>>Σε Εκκρεμότητα</option>
                             <option value="Approved" <?php echo $status == 'Approved' ? 'selected' : ''; ?>>Εγκεκριμένες</option>
+                            <option value="Rejected" <?php echo $status == 'Rejected' ? 'selected' : ''; ?>>Απορριφθείσες</option>
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
@@ -353,6 +357,8 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                                         <td>
                                             <?php if ($row['status'] === 'Approved'): ?>
                                                 <span class="badge bg-success">Εγκεκριμένη</span>
+                                            <?php elseif ($row['status'] === 'Rejected'): ?>
+                                                <span class="badge bg-danger">Απορριφθείσα</span>
                                             <?php else: ?>
                                                 <span class="badge bg-warning text-dark">Σε Εκκρεμότητα</span>
                                             <?php endif; ?>
@@ -366,14 +372,15 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                                                     <button type="button" class="btn btn-success btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'approve')">
                                                         <i class="bi bi-check-circle"></i> Έγκριση
                                                     </button>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'delete')">
+                                                <?php endif; ?>
+                                                <?php if ($row['status'] !== 'Rejected'): ?>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'reject')">
                                                         <i class="bi bi-x-circle"></i> Απόρριψη
                                                     </button>
-                                                <?php else: ?>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'delete')">
-                                                        <i class="bi bi-trash"></i> Διαγραφή
-                                                    </button>
                                                 <?php endif; ?>
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'delete')">
+                                                    <i class="bi bi-trash"></i> Διαγραφή
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -499,6 +506,9 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                 case 'approve':
                     actionText = 'έγκριση';
                     break;
+                case 'reject':
+                    actionText = 'απόρριψη';
+                    break;
                 case 'delete':
                     actionText = 'διαγραφή';
                     break;
@@ -506,7 +516,7 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
             
             message.textContent = `Είστε σίγουροι ότι θέλετε να προχωρήσετε στην ${actionText} αυτής της δήλωσης;`;
             document.getElementById('declarationId').value = id;
-            document.getElementById('actionStatus').value = action === 'delete' ? 'Rejected' : 'Approved';
+            document.getElementById('actionStatus').value = action === 'delete' ? 'Rejected' : ($action === 'reject' ? 'Rejected' : 'Approved');
             
             modal.show();
         }

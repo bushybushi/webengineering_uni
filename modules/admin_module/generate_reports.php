@@ -240,7 +240,7 @@ $people_without_declarations = $conn->query("
                 <div class="card shadow-sm h-100">
                     <div class="card-body text-center">
                         <i class="bi bi-calendar-check feature-icon mb-3" style="font-size: 2rem; color: #28a745;"></i>
-                        <h5 class="card-title">Ενεργές Περιόδοι</h5>
+                        <h5 class="card-title">Δηλωμένες Περιόδοι</h5>
                         <h2 class="mb-0"><?= count($declarations_by_year) ?></h2>
                     </div>
                 </div>

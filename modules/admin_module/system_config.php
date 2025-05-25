@@ -31,6 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $period_id = $_POST['period_id'];
         $stmt = $conn->prepare("DELETE FROM submission_periods WHERE id = ?");
         $stmt->execute([$period_id]);
+    } elseif (isset($_POST['toggle_period'])) {
+        $period_id = $_POST['period_id'];
+        $stmt = $conn->prepare("UPDATE submission_periods SET is_active = NOT is_active WHERE id = ?");
+        $stmt->execute([$period_id]);
     }
 }
 
@@ -56,7 +60,8 @@ $parties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Fetch periods without search
 $periods = $conn->query("
     SELECT sp.*, 
-           CASE WHEN COUNT(d.id) > 0 THEN 1 ELSE 0 END as is_used
+           CASE WHEN COUNT(d.id) > 0 THEN 1 ELSE 0 END as is_used,
+           sp.is_active
     FROM submission_periods sp
     LEFT JOIN declarations d ON sp.id = d.submission_period_id
     GROUP BY sp.id
@@ -349,6 +354,7 @@ $periods = $conn->query("
                                 <th>ID</th>
                                 <th>Έτος</th>
                                 <th>Κατάσταση</th>
+                                <th>Ενεργή Περίοδος</th>
                                 <th>Ενέργειες</th>
                             </tr>
                         </thead>
@@ -365,9 +371,23 @@ $periods = $conn->query("
                                         <?php endif; ?>
                                     </td>
                                     <td>
+                                        <?php if ($period['is_active']): ?>
+                                            <span class="badge bg-success">Ενεργή</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary">Ανενεργή</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
                                         <button type="button" class="btn btn-sm btn-warning" onclick="editPeriod(<?= $period['id'] ?>, '<?= $period['year'] ?>')">
                                             <i class="bi bi-pencil"></i>
                                         </button>
+                                        <form method="POST" class="d-inline">
+                                            <input type="hidden" name="period_id" value="<?= $period['id'] ?>">
+                                            <button type="submit" name="toggle_period" class="btn btn-sm <?= $period['is_active'] ? 'btn-danger' : 'btn-success' ?>">
+                                                <i class="bi bi-<?= $period['is_active'] ? 'pause-circle' : 'play-circle' ?>"></i>
+                                                <?= $period['is_active'] ? 'Απενεργοποίηση' : 'Ενεργοποίηση' ?>
+                                            </button>
+                                        </form>
                                         <?php if (!$period['is_used']): ?>
                                             <button type="button" class="btn btn-sm btn-danger" onclick="deletePeriod(<?= $period['id'] ?>, '<?= $period['year'] ?>')">
                                                 <i class="bi bi-trash"></i>

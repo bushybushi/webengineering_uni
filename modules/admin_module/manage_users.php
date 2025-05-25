@@ -35,27 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (isset($_POST['reject_politician'])) {
         $user_id = $_POST['user_id'];
-        // First delete the ID photos if they exist
-        $stmt = $conn->prepare("SELECT front_photo_path, back_photo_path FROM politician_id_photos WHERE user_id = ?");
-        $stmt->execute([$user_id]);
-        $photos = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($photos) {
-            // Delete the actual files
-            if ($photos['front_photo_path'] && file_exists("../../uploads/id_photos/" . $photos['front_photo_path'])) {
-                unlink("../../uploads/id_photos/" . $photos['front_photo_path']);
-            }
-            if ($photos['back_photo_path'] && file_exists("../../uploads/id_photos/" . $photos['back_photo_path'])) {
-                unlink("../../uploads/id_photos/" . $photos['back_photo_path']);
-            }
-            
-            // Delete the database records
-            $stmt = $conn->prepare("DELETE FROM politician_id_photos WHERE user_id = ?");
-            $stmt->execute([$user_id]);
-        }
-        
-        // Finally delete the user
-        $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE users SET verification_status = 'rejected' WHERE id = ?");
         $stmt->execute([$user_id]);
     }
     
@@ -127,6 +107,21 @@ if (!empty($search)) {
 }
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get rejected users
+$rejected_query = "SELECT * FROM users WHERE role = 'Politician' AND verification_status = 'rejected'";
+if (!empty($search)) {
+    $rejected_query .= " AND (first_name LIKE :search OR last_name LIKE :search OR email LIKE :search)";
+}
+$rejected_query .= " ORDER BY " . $sort_by . " " . $sort_order;
+
+$rejected_stmt = $conn->prepare($rejected_query);
+if (!empty($search)) {
+    $search_param = "%$search%";
+    $rejected_stmt->bindParam(':search', $search_param);
+}
+$rejected_stmt->execute();
+$rejected_users = $rejected_stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -436,21 +431,21 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <?php if (isset($row['is_suspended']) && $row['is_suspended']) { ?>
                                                 <form method="POST" class="d-inline">
                                                     <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
-                                                    <button type="submit" name="unsuspend_user" class="btn btn-success btn-sm">
+                                                    <button type="submit" name="unsuspend_user" class="btn btn-success btn-sm" <?= ($row['id'] == $_SESSION['id']) ? 'disabled' : '' ?>>
                                                         <i class="bi bi-unlock"></i> Επαναφορά
                                                     </button>
                                                 </form>
                                             <?php } else { ?>
                                                 <form method="POST" class="d-inline">
                                                     <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
-                                                    <button type="submit" name="suspend_user" class="btn btn-warning btn-sm">
+                                                    <button type="submit" name="suspend_user" class="btn btn-warning btn-sm" <?= ($row['id'] == $_SESSION['id']) ? 'disabled' : '' ?>>
                                                         <i class="bi bi-lock"></i> Αναστολή
                                                     </button>
                                                 </form>
                                             <?php } ?>
                                             <form method="POST" class="d-inline">
                                                 <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
-                                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal<?= $row['id'] ?>">
+                                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal<?= $row['id'] ?>" <?= ($row['id'] == $_SESSION['id']) ? 'disabled' : '' ?>>
                                                     <i class="bi bi-trash"></i> Διαγραφή
                                                 </button>
                                             </form>
@@ -525,6 +520,71 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ακύρωση</button>
                                                     <button type="submit" name="delete_user" class="btn btn-danger">Διαγραφή</button>
                                                 </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rejected Users Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Απορριφθέντες Χρήστες</h2>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Όνομα</th>
+                                <th>Email</th>
+                                <th>Ρόλος</th>
+                                <th>Ενέργειες</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($rejected_users as $row) { ?>
+                                <tr>
+                                    <td><?= $row['id'] ?></td>
+                                    <td><?= $row['first_name'] . ' ' . $row['last_name'] ?></td>
+                                    <td><?= $row['email'] ?></td>
+                                    <td><?= $row['role'] ?></td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewUserModal<?= $row['id'] ?>">
+                                                <i class="bi bi-eye"></i> Προβολή
+                                            </button>
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
+                                                <button type="submit" name="approve_politician" class="btn btn-success btn-sm">
+                                                    <i class="bi bi-check-circle"></i> Έγκριση
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- View User Modal -->
+                                <div class="modal fade" id="viewUserModal<?= $row['id'] ?>" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Προβολή Χρήστη</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p><strong>ID:</strong> <?= $row['id'] ?></p>
+                                                <p><strong>Όνομα:</strong> <?= $row['first_name'] . ' ' . $row['last_name'] ?></p>
+                                                <p><strong>Email:</strong> <?= $row['email'] ?></p>
+                                                <p><strong>Ρόλος:</strong> <?= $row['role'] ?></p>
+                                                <p><strong>Κατάσταση:</strong> <span class="badge bg-danger">Απορριφθείς</span></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
                                             </div>
                                         </div>
                                     </div>
