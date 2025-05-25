@@ -318,6 +318,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                             <i class="bi bi-person"></i> Το προφίλ μου
                                         </a>
                                     </li>
+                                <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="my-declarations.php">
+                                            <i class="bi bi-file-earmark-text"></i> Οι Δηλώσεις μου
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
                                     <li>
                                         <a class="dropdown-item" href="../submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
@@ -400,7 +407,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-
+                                <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
+                                        <a class="dropdown-item" href="my-declarations.php">
+                                            <i class="bi bi-file-earmark-text"></i> Οι Δηλώσεις μου
+                                        </a>
+                                    <?php endif; ?>
                                         <a class="dropdown-item" href="../submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
