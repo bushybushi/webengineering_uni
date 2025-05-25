@@ -55,9 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
         if (empty($field_errors)) {
             $pdo->beginTransaction();
 
-            // Insert declaration
-            $stmt = $pdo->prepare("INSERT INTO declarations (title, submission_date, status, submission_period_id) VALUES (?, NOW(), 'Pending', ?)");
-            $stmt->execute([$_POST['full_name'], $_POST['submission_period_id']]);
+         // Insert declaration
+            $stmt = $pdo->prepare("INSERT INTO declarations (user_id, title, submission_date, status, submission_period_id ) VALUES (?, ?, NOW(), 'Pending', ?)");
+            $stmt->execute([$_SESSION['id'], $_POST['full_name'], $_POST['submission_period_id']]);
             $declaration_id = $pdo->lastInsertId();
 
             // Insert personal data
