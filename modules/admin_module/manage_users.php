@@ -564,6 +564,10 @@ $rejected_users = $rejected_stmt->fetchAll(PDO::FETCH_ASSOC);
                                                     <i class="bi bi-check-circle"></i> Έγκριση
                                                 </button>
                                             </form>
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteRejectedUserModal<?= $row['id'] ?>">
+                                                <i class="bi bi-trash"></i> Διαγραφή
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
 
@@ -584,6 +588,29 @@ $rejected_users = $rejected_stmt->fetchAll(PDO::FETCH_ASSOC);
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Rejected User Modal -->
+                                <div class="modal fade" id="deleteRejectedUserModal<?= $row['id'] ?>" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Διαγραφή Χρήστη</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Είστε σίγουροι ότι θέλετε να διαγράψετε τον χρήστη <strong><?= $row['first_name'] . ' ' . $row['last_name'] ?></strong>;</p>
+                                                <p class="text-danger mb-0">Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form method="POST">
+                                                    <input type="hidden" name="user_id" value="<?= $row['id'] ?>">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ακύρωση</button>
+                                                    <button type="submit" name="delete_user" class="btn btn-danger">Διαγραφή</button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
