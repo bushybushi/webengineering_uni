@@ -224,7 +224,7 @@ $followed_politicians = $stmt->fetchAll();
             <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab">
-                        <i class="fas fa-star"></i> Αγαπημένες Δηλώσεις
+                        <i class="fas fa-star"></i> Δηλώσεις στα Αγαπημένα
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
