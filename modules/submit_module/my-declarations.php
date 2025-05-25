@@ -93,7 +93,7 @@ $declarations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="../favorites_module/favorites.php">
+                                        <a class="dropdown-item" href="../submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
                                     </li>
@@ -179,7 +179,7 @@ $declarations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-                                    <a href="../favorites_module/favorites.php" class="nav-link py-2">
+                                    <a href="../submit_module/favorites.php" class="nav-link py-2">
                                         <i class="bi bi-heart"></i> Αγαπημένα
                                     </a>
                                     <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
