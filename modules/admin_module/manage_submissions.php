@@ -18,6 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
+    if (isset($_POST['delete_declaration'])) {
+        $declaration_id = $_POST['declaration_id'];
+        $stmt = $conn->prepare("DELETE FROM declarations WHERE id = ?");
+        $stmt->execute([$declaration_id]);
+    }
+    
     // Handle bulk actions
     if (isset($_POST['bulk_action']) && isset($_POST['selected_declarations'])) {
         $selected_ids = $_POST['selected_declarations'];
@@ -368,19 +374,28 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
                                                 <a href="../submit_module/view-declaration.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm">
                                                     <i class="bi bi-eye"></i> Προβολή
                                                 </a>
-                                                <?php if ($row['status'] !== 'Approved'): ?>
+                                                <?php if ($row['status'] === 'Pending'): ?>
                                                     <button type="button" class="btn btn-success btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'approve')">
                                                         <i class="bi bi-check-circle"></i> Έγκριση
                                                     </button>
-                                                <?php endif; ?>
-                                                <?php if ($row['status'] !== 'Rejected'): ?>
                                                     <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'reject')">
                                                         <i class="bi bi-x-circle"></i> Απόρριψη
                                                     </button>
+                                                <?php elseif ($row['status'] === 'Rejected'): ?>
+                                                    <button type="button" class="btn btn-success btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'approve')">
+                                                        <i class="bi bi-check-circle"></i> Έγκριση
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'delete')">
+                                                        <i class="bi bi-trash"></i> Διαγραφή
+                                                    </button>
+                                                <?php else: // Approved ?>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'reject')">
+                                                        <i class="bi bi-x-circle"></i> Απόρριψη
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'delete')">
+                                                        <i class="bi bi-trash"></i> Διαγραφή
+                                                    </button>
                                                 <?php endif; ?>
-                                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction(<?= $row['id'] ?>, 'delete')">
-                                                    <i class="bi bi-trash"></i> Διαγραφή
-                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -516,7 +531,21 @@ $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
             
             message.textContent = `Είστε σίγουροι ότι θέλετε να προχωρήσετε στην ${actionText} αυτής της δήλωσης;`;
             document.getElementById('declarationId').value = id;
-            document.getElementById('actionStatus').value = action === 'delete' ? 'Rejected' : ($action === 'reject' ? 'Rejected' : 'Approved');
+            
+            if (action === 'delete') {
+                form.action = 'manage_submissions.php';
+                form.innerHTML = `
+                    <input type="hidden" name="declaration_id" value="${id}">
+                    <button type="submit" name="delete_declaration" class="btn btn-danger">Διαγραφή</button>
+                `;
+            } else {
+                form.action = 'manage_submissions.php';
+                form.innerHTML = `
+                    <input type="hidden" name="declaration_id" value="${id}">
+                    <input type="hidden" name="status" value="${action === 'approve' ? 'Approved' : 'Rejected'}">
+                    <button type="submit" name="update_status" class="btn btn-primary">Επιβεβαίωση</button>
+                `;
+            }
             
             modal.show();
         }

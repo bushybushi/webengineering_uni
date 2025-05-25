@@ -564,7 +564,6 @@ $rejected_users = $rejected_stmt->fetchAll(PDO::FETCH_ASSOC);
                                                     <i class="bi bi-check-circle"></i> Έγκριση
                                                 </button>
                                             </form>
-                                        </div>
                                     </td>
                                 </tr>
 
