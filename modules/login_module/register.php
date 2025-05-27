@@ -3,8 +3,13 @@
 $pdo = require_once "../../config/db_connection.php";
 
 // Include Composer's autoloader if it exists
-if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
-    require_once __DIR__ . '/../../vendor/autoload.php';
+$autoloader_path = __DIR__ . '/../../vendor/autoload.php';
+if (file_exists($autoloader_path)) {
+    require_once $autoloader_path;
+} else {
+    // Autoloader not found, display a clear error message
+    http_response_code(500);
+    die('Error: Composer autoloader not found. Please run composer install.');
 }
 
 // Load environment variables
@@ -12,8 +17,8 @@ $env_file = __DIR__ . '/../../.env';
 if (file_exists($env_file)) {
     $env_vars = parse_ini_file($env_file);
     if ($env_vars === false) {
-        error_log('Failed to parse .env file in register.php');
-        // Optionally, display an error to the user or log it differently
+        http_response_code(500);
+        die('Error: Failed to parse .env file. Please check the file format.');
     } else {
         foreach ($env_vars as $key => $value) {
             if (!isset($_ENV[$key])) { // Prevent overwriting existing environment variables
@@ -23,12 +28,18 @@ if (file_exists($env_file)) {
         }
     }
 } else {
-    error_log('.env file not found at: ' . $env_file . ' in register.php');
-    // Optionally, display an error to the user or log it differently
+    http_response_code(500);
+    die('Error: .env file not found. Please create a .env file with your SendGrid API key.');
 }
 
 // Get SendGrid API key from environment variable
 $sendgrid_api_key = $_ENV['SENDGRID_API_KEY'] ?? null;
+
+// Check if SendGrid API key is set
+if (!$sendgrid_api_key) {
+    http_response_code(500);
+    die('Error: SendGrid API key not set in .env file.');
+}
 
 // Define variables and initialize with empty values
 $first_name = $last_name = $email = $password = $confirm_password = $role = "";
