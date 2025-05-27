@@ -2,6 +2,34 @@
 // Include config file
 $pdo = require_once "../../config/db_connection.php";
 
+// Include Composer's autoloader if it exists
+if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
+    require_once __DIR__ . '/../../vendor/autoload.php';
+}
+
+// Load environment variables
+$env_file = __DIR__ . '/../../.env';
+if (file_exists($env_file)) {
+    $env_vars = parse_ini_file($env_file);
+    if ($env_vars === false) {
+        error_log('Failed to parse .env file in register.php');
+        // Optionally, display an error to the user or log it differently
+    } else {
+        foreach ($env_vars as $key => $value) {
+            if (!isset($_ENV[$key])) { // Prevent overwriting existing environment variables
+                putenv("$key=$value");
+                $_ENV[$key] = $value;
+            }
+        }
+    }
+} else {
+    error_log('.env file not found at: ' . $env_file . ' in register.php');
+    // Optionally, display an error to the user or log it differently
+}
+
+// Get SendGrid API key from environment variable
+$sendgrid_api_key = $_ENV['SENDGRID_API_KEY'] ?? null;
+
 // Define variables and initialize with empty values
 $first_name = $last_name = $email = $password = $confirm_password = $role = "";
 $title = $office = $address = $dob = $id_number = $marital_status = $num_of_dependents = $political_affiliation = "";
@@ -181,7 +209,45 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $headers .= "Reply-To: noreply@pothenesxes.com\r\n";
             $headers .= "X-Mailer: PHP/" . phpversion();
             
-            mail($to, $subject, $message, $headers);
+            // Use SendGrid to send email
+            if ($sendgrid_api_key) {
+                $from_email = new SendGrid\Mail\From("noreply@pothenesxes.com", "ΠΟΘΕΝ ΕΣΧΕΣ");
+                $to_email = new SendGrid\Mail\To($email, $first_name . " " . $last_name);
+                $plain_text_content = new SendGrid\Mail\PlainText($message);
+                
+                // Create HTML content for the email
+                $html_content = '<h2>Επιβεβαίωση Email</h2>';
+                $html_content .= '<p>Αγαπητέ/ή ' . htmlspecialchars($first_name) . ' ' . htmlspecialchars($last_name) . ',</p>';
+                $html_content .= '<p>Ευχαριστούμε για την εγγραφή σας στο ΠΟΘΕΝ ΕΣΧΕΣ. Παρακαλώ επιβεβαιώστε το email σας κάνοντας κλικ στον παρακάτω σύνδεσμο:</p>';
+                $html_content .= '<p><a href="' . htmlspecialchars($verification_link) . '">' . htmlspecialchars($verification_link) . '</a></p>';
+                $html_content .= '<p>Ο σύνδεσμος είναι έγκυρος για 24 ώρες.</p>';
+                $html_content .= '<p>Με εκτίμηση,<br>Η ομάδα του ΠΟΘΕΝ ΕΣΧΕΣ</p>';
+
+                $html_mail_content = new SendGrid\Mail\HtmlContent($html_content);
+
+                $email_obj = new SendGrid\Mail\Mail();
+                $email_obj->setFrom($from_email);
+                $email_obj->setSubject($subject);
+                $email_obj->addTo($to_email);
+                $email_obj->addContent($plain_text_content);
+                $email_obj->addContent($html_mail_content);
+
+                $sendgrid = new SendGrid($sendgrid_api_key);
+
+                try {
+                    $response = $sendgrid->send($email_obj);
+                    // Optional: Log response for debugging
+                    // print_r($response->statusCode());
+                    // print_r($response->body());
+                    // print_r($response->headers());
+                } catch (Exception $e) {
+                    error_log('SendGrid Error: ' . $e->getMessage());
+                    // Optionally, display an error to the user
+                }
+            } else {
+                error_log('SendGrid API key not set. Email not sent.');
+                // Optionally, display an error to the user
+            }
             
             $pdo->commit();
             
