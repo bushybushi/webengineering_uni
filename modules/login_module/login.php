@@ -35,47 +35,33 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validate credentials
     if(empty($email_err) && empty($password_err)){
         // Prepare a select statement
-        $sql = "SELECT id, first_name, last_name, email, password, role, verification_status, is_suspended FROM users WHERE email = :email ORDER BY is_suspended ASC";
+        $sql = "SELECT id, first_name, last_name, email, password, role, email_verified FROM users WHERE email = :email AND is_suspended != 2";
         
         if($stmt = $pdo->prepare($sql)){
             // Bind variables to the prepared statement as parameters
             $stmt->bindParam(":email", $param_email, PDO::PARAM_STR);
             
             // Set parameters
-            $param_email = trim($_POST["email"]);
+            $param_email = $email;
             
             // Attempt to execute the prepared statement
             if($stmt->execute()){
-                // Check if any accounts exist with this email
-                if($stmt->rowCount() > 0){
-                    $found_active_account = false;
-                    
-                    // Loop through all accounts with this email
-                    while($row = $stmt->fetch()){
+                // Check if email exists, if yes then verify password
+                if($stmt->rowCount() == 1){
+                    if($row = $stmt->fetch()){
                         $id = $row["id"];
                         $first_name = $row["first_name"];
                         $last_name = $row["last_name"];
                         $email = $row["email"];
                         $hashed_password = $row["password"];
                         $role = $row["role"];
-                        $verification_status = $row["verification_status"];
-                        $is_suspended = $row["is_suspended"];
+                        $email_verified = $row["email_verified"];
                         
                         if(password_verify($password, $hashed_password)){
-                            // If account is deleted, continue to next account
-                            if($is_suspended == 2) {
-                                continue;
-                            }
-                            // Check if politician is verified
-                            else if($role === "Politician" && $verification_status === "pending") {
-                                $login_err = "Ο λογαριασμός σας βρίσκεται σε εκκρεμότητα έγκρισης. Παρακαλώ περιμένετε την έγκριση από τον διαχειριστή.";
-                                break;
-                            } else if($role === "Politician" && $verification_status === "rejected") {
-                                $login_err = "Ο λογαριασμός σας έχει απορριφθεί. Παρακαλώ επικοινωνήστε με τον διαχειριστή για περισσότερες πληροφορίες.";
-                                break;
+                            // Check if email is verified
+                            if($email_verified == 0){
+                                $login_err = "Παρακαλώ επιβεβαιώστε το email σας πριν συνδεθείτε.";
                             } else {
-                                // Found an active account with correct password
-                                $found_active_account = true;
                                 // Password is correct, start a new session
                                 session_start();
                                 
@@ -87,22 +73,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 $_SESSION["email"] = $email;
                                 $_SESSION["role"] = $role;
                                 
-                                // Redirect user to welcome page
-                                header("location: ../../index.php");
+                                // Redirect user to appropriate page
+                                if($role === "Admin"){
+                                    header("location: ../admin_module/dashboard.php");
+                                } else {
+                                    header("location: ../profile_module/profile.php");
+                                }
                                 exit();
                             }
+                        } else{
+                            // Password is not valid
+                            $login_err = "Μη έγκυρο email ή κωδικός.";
                         }
                     }
-                    
-                    // If we went through all accounts and didn't find an active one
-                    if(!$found_active_account && empty($login_err)) {
-                        $login_err = "Μη έγκυρο email ή κωδικός.";
-                    }
-                } else {
-                    // No accounts found with this email
+                } else{
+                    // Email doesn't exist
                     $login_err = "Μη έγκυρο email ή κωδικός.";
                 }
-            } else {
+            } else{
                 echo "Ωχ! Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά αργότερα.";
             }
         }
@@ -134,13 +122,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <div class="text-center mb-4">
                             <img src="../../assets/images/logo.jpg" alt="ΠΟΘΕΝ ΕΣΧΕΣ Logo" height="60" class="mb-3">
                             <h2 class="fw-bold">Σύνδεση</h2>
-                            <p class="text-muted">Καλώς ήρθατε στο ΠΟΘΕΝ ΕΣΧΕΣ</p>
+                            <p class="text-muted">Συνδεθείτε στον λογαριασμό σας για να συνεχίσετε</p>
                         </div>
 
                         <?php 
                         if(!empty($login_err)){
                             echo '<div class="alert alert-danger">' . $login_err . '</div>';
-                        }        
+                        }
+                        
+                        if(isset($_SESSION['verification_sent']) && $_SESSION['verification_sent']){
+                            echo '<div class="alert alert-success">
+                                    <i class="bi bi-envelope-check me-2"></i>
+                                    Έχει σταλεί email επιβεβαίωσης στη διεύθυνση email σας. Παρακαλώ ελέγξτε το email σας για να ολοκληρώσετε την εγγραφή σας.
+                                  </div>';
+                            unset($_SESSION['verification_sent']);
+                        }
                         ?>
 
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="needs-validation" novalidate>
