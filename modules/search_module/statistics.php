@@ -325,6 +325,13 @@ try {
                                             <i class="bi bi-person"></i> Το προφίλ μου
                                         </a>
                                     </li>
+                                 <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../submit_module/my-declarations.php">
+                                            <i class="bi bi-file-earmark-text"></i> Οι Δηλώσεις μου
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
                                     <li>
                                         <a class="dropdown-item" href="../submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
@@ -336,14 +343,12 @@ try {
                                             <i class="bi bi-speedometer2"></i> Admin Dashboard
                                         </a>
                                     </li>
-                                    <?php endif; ?>
-                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
+                                    <?php endif; ?>             
                                     <li>
                                         <a class="dropdown-item" href="../api_module/api_documentation.php">
                                             <i class="bi bi-code-square"></i> API Documentation
                                         </a>
                                     </li>
-                                    <?php endif; ?>
                                     <li>
                                         <a class="dropdown-item" href="../login_module/logout.php">
                                             <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
@@ -360,6 +365,9 @@ try {
                                             <i class="bi bi-person-plus"></i> Εγγραφή
                                         </a>
                                     </li>
+                                 <a href="../api_module/api_documentation.php" class="nav-link py-2">
+                                        <i class="bi bi-code-square"></i> API Documentation
+                                    </a>
                                 <?php endif; ?>
                             </ul>
                         </div>
@@ -407,7 +415,11 @@ try {
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-
+ <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
+                                        <a class="dropdown-item" href="../submit_module/my-declarations.php">
+                                            <i class="bi bi-file-earmark-text"></i> Οι Δηλώσεις μου
+                                        </a>
+                                    <?php endif; ?>
                                         <a class="dropdown-item" href="../submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
@@ -417,11 +429,9 @@ try {
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
                                     </a>
                                     <?php endif; ?>
-                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <a href="../api_module/api_documentation.php" class="nav-link py-2">
                                         <i class="bi bi-code-square"></i> API Documentation
                                     </a>
-                                    <?php endif; ?>
                                     <a href="../login_module/logout.php" class="nav-link py-2">
                                         <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
                                     </a>
@@ -431,6 +441,9 @@ try {
                                     </a>
                                     <a href="../login_module/register.php" class="nav-link py-2">
                                         <i class="bi bi-person-plus me-2"></i> Εγγραφή
+                                    </a>
+                                 <a href="../api_module/api_documentation.php" class="nav-link py-2">
+                                        <i class="bi bi-code-square"></i> API Documentation
                                     </a>
                                 <?php endif; ?>
                             </div>
