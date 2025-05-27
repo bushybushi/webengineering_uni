@@ -365,9 +365,11 @@ try {
                                             <i class="bi bi-person-plus"></i> Εγγραφή
                                         </a>
                                     </li>
-                                 <a href="../api_module/api_documentation.php" class="nav-link py-2">
-                                        <i class="bi bi-code-square"></i> API Documentation
-                                    </a>
+                                  <li>
+                                        <a class="dropdown-item" href="../api_module/api_documentation.php">
+                                            <i class="bi bi-code-square"></i> API Documentation
+                                        </a>
+                                    </li>
                                 <?php endif; ?>
                             </ul>
                         </div>
@@ -442,9 +444,11 @@ try {
                                     <a href="../login_module/register.php" class="nav-link py-2">
                                         <i class="bi bi-person-plus me-2"></i> Εγγραφή
                                     </a>
-                                 <a href="../api_module/api_documentation.php" class="nav-link py-2">
-                                        <i class="bi bi-code-square"></i> API Documentation
-                                    </a>
+                                     <li>
+                                        <a class="dropdown-item" href="../api_module/api_documentation.php">
+                                            <i class="bi bi-code-square"></i> API Documentation
+                                        </a>
+                                    </li>
                                 <?php endif; ?>
                             </div>
                         </li>
