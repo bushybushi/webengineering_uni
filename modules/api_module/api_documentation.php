@@ -297,6 +297,13 @@ foreach ($apiKeys as $key) {
                                             <i class="bi bi-person"></i> Το προφίλ μου
                                         </a>
                                     </li>
+                                 <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
+      <li>
+                                        <a class="dropdown-item" href="../submit_module/my-declarations.php">
+                                            <i class="bi bi-file-earmark-text"></i> Οι Δηλώσεις μου
+                                        </a>
+      </li>
+                                    <?php endif; ?>
                                     <li>
                                         <a class="dropdown-item" href="../submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
@@ -309,13 +316,11 @@ foreach ($apiKeys as $key) {
                                         </a>
                                     </li>
                                     <?php endif; ?>
-                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <li>
                                         <a class="dropdown-item" href="../api_module/api_documentation.php">
                                             <i class="bi bi-code-square"></i> API Documentation
                                         </a>
                                     </li>
-                                    <?php endif; ?>
                                     <li>
                                         <a class="dropdown-item" href="../login_module/logout.php">
                                             <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
@@ -330,6 +335,11 @@ foreach ($apiKeys as $key) {
                                     <li>
                                         <a class="dropdown-item" href="../login_module/register.php">
                                             <i class="bi bi-person-plus"></i> Εγγραφή
+                                        </a>
+                                    </li>
+                                <li>
+                                        <a class="dropdown-item" href="../api_module/api_documentation.php">
+                                            <i class="bi bi-code-square"></i> API Documentation
                                         </a>
                                     </li>
                                 <?php endif; ?>
@@ -379,7 +389,11 @@ foreach ($apiKeys as $key) {
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-
+ <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
+                                        <a class="dropdown-item" href="../submit_module/my-declarations.php">
+                                            <i class="bi bi-file-earmark-text"></i> Οι Δηλώσεις μου
+                                        </a>
+                                    <?php endif; ?>
                                         <a class="dropdown-item" href="../submit_module/favorites.php">
                                             <i class="bi bi-heart"></i> Αγαπημένα
                                         </a>
@@ -389,11 +403,9 @@ foreach ($apiKeys as $key) {
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
                                     </a>
                                     <?php endif; ?>
-                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <a href="../api_module/api_documentation.php" class="nav-link py-2">
                                         <i class="bi bi-code-square"></i> API Documentation
                                     </a>
-                                    <?php endif; ?>
                                     <a href="../login_module/logout.php" class="nav-link py-2">
                                         <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
                                     </a>
@@ -404,6 +416,9 @@ foreach ($apiKeys as $key) {
                                     <a href="../login_module/register.php" class="nav-link py-2">
                                         <i class="bi bi-person-plus me-2"></i> Εγγραφή
                                     </a>
+                                        <a class="dropdown-item" href="../api_module/api_documentation.php">
+                                            <i class="bi bi-code-square"></i> API Documentation
+                                        </a>
                                 <?php endif; ?>
                             </div>
                         </li>
