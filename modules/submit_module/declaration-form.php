@@ -337,13 +337,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                         </a>
                                     </li>
                                     <?php endif; ?>
-                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <li>
                                         <a class="dropdown-item" href="../api_module/api_documentation.php">
                                             <i class="bi bi-code-square"></i> API Documentation
                                         </a>
                                     </li>
-                                    <?php endif; ?>
                                     <li>
                                         <a class="dropdown-item" href="../login_module/logout.php">
                                             <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
@@ -421,11 +419,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($pdo)) {
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
                                     </a>
                                     <?php endif; ?>
-                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <a href="../api_module/api_documentation.php" class="nav-link py-2">
                                         <i class="bi bi-code-square"></i> API Documentation
                                     </a>
-                                    <?php endif; ?>
                                     <a href="../login_module/logout.php" class="nav-link py-2">
                                         <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
                                     </a>
