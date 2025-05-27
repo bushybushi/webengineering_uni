@@ -92,18 +92,18 @@ $declarations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <i class="bi bi-person"></i> Το προφίλ μου
                                         </a>
                                     </li>
-                                    <li>
-                                        <a class="dropdown-item" href="../submit_module/favorites.php">
-                                            <i class="bi bi-heart"></i> Αγαπημένα
-                                        </a>
-                                    </li>
-                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
+                                 <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
                                     <li>
                                         <a class="dropdown-item" href="my-declarations.php">
                                             <i class="bi bi-file-earmark-text"></i> Οι Δηλώσεις μου
                                         </a>
                                     </li>
                                     <?php endif; ?>
+                                    <li>
+                                        <a class="dropdown-item" href="../submit_module/favorites.php">
+                                            <i class="bi bi-heart"></i> Αγαπημένα
+                                        </a>
+                                    </li>
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                                     <li>
                                         <a class="dropdown-item" href="../admin_module/dashboard.php">
@@ -177,14 +177,14 @@ $declarations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <a href="../profile_module/profile.php" class="nav-link py-2">
                                         <i class="bi bi-person"></i> Το προφίλ μου
                                     </a>
-                                    <a href="../submit_module/favorites.php" class="nav-link py-2">
-                                        <i class="bi bi-heart"></i> Αγαπημένα
-                                    </a>
-                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
+                                <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Politician')): ?>
                                     <a href="my-declarations.php" class="nav-link py-2">
                                         <i class="bi bi-file-earmark-text"></i> Οι Δηλώσεις μου
                                     </a>
                                     <?php endif; ?>
+                                    <a href="../submit_module/favorites.php" class="nav-link py-2">
+                                        <i class="bi bi-heart"></i> Αγαπημένα
+                                    </a>
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                                     <a href="../admin_module/dashboard.php" class="nav-link py-2">
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
