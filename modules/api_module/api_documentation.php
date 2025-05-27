@@ -1,9 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['id']) || !in_array($_SESSION['role'], ['Admin', 'Public', 'Politician'])) {
-    header('Location: ../login_module/login.php');
-    exit;
-}
+
 
 // Get database connection
 $pdo = require '../../config/db_connection.php';
