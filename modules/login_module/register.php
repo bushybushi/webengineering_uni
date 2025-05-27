@@ -117,9 +117,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         try {
             $pdo->beginTransaction();
             
+            // Generate verification token
+            $verification_token = bin2hex(random_bytes(32));
+            $verification_expires = date('Y-m-d H:i:s', strtotime('+24 hours'));
+            
             // Insert into users table
-            $sql = "INSERT INTO users (first_name, last_name, email, password, role, verification_status) 
-                    VALUES (:first_name, :last_name, :email, :password, :role, :verification_status)";
+            $sql = "INSERT INTO users (first_name, last_name, email, password, role, verification_status, verification_token, verification_expires, email_verified) 
+                    VALUES (:first_name, :last_name, :email, :password, :role, :verification_status, :verification_token, :verification_expires, 0)";
             
             $stmt = $pdo->prepare($sql);
             
@@ -133,6 +137,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $stmt->bindParam(":password", $param_password);
             $stmt->bindParam(":role", $role);
             $stmt->bindParam(":verification_status", $verification_status);
+            $stmt->bindParam(":verification_token", $verification_token);
+            $stmt->bindParam(":verification_expires", $verification_expires);
             
             $stmt->execute();
             $user_id = $pdo->lastInsertId();
@@ -160,9 +166,27 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 $stmt->execute();
             }
             
+            // Send verification email
+            $verification_link = "http://" . $_SERVER['HTTP_HOST'] . "/modules/login_module/verify_email.php?token=" . $verification_token;
+            $to = $email;
+            $subject = "Επιβεβαίωση Email - ΠΟΘΕΝ ΕΣΧΕΣ";
+            $message = "Αγαπητέ/ή " . $first_name . " " . $last_name . ",\n\n";
+            $message .= "Ευχαριστούμε για την εγγραφή σας στο ΠΟΘΕΝ ΕΣΧΕΣ. Παρακαλώ επιβεβαιώστε το email σας κάνοντας κλικ στον παρακάτω σύνδεσμο:\n\n";
+            $message .= $verification_link . "\n\n";
+            $message .= "Ο σύνδεσμος είναι έγκυρος για 24 ώρες.\n\n";
+            $message .= "Με εκτίμηση,\n";
+            $message .= "Η ομάδα του ΠΟΘΕΝ ΕΣΧΕΣ";
+            
+            $headers = "From: noreply@pothenesxes.com\r\n";
+            $headers .= "Reply-To: noreply@pothenesxes.com\r\n";
+            $headers .= "X-Mailer: PHP/" . phpversion();
+            
+            mail($to, $subject, $message, $headers);
+            
             $pdo->commit();
             
-            // Redirect to login page
+            // Redirect to login page with success message
+            $_SESSION['verification_sent'] = true;
             header("location: login.php");
             exit();
             
