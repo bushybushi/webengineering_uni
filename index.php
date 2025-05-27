@@ -84,13 +84,11 @@ require_once 'config/db_connection.php';
                                         </a>
                                     </li>
                                     <?php endif; ?>
-                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <li>
                                         <a class="dropdown-item" href="./modules/api_module/api_documentation.php">
                                             <i class="bi bi-code-square"></i> API Documentation
                                         </a>
                                     </li>
-                                    <?php endif; ?>
                                     <li>
                                         <a class="dropdown-item" href="./modules/login_module/logout.php">
                                             <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
@@ -168,11 +166,9 @@ require_once 'config/db_connection.php';
                                         <i class="bi bi-speedometer2"></i> Admin Dashboard
                                     </a>
                                     <?php endif; ?>
-                                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Public' || $_SESSION['role'] === 'Politician')): ?>
                                     <a href="./modules/api_module/api_documentation.php" class="nav-link py-2">
                                         <i class="bi bi-code-square"></i> API Documentation
                                     </a>
-                                    <?php endif; ?>
                                     <a href="./modules/login_module/logout.php" class="nav-link py-2">
                                         <i class="bi bi-box-arrow-right"></i> Αποσύνδεση
                                     </a>
